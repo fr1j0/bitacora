@@ -80,7 +80,7 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 
 The short version: long Claude Code sessions degrade. The context window fills up, attention spreads, decisions drift. The honest move is to clear and resume — but resuming cleanly requires a structured handoff somewhere. And if you do that handoff in Jira (where work already lives), in a format other agents can read, you get something better than personal memory: a shared external memory layer for the whole team.
 
-The longer version: a previous tool that solved part of this problem turned out to be a scam — abandoned project, suspicious auto-update, crypto rug pull. Bitácora is the structural answer to that failure mode: public source, no auto-update, no telemetry, plain files in directories you can grep.
+The longer version: a tool you trust with your workflow should be one you can fully inspect and control. Bitácora is built on that principle — public source, no auto-update, no telemetry, just plain files in directories you can grep. You always know exactly what it does, and nothing changes unless you change it.
 
 ## Architecture
 
@@ -147,7 +147,7 @@ This creates a virtuous loop: the more team members adopt the format, the more u
 ## Philosophy and safety
 
 > [!NOTE]
-> These aren't features — they're structural commitments. The answer to the kind of supply-chain failure that prompted this project.
+> These aren't features — they're structural commitments, baked in from the start so you can trust the tool with your workflow.
 
 - **Public source.** Read every line. No black boxes.
 - **No auto-update.** Plugin updates happen only when you explicitly run `/plugin install` again. No version you didn't choose will land on your machine.
