@@ -62,6 +62,8 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 
 🚧 **statusLine** *(planned)* — a context-window meter with progressive UX (calm → amber → red → critical) so you know when to hand off before quality degrades.
 
+🚧 **`[CTX]` commit anchor** *(idea)* — an optional anchor line tying a `[CTX]` comment to the commit/PR it reflects, so resume and debugging can ground state in real code: verify "done" against the diff, or bisect a regression from a known-good point. Uses a PR-relative form (e.g. `PR #17 @ 4a29459`) to survive squash-merges.
+
 ## Why this exists
 
 The short version: long Claude Code sessions degrade. The context window fills up, attention spreads, decisions drift. The honest move is to clear and resume — but resuming cleanly requires a structured handoff somewhere. And if you do that handoff in Jira (where work already lives), in a format other agents can read, you get something better than personal memory: a shared external memory layer for the whole team.
