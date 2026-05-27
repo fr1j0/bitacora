@@ -31,10 +31,10 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 
 ## What it does
 
-Bitácora is a small plugin layered on top of two foundation pieces that already exist in the Claude Code ecosystem:
+Bitácora is a small plugin that builds on the Claude Code ecosystem:
 
-- **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears
-- **Atlassian Rovo MCP** — Jira and Confluence primitives
+- **Atlassian Rovo MCP** — the Jira and Confluence primitives Bitácora reads and writes through *(required)*
+- **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears *(optional companion)*
 
 What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, sharpening, spiking, picking, and reporting work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
@@ -92,8 +92,8 @@ Bitácora is intentionally small. It composes with existing tools rather than re
                           │  layers on top of
                           ▼
   ┌────────────────────────┬────────────────────────┐
-  │   Atlassian Rovo MCP    │      Claude Code        │
-  │   (Jira read/write)     │        (host)           │
+  │   Atlassian Rovo MCP   │      Claude Code       │
+  │   (Jira read/write)    │         (host)         │
   └────────────────────────┴────────────────────────┘
 
   Optional companion · local scratch layer:
