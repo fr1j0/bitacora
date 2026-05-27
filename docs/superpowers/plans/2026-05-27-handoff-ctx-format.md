@@ -208,11 +208,12 @@ FIXTURES="$DIR/../skills/jira-comment-format/examples"
 
 fail=0
 check() {
+  # NOTE: the script uses `set -uo pipefail` (no `-e`), so a non-zero exit from
+  # the validator does not abort — do NOT add `set -e` here; in bash it leaks out
+  # of the function and aborts the later pipeline assertion.
   local file="$1" expected_word="$2" expected_code="$3" out code
-  set +e
   out="$("$VALIDATOR" "$file")"
   code=$?
-  set -e
   if [[ "$out" == "$expected_word" && "$code" == "$expected_code" ]]; then
     echo "PASS: $(basename "$file") → $out ($code)"
   else
