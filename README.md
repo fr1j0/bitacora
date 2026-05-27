@@ -38,6 +38,18 @@ Bitácora is a small plugin layered on top of two foundation pieces that already
 
 What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, sharpening, spiking, picking, and reporting work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
+## What lives where — status vs. scratch
+
+Bitácora's job is **status** — the durable, ticket-level narrative a teammate would care about: where the work stands, the decisions behind it, and what's next. That belongs in Jira, on the ticket, in the open. That's what `[CTX]` comments are.
+
+What Bitácora deliberately *doesn't* manage is the **high-frequency scratch** between sessions — the running breadcrumbs, the small "just did X" notes, the granular working state that turns over every few minutes. That data is local, personal, and churny, and it has its own tools:
+
+- **Remember** — local session memory across context clears (the `.remember/` buffer)
+- **claude-mem** — a Remember-compatible alternative
+- Any **memory MCP server**, or Claude Code's built-in `CLAUDE.md` memory
+
+Two altitudes: Jira holds the milestones the team needs; your local memory tool holds the minute-to-minute scratch only you need. Bitácora owns the first and stays out of the second — which is why Remember is *optional*, not required.
+
 ## Commands
 
 The flagship command — wrap up a session cleanly:
@@ -85,7 +97,7 @@ Bitácora is intentionally small. It composes with existing tools rather than re
   └──────────────┴──────────────┴──────────────┘
 ```
 
-You'll want all three installed for Bitácora to be fully useful.
+At minimum you need the **Atlassian Rovo MCP** (so Bitácora can read and write Jira) and **Claude Code** itself. **Remember** is optional but recommended — it's where the high-frequency scratch lives, separate from the ticket-level status Bitácora owns (see [What lives where](#what-lives-where--status-vs-scratch)).
 
 ## Installation
 
@@ -100,8 +112,8 @@ Once published:
 
 Prerequisites:
 
-- Remember (or a claude-mem-compatible plugin) installed for local memory
-- Atlassian MCP configured with read/write access to your team's Jira instance
+- Atlassian MCP configured with read/write access to your team's Jira instance *(required)*
+- Remember, claude-mem, or another local memory tool *(optional — for the between-sessions scratch Bitácora doesn't manage)*
 
 ## The `[CTX]` comment format
 
