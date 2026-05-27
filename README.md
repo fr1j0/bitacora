@@ -15,7 +15,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. On the roadmap: sharpening vague PM tickets, timeboxed spikes, a smart ticket picker, and a context-window meter that tells you when to clear and resume cleanly.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. On the roadmap: a smart ticket picker, and a context-window meter that tells you when to clear and resume cleanly.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
@@ -25,7 +25,7 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 ## At a glance
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
-- **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, sharpening, spikes, picking, and status.
+- **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, and (planned) ticket picking.
 - **Today** — Phase 1 ships `/bitacora:handoff` + the `[CTX]` format. Everything else is on the roadmap below.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
@@ -36,7 +36,7 @@ Bitácora is a small plugin that builds on the Claude Code ecosystem:
 - **Atlassian Rovo MCP** — the Jira and Confluence primitives Bitácora reads and writes through *(required)*
 - **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears *(optional companion)*
 
-What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, sharpening, spiking, picking, and reporting work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
+What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, and (planned) picking work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
 ## What lives where — status vs. scratch
 
@@ -66,7 +66,6 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 | `/bitacora:help` | ✅ **Phase 1** | Print the Bitácora command reference — shipped commands and the planned roadmap. |
 | `/bitacora:resume` | ✅ **Phase 1** | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
 | `/bitacora:status` | ✅ **Phase 1** | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary — PM (`--for-pm`), engineer (`--for-eng`), or self (`--for-self`, default). Read-only: prints the summary and offers a clipboard copy. |
-| `/bitacora:spike` | 🚧 Planned | Create a timeboxed exploratory spike ticket with a mandatory recommendation at conclusion. |
 | `/bitacora:next` | 🚧 Planned | Smart morning ticket picker. Reads your boards, categorizes by pickup cost, and surfaces reasoning for each candidate. |
 
 > Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
