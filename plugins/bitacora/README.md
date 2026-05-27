@@ -29,10 +29,14 @@ dir (one-time, per machine):
 
 ```bash
 mkdir -p ~/.claude/commands/bit
-alias_dir="$(dirname "$(find ~/.claude/plugins -path '*bitacora/alias/bit-handoff.md' | head -1)")"
-for f in "$alias_dir"/bit-*.md; do
-  cp "$f" ~/.claude/commands/bit/"$(basename "$f" | sed 's/^bit-//')"
-done
+alias_file="$(find ~/.claude/plugins -path '*bitacora/alias/bit-handoff.md' | head -1)"
+if [ -z "$alias_file" ]; then
+  echo "bitacora alias dir not found — is the plugin installed?" >&2
+else
+  for f in "$(dirname "$alias_file")"/bit-*.md; do
+    cp "$f" ~/.claude/commands/bit/"$(basename "$f" | sed 's/^bit-//')"
+  done
+fi
 ```
 
 This copies every bundled alias (the `bit-` prefix is stripped to form the
