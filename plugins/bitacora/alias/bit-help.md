@@ -16,8 +16,10 @@ Bitácora — commands
                                 local handoff for next session.
   /bitacora:help                Show this command reference.
 
-  Planned
+  Next up (design merged)
   /bitacora:resume    Rehydrate a cleared session from a ticket's latest [CTX].
+
+  Planned
   /bitacora:improve   Sharpen a vague or weak ticket your branch is based on.
   /bitacora:status    Summarize a ticket's current state (PM / eng / self modes).
   /bitacora:spike     Create a timeboxed spike ticket with a mandatory rec.
