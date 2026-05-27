@@ -1,27 +1,35 @@
+<div align="center">
+
 # Bitácora
-
-![Status](https://img.shields.io/badge/status-alpha-orange)
-![Built for](https://img.shields.io/badge/built%20for-Claude%20Code-5A4FCF)
-![License](https://img.shields.io/badge/license-MIT-blue)
-
-> **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
 **Every bit of context, logged.**
 
+*Structured session handoffs, logged to Jira — so context survives context clears, sessions, and teammates.*
+
+[![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](#)
+[![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-D97757?style=for-the-badge&logo=claude&logoColor=white)](https://claude.com/claude-code)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/fr1j0/bitacora?style=for-the-badge&logo=github&logoColor=white&color=181717)](https://github.com/fr1j0/bitacora/stargazers)
+
+</div>
+
+> **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
+
 Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams. It captures structured handoffs across sessions, sharpens vague PM tickets, runs timeboxed spikes, surfaces what to work on next, and keeps a context-window meter visible so you know when to clear and resume cleanly.
 
-**Status:** *Alpha — in active development. API may change. Use at your own risk; pin to a commit you trust.*
+> [!WARNING]
+> **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
 
 ---
 
-## ⚓ At a glance
+## At a glance
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
 - **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, sharpening, spikes, picking, and status.
 - **Today** — Phase 1 ships `/bitacora:handoff` + the `[CTX]` format. Everything else is on the roadmap below.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
-## 📖 What it does
+## What it does
 
 Bitácora is a small plugin layered on top of three foundation pieces that already exist in the Claude Code ecosystem:
 
@@ -31,7 +39,15 @@ Bitácora is a small plugin layered on top of three foundation pieces that alrea
 
 What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, sharpening, spiking, picking, and reporting work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
-## ⌨️ Commands
+## Commands
+
+The one shipped command — wrap up a session cleanly:
+
+```bash
+/bitacora:handoff
+```
+
+Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local handoff for next-session continuity.
 
 | Command | Status | What it does |
 |---------|--------|--------------|
@@ -45,13 +61,13 @@ What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated comma
 
 🚧 **statusLine** *(planned)* — a context-window meter with progressive UX (calm → amber → red → critical) so you know when to hand off before quality degrades.
 
-## 🧭 Why this exists
+## Why this exists
 
 The short version: long Claude Code sessions degrade. The context window fills up, attention spreads, decisions drift. The honest move is to clear and resume — but resuming cleanly requires a structured handoff somewhere. And if you do that handoff in Jira (where work already lives), in a format other agents can read, you get something better than personal memory: a shared external memory layer for the whole team.
 
 The longer version: a previous tool that solved part of this problem turned out to be a scam — abandoned project, suspicious auto-update, crypto rug pull. Bitácora is the structural answer to that failure mode: public source, no auto-update, no telemetry, plain files in directories you can grep.
 
-## 🏗️ Architecture
+## Architecture
 
 Bitácora is intentionally small. It composes with existing tools rather than replacing them.
 
@@ -68,7 +84,7 @@ Bitácora is intentionally small. It composes with existing tools rather than re
 
 You'll want all four installed for Bitácora to be fully useful.
 
-## 📦 Installation
+## Installation
 
 *Coming once Phase 1 is validated through personal use. For now, this is a design with a repo.*
 
@@ -85,7 +101,7 @@ Prerequisites:
 - Remember (or a claude-mem-compatible plugin) installed for local memory
 - Atlassian MCP configured with read/write access to your team's Jira instance
 
-## 🗂️ The `[CTX]` comment format
+## The `[CTX]` comment format
 
 Bitácora writes Jira comments in a strict structured format so other agents (and humans) can parse them reliably:
 
@@ -114,9 +130,10 @@ Agents reading the ticket for `/bitacora:status` synthesis, `/bitacora:handoff` 
 
 This creates a virtuous loop: the more team members adopt the format, the more useful the shared memory layer becomes. See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](docs/JIRA_AGENT_COMMENT_FORMAT.md) for the full spec.
 
-## 🛡️ Philosophy and safety
+## Philosophy and safety
 
-These aren't features. They're structural commitments — the answer to the kind of supply-chain failure that prompted this project.
+> [!NOTE]
+> These aren't features — they're structural commitments. The answer to the kind of supply-chain failure that prompted this project.
 
 - **Public source.** Read every line. No black boxes.
 - **No auto-update.** Plugin updates happen only when you explicitly run `/plugin install` again. No version you didn't choose will land on your machine.
@@ -124,7 +141,7 @@ These aren't features. They're structural commitments — the answer to the kind
 - **Pin to a commit if you want.** Fork and lock to a specific revision for full reproducibility.
 - **Confirm before writing.** Bitácora never writes to Jira without showing you the draft first. There is no "trust mode" that bypasses this.
 
-## 🚫 What Bitácora is not
+## What Bitácora is not
 
 - *Not a workflow methodology.* That's Superpowers' job.
 - *Not a memory system.* That's Remember (or claude-mem).
@@ -134,17 +151,17 @@ These aren't features. They're structural commitments — the answer to the kind
 
 Bitácora is the *glue* — the opinionated workflow layer that ties these tools into a coherent, team-aware ticket lifecycle.
 
-## 🤝 Contributing
+## Contributing
 
 Currently in alpha. Issues and design discussion are welcome via GitHub Issues. Pull requests may not be accepted until Phase 1 stabilizes; once it does, contribution guidelines will appear in `CONTRIBUTING.md`.
 
 If you want to use Bitácora during alpha, fork it and pin to whatever commit you've audited. That's the safest path while the API is still settling.
 
-## 📄 License
+## License
 
 [MIT](LICENSE) — permissive, allowing commercial and private use. The one commitment beyond MIT's terms: the *project itself* will not auto-update users into surprises.
 
-## 🪵 About the name
+## About the name
 
 *Bitácora* comes from the Spanish *bitácula*, from the Latin *habitaculum* — "a dwelling place." Originally it referred to the wooden housing on a ship's deck that held the compass, and by extension to the captain's logbook kept inside it.
 
@@ -152,4 +169,8 @@ It has no etymological relationship to the English word "bit." But it's a coinci
 
 ---
 
+<div align="center">
+
 *Bitácora. Every bit of context, logged.*
+
+</div>
