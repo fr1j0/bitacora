@@ -71,22 +71,15 @@ The longer version: a previous tool that solved part of this problem turned out 
 
 Bitácora is intentionally small. It composes with existing tools rather than replacing them.
 
-```mermaid
-flowchart TD
-    B["<b>Bitácora</b><br/>commands + the [CTX] comment-format discipline"]:::bitacora
-
-    B -->|layers on top of| F
-
-    subgraph F [" "]
-        direction LR
-        R["<b>Remember</b><br/>local session memory"]:::foundation
-        A["<b>Atlassian Rovo MCP</b><br/>Jira + Confluence primitives"]:::foundation
-        C["<b>Claude Code</b><br/>host runtime"]:::foundation
-    end
-
-    classDef bitacora fill:#D97757,stroke:#B5563B,stroke-width:2px,color:#ffffff
-    classDef foundation fill:#1F2430,stroke:#3A4150,stroke-width:1.5px,color:#E6E6E6
-    style F fill:none,stroke:none
+```
+  Bitácora — commands + the [CTX] comment-format discipline
+                          │
+                          │  layers on top of
+                          ▼
+  ┌──────────────┬──────────────┬──────────────┐
+  │   Remember   │  Atlassian   │ Claude Code  │
+  │   (memory)   │   Rovo MCP   │   (host)     │
+  └──────────────┴──────────────┴──────────────┘
 ```
 
 You'll want all three installed for Bitácora to be fully useful.
