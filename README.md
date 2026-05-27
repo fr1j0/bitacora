@@ -9,7 +9,6 @@
 [![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](#)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-D97757?style=for-the-badge&logo=claude&logoColor=white)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/fr1j0/bitacora?style=for-the-badge&logo=github&logoColor=white&color=181717)](https://github.com/fr1j0/bitacora/stargazers)
 
 </div>
 
