@@ -16,13 +16,14 @@ Bitácora — commands
                                 local handoff for next session.
   /bitacora:resume [KEY]        Rehydrate a cleared session from a
                                 ticket's latest [CTX] (read-only).
+  /bitacora:status [KEY]        Summarize a ticket's latest [CTX] for an
+                                audience (--for-pm/--for-eng/--for-self).
   /bitacora:help                Show this command reference.
 
   Planned
   /bitacora:improve   Sharpen a vague or weak ticket your branch is based on.
-  /bitacora:status    Summarize a ticket's current state (PM / eng / self modes).
   /bitacora:spike     Create a timeboxed spike ticket with a mandatory rec.
   /bitacora:next      Morning ticket picker across your boards.
 
-  Alias: /bit:handoff, /bit:resume, /bit:help (opt-in — see plugin README)
+  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:help (opt-in — see plugin README)
 ```
