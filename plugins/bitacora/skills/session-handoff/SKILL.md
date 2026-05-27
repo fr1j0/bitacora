@@ -85,9 +85,11 @@ Never write to Jira before this gate.
    to screen** for manual save, and ask whether to still attempt the Jira writes.
 2. **Resolve the Atlassian site:** `getAccessibleAtlassianResources` → `cloudId`. If
    multiple sites, ask which (or use a `jira_cloud_id` override if configured).
-3. **Write each approved ticket's `[CTX]`** via `addCommentToJiraIssue`. **Per-ticket
-   failures are isolated** — one ticket's 404 / permission error does not abort the
-   others.
+3. **Write each approved ticket's `[CTX]`** via `addCommentToJiraIssue`, following the
+   *Write mechanics* rule in `jira-comment-format` (blank line before/after every section
+   label and bullet list, or build ADF directly) so labels like `Decisions:`/`Next:` don't
+   get absorbed into the preceding bullet. **Per-ticket failures are isolated** — one
+   ticket's 404 / permission error does not abort the others.
 
 ## 6. Report
 

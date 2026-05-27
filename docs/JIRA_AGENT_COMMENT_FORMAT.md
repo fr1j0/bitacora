@@ -15,25 +15,37 @@ Bitácora: adoption compounds.
 ## The format
 
 Every agent-written comment starts with `[CTX]`. The common variant is the status update.
-Required = the header line (with a date) + a `Status:` line + a `Next:` line; everything
+Required = the header line + a `Status:` line + a `Next:` line; everything
 else is optional and appears only when non-empty.
 
 ```
-[CTX] Status update — 2026-05-27
+[CTX] Status update
 
 Status: In Progress
+
 Done:
-  - OAuth provider client implemented and tested
+
+- OAuth provider client implemented and tested
+
 Decisions:
-  - PKCE flow over implicit — more secure for SPAs
+
+- PKCE flow over implicit — more secure for SPAs
+
 Next:
-  - Token refresh implementation
+
+- Token refresh implementation
+
 Blockers:
-  None
+
+- None
 ```
 
 - **Outcome-oriented**, not process. *What changed and why*, not *how I figured it out*.
 - No code diffs (link the PR). No mid-task speculation (that's local scratch).
+- **No date in the header** — the comment's own `created` timestamp is authoritative;
+  read it from metadata, don't hand-type it into the body.
+- Put a **blank line before/after every section label and bullet list** — otherwise the
+  markdown→ADF conversion absorbs labels like `Decisions:`/`Next:` into the preceding bullet.
 - Team/PM-facing open questions go in an `Open questions:` section; next-session-only
   questions stay in local scratch.
 

@@ -9,30 +9,42 @@ human-facing companion `docs/JIRA_AGENT_COMMENT_FORMAT.md` defers to this file.
 
 ## Canonical `[CTX]` status update
 
-Required = the header line (with a date) + a `Status:` line + a `Next:` line.
+Required = the header line + a `Status:` line + a `Next:` line.
 `Done`/`Decisions`/`Blockers`/`Open questions` are optional and appear only when
 non-empty. Order below is recommended; compliance is order-independent.
 
 ```
-[CTX] Status update — <YYYY-MM-DD>     ← REQUIRED: header line w/ date
+[CTX] Status update                    ← REQUIRED: header line
 
 Status: <state>                        ← REQUIRED
+
 Done:                                  ← optional — omit if empty
-  - <bullet>
+- <bullet>
+
 Decisions:                             ← optional — bullet + rationale
-  - <bullet>
+- <bullet>
+
 Next:                                  ← REQUIRED
-  - <bullet>
+- <bullet>
+
 Blockers:                              ← optional
-  - <bullet>
+- <bullet>
+
 Open questions:                        ← optional — team/PM-facing only
-  - <bullet>
+- <bullet>
 ```
+
+A **blank line separates every block** (the `Status:` line, each section label, and
+each bullet list). This is not cosmetic — see *Write mechanics* below.
 
 See `examples/compliant.txt` for a full compliant example.
 
-The header **date** is a write-side convention — always include it — but it is *not* machine-enforced: the validator checks only the `[CTX]` prefix and the presence of
-`Status:` and `Next:` lines.
+**No date in the header.** Every Jira comment already carries an authoritative
+`created` timestamp (returned by the API, shown in the UI next to the author) — a
+hand-typed date just duplicates it and can drift or be wrong. Read the date from
+comment metadata, not the body. (If you ever excerpt a `[CTX]` *outside* Jira where
+that metadata is lost, add the date then — but never in the comment itself.) The
+validator checks only the `[CTX]` prefix and the presence of `Status:`/`Next:` lines.
 
 ## Write rules (hard)
 
@@ -42,6 +54,27 @@ The header **date** is a write-side convention — always include it — but it 
 - One comment per logical update, not one per turn.
 - **Open questions placement:** team/PM-facing questions go in the `Open questions:`
   section of the `[CTX]` comment; next-session-only questions go to Remember scratch.
+
+## Write mechanics (rendering-safe)
+
+`addCommentToJiraIssue` converts `commentBody` (when `contentFormat: markdown`, the
+default) to ADF. Markdown's **lazy continuation** merges adjacent non-blank lines into
+one block, which silently corrupts a `[CTX]`:
+
+- a label placed directly after a bullet (`...moved to In Progress` ⏎ `Decisions:`) gets
+  **absorbed into that bullet** as a soft line-break — the label disappears as a heading;
+- two label/value lines with no blank line (`Status: In Progress` ⏎ `Done:`) **merge into
+  one paragraph**.
+
+So the hard rule: **put a blank line before and after every section label and every
+bullet list.** Each label is its own paragraph; each list is its own block. Bullets are
+top-level (`- x`), not indented. Verify by reading the comment back with
+`responseContentFormat: adf` — every label must be a standalone `paragraph` node and each
+group of bullets a separate `bulletList`, with no `\n` inside a list item's text.
+
+For guaranteed fidelity (no converter in the loop), build the body as ADF directly and
+pass `contentFormat: adf`; markdown-with-blank-lines is the lighter default and renders
+correctly.
 
 ## Read-side compliance
 
