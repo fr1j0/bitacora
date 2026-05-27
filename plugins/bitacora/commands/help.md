@@ -14,10 +14,9 @@ Bitácora — commands
   /bitacora:handoff [KEYS...]   Wrap up a session cleanly: draft [CTX]
                                 comments to each touched ticket + a
                                 local handoff for next session.
+  /bitacora:resume [KEY]        Rehydrate a cleared session from a
+                                ticket's latest [CTX] (read-only).
   /bitacora:help                Show this command reference.
-
-  Next up (design merged)
-  /bitacora:resume    Rehydrate a cleared session from a ticket's latest [CTX].
 
   Planned
   /bitacora:improve   Sharpen a vague or weak ticket your branch is based on.
@@ -25,5 +24,5 @@ Bitácora — commands
   /bitacora:spike     Create a timeboxed spike ticket with a mandatory rec.
   /bitacora:next      Morning ticket picker across your boards.
 
-  Alias: /bit:handoff, /bit:help (opt-in — see plugin README)
+  Alias: /bit:handoff, /bit:resume, /bit:help (opt-in — see plugin README)
 ```
