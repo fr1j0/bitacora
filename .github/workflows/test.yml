@@ -12,3 +12,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run [CTX] validator tests
         run: bash plugins/bitacora/scripts/test-validate-ctx.sh
+      - name: "Run /bit: alias sync tests"
+        run: bash plugins/bitacora/scripts/test-sync-bit-aliases.sh
