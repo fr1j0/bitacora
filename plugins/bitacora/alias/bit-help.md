@@ -17,6 +17,7 @@ Bitácora — commands
   /bitacora:help                Show this command reference.
 
   Planned
+  /bitacora:resume    Rehydrate a cleared session from a ticket's latest [CTX].
   /bitacora:improve   Sharpen a vague or weak ticket your branch is based on.
   /bitacora:status    Summarize a ticket's current state (PM / eng / self modes).
   /bitacora:spike     Create a timeboxed spike ticket with a mandatory rec.
