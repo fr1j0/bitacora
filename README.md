@@ -15,7 +15,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams. It captures structured handoffs across sessions, sharpens vague PM tickets, runs timeboxed spikes, surfaces what to work on next, and keeps a context-window meter visible so you know when to clear and resume cleanly.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. On the roadmap: sharpening vague PM tickets, timeboxed spikes, a smart ticket picker, and a context-window meter that tells you when to clear and resume cleanly.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
@@ -162,7 +162,7 @@ This creates a virtuous loop: the more team members adopt the format, the more u
 
 - *Not a memory system.* That's Remember (or claude-mem).
 - *Not a Jira client.* That's the Atlassian MCP.
-- *Not a context compressor.* That's Context Mode if you need it.
+- *Not a context compressor.* It doesn't shrink your live context window — it helps you hand off cleanly and resume, so you can afford to `/clear`.
 - *Not a replacement for your judgment.* Every Jira write is confirmation-gated; you decide what goes up.
 
 Bitácora is the *glue* — the opinionated workflow layer that ties these tools into a coherent, team-aware ticket lifecycle.
