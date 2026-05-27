@@ -31,9 +31,8 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 
 ## What it does
 
-Bitácora is a small plugin layered on top of three foundation pieces that already exist in the Claude Code ecosystem:
+Bitácora is a small plugin layered on top of two foundation pieces that already exist in the Claude Code ecosystem:
 
-- **[Superpowers](https://github.com/obra/superpowers)** — workflow discipline (brainstorm → plan → TDD → review)
 - **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears
 - **Atlassian Rovo MCP** — Jira and Confluence primitives
 
@@ -76,13 +75,13 @@ Bitácora is intentionally small. It composes with existing tools rather than re
                           │
                           │  layers on top of
                           ▼
-  ┌──────────────┬──────────────┬──────────────┬──────────────┐
-  │  Superpowers │   Remember   │  Atlassian   │ Claude Code  │
-  │  (workflow)  │   (memory)   │   Rovo MCP   │   (host)     │
-  └──────────────┴──────────────┴──────────────┴──────────────┘
+  ┌──────────────┬──────────────┬──────────────┐
+  │   Remember   │  Atlassian   │ Claude Code  │
+  │   (memory)   │   Rovo MCP   │   (host)     │
+  └──────────────┴──────────────┴──────────────┘
 ```
 
-You'll want all four installed for Bitácora to be fully useful.
+You'll want all three installed for Bitácora to be fully useful.
 
 ## Installation
 
@@ -97,7 +96,6 @@ Once published:
 
 Prerequisites:
 
-- Superpowers installed via the Anthropic marketplace
 - Remember (or a claude-mem-compatible plugin) installed for local memory
 - Atlassian MCP configured with read/write access to your team's Jira instance
 
@@ -143,7 +141,6 @@ This creates a virtuous loop: the more team members adopt the format, the more u
 
 ## What Bitácora is not
 
-- *Not a workflow methodology.* That's Superpowers' job.
 - *Not a memory system.* That's Remember (or claude-mem).
 - *Not a Jira client.* That's the Atlassian MCP.
 - *Not a context compressor.* That's Context Mode if you need it.
