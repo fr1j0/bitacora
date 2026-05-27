@@ -65,7 +65,6 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 | `/bitacora:handoff` | ✅ **Phase 1** | Wrap up a session cleanly. Writes a structured `[CTX]` comment to each touched Jira ticket plus a local handoff for next-session continuity. |
 | `/bitacora:help` | ✅ **Phase 1** | Print the Bitácora command reference — shipped commands and the planned roadmap. |
 | `/bitacora:resume` | ✅ **Phase 1** | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
-| `/bitacora:improve` | 🚧 Planned | Sharpen a vague or technically weak ticket *your branch is based on*. Surfaces clarifying questions, then produces a structured rewrite that preserves the original intent. |
 | `/bitacora:status` | ✅ **Phase 1** | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary — PM (`--for-pm`), engineer (`--for-eng`), or self (`--for-self`, default). Read-only: prints the summary and offers a clipboard copy. |
 | `/bitacora:spike` | 🚧 Planned | Create a timeboxed exploratory spike ticket with a mandatory recommendation at conclusion. |
 | `/bitacora:next` | 🚧 Planned | Smart morning ticket picker. Reads your boards, categorizes by pickup cost, and surfaces reasoning for each candidate. |
@@ -143,7 +142,7 @@ Next:
 
 No hand-typed date — the comment's own timestamp is authoritative. A blank line separates every section so the labels render as headings, not as part of the previous bullet.
 
-Agents reading the ticket for `/bitacora:status` synthesis, `/bitacora:handoff` resume, or cross-ticket queries use only `[CTX]`-prefixed comments. Free-form human discussion is ignored for state extraction (but still read for requirements understanding by `/bitacora:improve`).
+Agents reading the ticket for `/bitacora:status` synthesis, `/bitacora:handoff` resume, or cross-ticket queries use only `[CTX]`-prefixed comments — free-form human discussion is ignored for state extraction.
 
 This creates a virtuous loop: the more team members adopt the format, the more useful the shared memory layer becomes. See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](docs/JIRA_AGENT_COMMENT_FORMAT.md) for the full spec.
 
