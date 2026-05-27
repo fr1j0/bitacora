@@ -20,6 +20,7 @@ enriches the handoff, and the workflow degrades gracefully when it's missing.
 |---------|--------------|
 | `/bitacora:handoff [KEYS...]` | Reconstruct the Jira tickets touched this session, draft a `[CTX]` status comment for each (confirm before writing), and save one consolidated local scratch via Remember. Pass ticket keys to force the set. |
 | `/bitacora:resume [KEY]` | Rehydrate a fresh session from a ticket's latest `[CTX]`: read its `Status` / `Decisions` / `Next` back into context after a `/clear` and print a compact, read-only briefing. Pass a key to target a ticket; otherwise resolved from the branch. |
+| `/bitacora:status [KEY] [--for-pm\|--for-eng\|--for-self]` | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary (default `--for-self`): different sections foregrounded and a different voice per mode. Read-only — prints the summary and offers a clipboard copy. |
 | `/bitacora:help` | Print the Bitácora command reference — shipped commands and the planned roadmap. |
 
 ## Optional: the shorter `/bit:` alias
@@ -41,8 +42,8 @@ fi
 ```
 
 This copies every bundled alias (the `bit-` prefix is stripped to form the
-command name). Then `/bit:handoff`, `/bit:resume`, and `/bit:help` run the same
-workflows as their `/bitacora:…` forms.
+command name). Then `/bit:handoff`, `/bit:resume`, `/bit:status`, and `/bit:help`
+run the same workflows as their `/bitacora:…` forms.
 
 You only run this **once**. After `~/.claude/commands/bit/` exists, the plugin keeps
 it in sync for you: a `SessionStart` hook (`scripts/sync-bit-aliases.sh`) re-copies the
