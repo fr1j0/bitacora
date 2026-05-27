@@ -40,7 +40,7 @@ What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated comma
 
 ## Commands
 
-The one shipped command — wrap up a session cleanly:
+The flagship command — wrap up a session cleanly:
 
 ```bash
 /bitacora:handoff
@@ -57,7 +57,7 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 | `/bitacora:spike` | 🚧 Planned | Create a timeboxed exploratory spike ticket with a mandatory recommendation at conclusion. |
 | `/bitacora:next` | 🚧 Planned | Smart morning ticket picker. Reads your boards, categorizes by pickup cost, and surfaces reasoning for each candidate. |
 
-> Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`) — see the [plugin README](plugins/bitacora/README.md).
+> Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
 
 🚧 **statusLine** *(planned)* — a context-window meter with progressive UX (calm → amber → red → critical) so you know when to hand off before quality degrades.
 

@@ -2,8 +2,10 @@
 description: (alias of /bitacora:help) Show the Bitácora command reference.
 ---
 
-Print the command reference below verbatim — exactly the fenced block, with no
-additions, tool calls, or commentary:
+<!-- Keep the fenced block in sync with commands/help.md (command files have no include primitive). -->
+
+Output the command reference below exactly as written, inside a code block —
+nothing else: no preamble, commentary, or tool calls.
 
 ```
 Bitácora — commands
