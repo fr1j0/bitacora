@@ -9,7 +9,7 @@
 #   - Trimmed text MUST START WITH "[CTX]" (startswith, NOT substring) else not-in-format.
 #   - compliant requires a "Status:" line AND a "Next:" line.
 #   - Starts with "[CTX]" but missing Status/Next → malformed.
-# NOTE: the header date is a documented convention, NOT machine-enforced in v1.
+# NOTE: no date in the header — the comment's own created timestamp is authoritative.
 # NOTE: "Status:"/"Next:" are matched at column 0 — leading spaces disqualify a line.
 # NOTE: input is used as-is otherwise; CRLF (\r) line endings are accepted (treated as content).
 set -euo pipefail
