@@ -21,7 +21,6 @@ Bitácora — commands
   /bitacora:help                Show this command reference.
 
   Planned
-  /bitacora:improve   Sharpen a vague or weak ticket your branch is based on.
   /bitacora:spike     Create a timeboxed spike ticket with a mandatory rec.
   /bitacora:next      Morning ticket picker across your boards.
 

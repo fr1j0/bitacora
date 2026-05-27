@@ -528,7 +528,15 @@ The foundation. Highest daily value, builds on existing Jira-comment habit, vali
 
 **Acceptance test:** Complete a task, run `/handoff`, exit, start fresh session, see resumed state from claude-mem with correct restatement. Jira ticket has a clean structured comment.
 
-### Phase 2 — `/improve-ticket`
+### Phase 2 — `/improve-ticket` — **dropped (2026-05-27)**
+
+> **Not building this.** A design spike (TESTING-10) reached "build with caveats," but
+> Jira now ships a strong native improve-description feature (Atlassian Intelligence / Rovo)
+> that covers prose rewriting, acceptance criteria, and ambiguity surfacing in-ticket. The
+> only thing a Bitácora command added was local-codebase-grounded technical notes — too thin
+> to justify duplicating a feature the vendor owns. Bitácora stays focused on the
+> agent-session lifecycle (handoff / resume / status + `[CTX]`). Original sketch retained
+> below for history.
 
 Immediate utility, low risk with the confirm-before-write rule.
 
