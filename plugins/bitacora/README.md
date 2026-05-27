@@ -19,20 +19,22 @@ enriches the handoff, and the workflow degrades gracefully when it's missing.
 | Command | What it does |
 |---------|--------------|
 | `/bitacora:handoff [KEYS...]` | Reconstruct the Jira tickets touched this session, draft a `[CTX]` status comment for each (confirm before writing), and save one consolidated local scratch via Remember. Pass ticket keys to force the set. |
+| `/bitacora:help` | Print the Bitácora command reference — shipped commands and the planned roadmap. |
 
 ## Optional: the shorter `/bit:` alias
 
 Command namespace equals the plugin name, so commands are `/bitacora:…` by default.
-For a shorter `/bit:handoff`, copy the bundled alias into your personal commands dir
-(one-time, per machine):
+For the shorter `/bit:…` forms, copy the bundled aliases into your personal commands
+dir (one-time, per machine):
 
 ```bash
 mkdir -p ~/.claude/commands/bit
-cp "$(dirname "$(find ~/.claude/plugins -path '*bitacora/alias/bit-handoff.md' | head -1)")/bit-handoff.md" \
-   ~/.claude/commands/bit/handoff.md
+alias_dir="$(dirname "$(find ~/.claude/plugins -path '*bitacora/alias/bit-handoff.md' | head -1)")"
+cp "$alias_dir/bit-handoff.md" ~/.claude/commands/bit/handoff.md
+cp "$alias_dir/bit-help.md"    ~/.claude/commands/bit/help.md
 ```
 
-Then `/bit:handoff` and `/bitacora:handoff` both run the same workflow.
+Then `/bit:handoff` and `/bit:help` run the same workflows as their `/bitacora:…` forms.
 
 ## The `[CTX]` format
 
