@@ -52,7 +52,7 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 |---------|--------|--------------|
 | `/bitacora:handoff` | ✅ **Phase 1** | Wrap up a session cleanly. Writes a structured `[CTX]` comment to each touched Jira ticket plus a local handoff for next-session continuity. |
 | `/bitacora:help` | ✅ **Phase 1** | Print the Bitácora command reference — shipped commands and the planned roadmap. |
-| `/bitacora:resume` | 🚧 Planned | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
+| `/bitacora:resume` | ✅ **Phase 1** | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
 | `/bitacora:improve` | 🚧 Planned | Sharpen a vague or technically weak ticket *your branch is based on*. Surfaces clarifying questions, then produces a structured rewrite that preserves the original intent. |
 | `/bitacora:status` | 🚧 Planned | Synthesize a ticket's current state into a human-readable summary. Audience modes for PM (`--for-pm`), engineer (`--for-eng`), and self (`--for-self`). |
 | `/bitacora:spike` | 🚧 Planned | Create a timeboxed exploratory spike ticket with a mandatory recommendation at conclusion. |
@@ -61,6 +61,8 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 > Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
 
 🚧 **statusLine** *(planned)* — a context-window meter with progressive UX (calm → amber → red → critical) so you know when to hand off before quality degrades.
+
+🚧 **`[CTX]` commit anchor** *(idea)* — an optional anchor line tying a `[CTX]` comment to the commit/PR it reflects, so resume and debugging can ground state in real code: verify "done" against the diff, or bisect a regression from a known-good point. Uses a PR-relative form (e.g. `PR #17 @ 4a29459`) to survive squash-merges.
 
 ## Why this exists
 
