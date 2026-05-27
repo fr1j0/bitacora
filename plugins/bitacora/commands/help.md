@@ -21,7 +21,6 @@ Bitácora — commands
   /bitacora:help                Show this command reference.
 
   Planned
-  /bitacora:spike     Create a timeboxed spike ticket with a mandatory rec.
   /bitacora:next      Morning ticket picker across your boards.
 
   Alias: /bit:handoff, /bit:resume, /bit:status, /bit:help (opt-in — see plugin README)

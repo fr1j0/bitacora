@@ -557,7 +557,17 @@ Closes the loop on the Jira-as-shared-memory pattern. After a few weeks of Phase
 
 **Acceptance test:** Run `/status` on a real ticket with multiple `[CTX]` updates. Synthesis is accurate, audience modes produce meaningfully different outputs, skipped-comment count is surfaced honestly when present.
 
-### Phase 4 — `/spike`
+### Phase 4 — `/spike` — **dropped (2026-05-27)**
+
+> **Not building this.** `/spike` is ticket *authoring* (creation), which sits outside
+> Bitácora's scope: a status-tracking / continuity layer that reads and writes structured
+> state on tickets that already exist. Singling out "spike" creation is also arbitrary
+> (why not stories or bugs?), and native Jira already creates tickets. The one in-DNA
+> nugget — a forced "build / don't build / build with caveats" recommendation at a spike's
+> conclusion — already fits the existing `[CTX]` `Status:` line (as TESTING-10 demonstrated:
+> `Status: Spike complete — RECOMMENDATION: build with caveats`). Dropped alongside
+> `/improve-ticket`; the two share a lesson: **Bitácora is a memory layer, not a
+> ticket-authoring tool.** Original sketch retained below for history.
 
 High-value but the design hinges on the recommendation-forcing template. Needs real-use iteration.
 
