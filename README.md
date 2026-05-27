@@ -7,6 +7,7 @@
 *Structured session handoffs, logged to Jira — so context survives context clears, sessions, and teammates.*
 
 [![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](#)
+[![Tests](https://img.shields.io/github/actions/workflow/status/fr1j0/bitacora/test.yml?style=for-the-badge&label=tests)](https://github.com/fr1j0/bitacora/actions/workflows/test.yml)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-D97757?style=for-the-badge&logo=claude&logoColor=white)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
 
