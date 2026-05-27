@@ -354,3 +354,21 @@ fixtures as ground-truth oracle.
 - `cloudId` resolution UX when multiple Atlassian sites are accessible (ask vs `jira_cloud_id` setting).
 - Where plugin settings live and how `project_key_pattern` / `comment_compliance` are read
   by a prompt-based command (settings file location and read mechanism).
+
+## Addendum — decisions made during planning (2026-05-27)
+
+- **Plugin name `bitacora`** → canonical command `/bitacora:handoff` (command namespace
+  equals plugin name). An **opt-in `/bit:` alias** is shipped as a copy-paste file
+  (`plugins/bitacora/alias/bit-handoff.md`) the user drops into
+  `~/.claude/commands/bit/handoff.md`; it invokes the same skill. No second plugin.
+- **Handoff workflow lives in a `handoff` skill**, with `commands/handoff.md` a thin
+  trigger. This refines the spec's "workflow in the command" to keep the command thin and
+  let the `/bit:` alias reuse identical logic with zero duplication. Still Approach A (thin
+  command + shared skills), still no subagent/hook.
+- **Continuity-read uses `getJiraIssue`** (with comments), resolving the spec's open item
+  about a separate comments-read tool.
+- **Settings overrides** read from `${CLAUDE_PROJECT_DIR}/.bitacora.yml` then
+  `~/.claude/bitacora.yml`; absent → documented defaults (resolves the settings-location
+  open item).
+- **`validate-ctx.sh` does not machine-enforce the header date** (documented convention
+  only), keeping three clean classes that match the three golden fixtures.

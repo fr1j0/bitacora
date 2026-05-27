@@ -24,7 +24,7 @@ After surveying the Claude Code ecosystem, the right approach is **not** to buil
 | Layer | Existing tool | What it provides |
 |-------|---------------|------------------|
 | Workflow discipline | **Superpowers** | brainstorm → plan → TDD → subagent dev → review. Open source, ~170K stars, official Anthropic marketplace, maintained by Jesse Vincent (obra). |
-| Local session memory | **claude-mem** (preferred) or **Remember** | Cross-session memory persistence with semantic retrieval. Handles handoff/resume across degrading sessions. |
+| Local session memory | **Remember** (installed/verified) | Cross-session memory persistence. Handles handoff/resume across degrading sessions. (claude-mem is not installed in this environment; Bitácora targets Remember.) |
 | Jira/Confluence primitives | **Atlassian Rovo MCP** | Already connected. Read/write tickets, comments, search via JQL. |
 | Code review | **pr-review-toolkit** or small custom review skill | Reviewing teammate PRs |
 
