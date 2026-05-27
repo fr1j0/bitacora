@@ -30,11 +30,15 @@ dir (one-time, per machine):
 ```bash
 mkdir -p ~/.claude/commands/bit
 alias_dir="$(dirname "$(find ~/.claude/plugins -path '*bitacora/alias/bit-handoff.md' | head -1)")"
-cp "$alias_dir/bit-handoff.md" ~/.claude/commands/bit/handoff.md
-cp "$alias_dir/bit-help.md"    ~/.claude/commands/bit/help.md
+for f in "$alias_dir"/bit-*.md; do
+  cp "$f" ~/.claude/commands/bit/"$(basename "$f" | sed 's/^bit-//')"
+done
 ```
 
-Then `/bit:handoff` and `/bit:help` run the same workflows as their `/bitacora:…` forms.
+This copies every bundled alias (the `bit-` prefix is stripped to form the
+command name), so any alias shipped in a later release is picked up by re-running
+the snippet — no need to edit it. Then `/bit:handoff` and `/bit:help` run the same
+workflows as their `/bitacora:…` forms.
 
 ## The `[CTX]` format
 
