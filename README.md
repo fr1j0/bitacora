@@ -2,8 +2,7 @@
 
 ![Status](https://img.shields.io/badge/status-alpha-orange)
 ![Built for](https://img.shields.io/badge/built%20for-Claude%20Code-5A4FCF)
-![No telemetry](https://img.shields.io/badge/telemetry-none-brightgreen)
-![License](https://img.shields.io/badge/license-TBD-lightgrey)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
@@ -143,7 +142,7 @@ If you want to use Bitácora during alpha, fork it and pin to whatever commit yo
 
 ## 📄 License
 
-To be determined — likely MIT or Apache 2.0. The intent is permissive, allowing commercial and private use, with the understanding that the *project itself* will not auto-update users into surprises.
+[MIT](LICENSE) — permissive, allowing commercial and private use. The one commitment beyond MIT's terms: the *project itself* will not auto-update users into surprises.
 
 ## 🪵 About the name
 
