@@ -8,24 +8,6 @@ Jira-aware workflow layer for Claude Code. **Phase 1:** `/bitacora:handoff` and 
 Bitácora runs on Claude Code alone. Both integrations below are **optional** — each one
 enriches the handoff, and the workflow degrades gracefully when it's missing.
 
-```mermaid
-flowchart TD
-    B["<b>Bitácora</b><br/>commands + the [CTX] comment-format discipline"]:::bitacora
-
-    B -->|layers on top of| F
-
-    subgraph F [" "]
-        direction LR
-        R["<b>Remember</b><br/>local session memory"]:::foundation
-        A["<b>Atlassian Rovo MCP</b><br/>Jira + Confluence primitives"]:::foundation
-        C["<b>Claude Code</b><br/>host runtime"]:::foundation
-    end
-
-    classDef bitacora fill:#D97757,stroke:#B5563B,stroke-width:2px,color:#ffffff
-    classDef foundation fill:#1F2430,stroke:#3A4150,stroke-width:1.5px,color:#E6E6E6
-    style F fill:none,stroke:none
-```
-
 - **Remember** plugin (local session memory) — handoff delegates the consolidated local
   scratch to it. Without it, the scratch is printed to screen for you to save manually.
 - **Atlassian Rovo MCP** with read/write to your Jira — for writing the `[CTX]` comments.
