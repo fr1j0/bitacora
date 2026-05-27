@@ -66,7 +66,7 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 | `/bitacora:help` | ✅ **Phase 1** | Print the Bitácora command reference — shipped commands and the planned roadmap. |
 | `/bitacora:resume` | ✅ **Phase 1** | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
 | `/bitacora:improve` | 🚧 Planned | Sharpen a vague or technically weak ticket *your branch is based on*. Surfaces clarifying questions, then produces a structured rewrite that preserves the original intent. |
-| `/bitacora:status` | 🚧 Planned | Synthesize a ticket's current state into a human-readable summary. Audience modes for PM (`--for-pm`), engineer (`--for-eng`), and self (`--for-self`). |
+| `/bitacora:status` | ✅ **Phase 1** | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary — PM (`--for-pm`), engineer (`--for-eng`), or self (`--for-self`, default). Read-only: prints the summary and offers a clipboard copy. |
 | `/bitacora:spike` | 🚧 Planned | Create a timeboxed exploratory spike ticket with a mandatory recommendation at conclusion. |
 | `/bitacora:next` | 🚧 Planned | Smart morning ticket picker. Reads your boards, categorizes by pickup cost, and surfaces reasoning for each candidate. |
 
