@@ -79,7 +79,7 @@ Bitácora is intentionally small. It composes with existing tools rather than re
                           ▼
   ┌──────────────┬──────────────┬──────────────┐
   │   Remember   │  Atlassian   │ Claude Code  │
-  │   (memory)   │   Rovo MCP   │   (host)     │
+  │  (optional)  │   Rovo MCP   │   (host)     │
   └──────────────┴──────────────┴──────────────┘
 ```
 
