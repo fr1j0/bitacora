@@ -361,7 +361,9 @@ fixtures as ground-truth oracle.
   equals plugin name). An **opt-in `/bit:` alias** is shipped as a copy-paste file
   (`plugins/bitacora/alias/bit-handoff.md`) the user drops into
   `~/.claude/commands/bit/handoff.md`; it invokes the same skill. No second plugin.
-- **Handoff workflow lives in a `handoff` skill**, with `commands/handoff.md` a thin
+- **Handoff workflow lives in a `session-handoff` skill** (renamed from `handoff` to
+  avoid colliding with the `handoff` command's qualified name `bitacora:handoff`), with
+  `commands/handoff.md` a thin
   trigger. This refines the spec's "workflow in the command" to keep the command thin and
   let the `/bit:` alias reuse identical logic with zero duplication. Still Approach A (thin
   command + shared skills), still no subagent/hook.
