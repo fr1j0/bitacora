@@ -41,9 +41,15 @@ fi
 ```
 
 This copies every bundled alias (the `bit-` prefix is stripped to form the
-command name), so any alias shipped in a later release is picked up by re-running
-the snippet — no need to edit it. Then `/bit:handoff`, `/bit:resume`, and `/bit:help`
-run the same workflows as their `/bitacora:…` forms.
+command name). Then `/bit:handoff`, `/bit:resume`, and `/bit:help` run the same
+workflows as their `/bitacora:…` forms.
+
+You only run this **once**. After `~/.claude/commands/bit/` exists, the plugin keeps
+it in sync for you: a `SessionStart` hook (`scripts/sync-bit-aliases.sh`) re-copies the
+bundled aliases at the start of each session, so any alias shipped in a later release
+shows up automatically (on the next session) — no need to re-run the snippet. The hook
+is **opt-in and additive**: it does nothing until that dir exists, and it only adds or
+updates files, never deletes them.
 
 ## The `[CTX]` format
 
