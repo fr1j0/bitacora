@@ -43,7 +43,7 @@ Jira read access.
 `getJiraIssue` for the resolved key, **requesting comments**. Extract `[CTX]` comments per
 the **strict** READ rules in `bitacora:jira-comment-format`:
 
-- Count only **compliant** `[CTX]` comments (start with `[CTX]`, carry `Status:` + `Next:`).
+- Count only **compliant** `[CTX]` comments (trimmed text starts with `[CTX]` and carries `Status:` + `Next:` — the strict-prefix rule in `bitacora:jira-comment-format`).
 - The **latest** compliant `[CTX]` is authoritative for `Status` and `Next`.
 - Stitch up to `status.ctx_lookback` prior `[CTX]` comments (default 2) to build a short
   Done/progress trajectory.
@@ -54,10 +54,10 @@ the **strict** READ rules in `bitacora:jira-comment-format`:
 ## 5. Render for the selected mode
 
 Faithful, condensed, **no invention**. Omit any section the `[CTX]` did not contain.
-Preserve URLs verbatim except where a mode strips them (below). Rephrasing the `Status:`
+Preserve the ticket URL verbatim. PM mode is the only one that strips anything — internal references like PR/commit hashes — and it still keeps the ticket link (below). Rephrasing the `Status:`
 value into plain language for PM is allowed; inventing facts is not.
 
-### --for-self (default) — terse personal recall (jargon + PR links fine)
+### --for-self (default) — terse personal recall: latest Status, no Done trajectory (use --for-eng for that). Jargon + PR links fine.
 
 ```
 PROJ-1234 "<title>" — <Jira status>
@@ -83,7 +83,7 @@ Blockers / open questions:
 - <only if present>
 ```
 
-### --for-pm — plain-language stakeholder status (strip jargon + PR hashes; lead with state/risk; keep ticket link)
+### --for-pm — plain-language stakeholder status (strip jargon and PR/commit hashes, but keep the ticket link; lead with state/risk)
 
 ```
 PROJ-1234 "<title>"
