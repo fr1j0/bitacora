@@ -1,0 +1,14 @@
+AUTH-204 "OAuth login" — In Progress
+https://acme.atlassian.net/browse/AUTH-204
+
+Done recently:
+- OAuth provider client (PKCE) and callback happy path
+- Token refresh with rotating refresh tokens, covered by integration tests vs the staging IdP
+Decisions:
+- Store refresh tokens httpOnly+Secure server-side, never in localStorage — avoids XSS token theft
+Next:
+- Wire refresh into the SPA silent-renew flow
+- Decide session idle-timeout with product
+Blockers / open questions:
+- Blocked on product confirming idle-timeout (30m vs 60m)
+- Open: should "remember me" extend refresh lifetime, and to how long?

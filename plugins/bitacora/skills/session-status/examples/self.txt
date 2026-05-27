@@ -1,0 +1,9 @@
+AUTH-204 "OAuth login" — In Progress
+Left off:   Token refresh implemented (rotating refresh tokens), covered by integration tests.
+Next:
+- Wire refresh into the SPA silent-renew flow
+- Decide session idle-timeout with product
+Decisions:
+- Refresh tokens httpOnly+Secure server-side, never localStorage (XSS)
+Blockers:
+- Product to confirm idle-timeout (30m vs 60m)
