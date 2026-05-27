@@ -91,10 +91,13 @@ Bitácora is intentionally small. It composes with existing tools rather than re
                           │
                           │  layers on top of
                           ▼
-  ┌──────────────┬──────────────┬──────────────┐
-  │   Remember   │  Atlassian   │ Claude Code  │
-  │  (optional)  │   Rovo MCP   │   (host)     │
-  └──────────────┴──────────────┴──────────────┘
+  ┌────────────────────────┬────────────────────────┐
+  │   Atlassian Rovo MCP    │      Claude Code        │
+  │   (Jira read/write)     │        (host)           │
+  └────────────────────────┴────────────────────────┘
+
+  Optional companion · local scratch layer:
+      Remember / claude-mem / memory MCP — the between-sessions notes
 ```
 
 At minimum you need the **Atlassian Rovo MCP** (so Bitácora can read and write Jira) and **Claude Code** itself. **Remember** is optional but recommended — it's where the high-frequency scratch lives, separate from the ticket-level status Bitácora owns (see [What lives where](#what-lives-where--status-vs-scratch)).
