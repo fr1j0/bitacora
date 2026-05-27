@@ -1,5 +1,13 @@
 <div align="center">
 
+```
+████  █████ █████
+█   █   █     █
+████    █     █
+█   █   █     █
+████  █████   █
+```
+
 # Bitácora
 
 **Every bit of context, logged.**
