@@ -1,0 +1,10 @@
+{
+  "name": "bitacora",
+  "description": "Jira-aware workflow layer for Claude Code: clean session handoffs and the [CTX] comment-format discipline.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Bitácora contributors"
+  },
+  "license": "MIT",
+  "keywords": ["jira", "workflow", "handoff", "context", "memory"]
+}

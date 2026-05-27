@@ -1,0 +1,3 @@
+Thanks for this! As we noted in yesterday's [CTX] update, the token
+refresh still needs the concurrent-refresh edge case handled. I'll
+pair with Sarah on it tomorrow morning.

@@ -1,0 +1,11 @@
+[CTX] Status update — 2026-05-27
+
+Status: In Progress
+Done:
+  - OAuth provider client implemented and tested
+Decisions:
+  - PKCE flow over implicit — more secure for SPAs
+Next:
+  - Token refresh implementation
+Blockers:
+  None
