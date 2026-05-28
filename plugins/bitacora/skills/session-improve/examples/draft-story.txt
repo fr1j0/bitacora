@@ -1,0 +1,44 @@
+Improving PROJ-1234 — "Make the export pipeline faster"  (Story, In Progress)
+Corpus: 3 [CTX] comments · 5 free-form comments · 4 Remember hits · 2 commits · 1 PR
+
+3 clarifying questions before rewriting:
+
+1. "users want this faster" — do we have a target p95, or qualitative?
+   (anchor: description, sentence 1)
+2. "should work on mobile" — responsive web, PWA, or native? The repo has all three.
+   (anchor: description, sentence 2)
+3. Slack thread (linked in comment #3) mentions Sarah's caching idea — in scope or
+   follow-up? (anchor: comment #3 from sarah@)
+
+Answers (or "skip"): >  p95 4s · responsive web · caching follow-up
+
+--- description (proposed) ---
+
+Acceptance criteria
+
+- p95 export latency drops below 4s for tenants up to 50k rows
+- No regression in the 10k-row baseline (currently ~1.8s)
+- Responsive-web only (PWA / native explicitly out of scope)
+
+Technical notes
+
+- The export_jobs worker currently does a per-row write; batching is the obvious lever
+- Sarah's caching idea (comment #3) is parked as a follow-up, not part of this story
+- See PR #781 (in progress) for the worker scaffolding
+
+Out of scope
+
+- Caching layer (follow-up ticket)
+- PWA / native client work
+
+Open questions
+
+- (none — all clarifying questions resolved)
+
+--- title (unchanged — scope is description-only) ---
+
+MCP write pending:
+  - 1 [ARCHIVE] snapshot comment
+  - 1 field edit — description
+
+Confirm? (y/N)
