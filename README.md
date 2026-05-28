@@ -15,7 +15,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. On the roadmap: a smart ticket picker, and a context-window meter that tells you when to clear and resume cleanly.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
@@ -25,8 +25,8 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 ## At a glance
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
-- **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, and (planned) ticket picking.
-- **Today** — Phase 1 ships `/bitacora:handoff` + the `[CTX]` format. Everything else is on the roadmap below.
+- **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, and morning ticket picking.
+- **Today** — Phase 1 is complete: `handoff`, `resume`, `status`, `next`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
 ## What it does
@@ -36,7 +36,7 @@ Bitácora is a small plugin that builds on the Claude Code ecosystem:
 - **Atlassian Rovo MCP** — the Jira and Confluence primitives Bitácora reads and writes through *(required)*
 - **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears *(optional companion)*
 
-What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, and (planned) picking work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
+What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, and picking work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
 ## What lives where — status vs. scratch
 
@@ -70,7 +70,7 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 
 > Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
 
-🚧 **statusLine** *(planned)* — a context-window meter with progressive UX (calm → amber → red → critical) so you know when to hand off before quality degrades.
+✅ **statusLine** *(opt-in)* — a single-line context-window meter that bolds red at ≥85% so you know when to `/bitacora:handoff` then `/clear` + `/bitacora:resume`. Also shows the active ticket and a `✎ handoff pending` marker. Opt-in setup in the [plugin README](plugins/bitacora/README.md#optional-the-statusline).
 
 🚧 **`[CTX]` commit anchor** *(idea)* — an optional anchor line tying a `[CTX]` comment to the commit/PR it reflects, so resume and debugging can ground state in real code: verify "done" against the diff, or bisect a regression from a known-good point. Uses a PR-relative form (e.g. `PR #17 @ 4a29459`) to survive squash-merges.
 
@@ -102,7 +102,7 @@ At minimum you need the **Atlassian Rovo MCP** (so Bitácora can read and write 
 
 ## Installation
 
-*Coming once Phase 1 is validated through personal use. For now, this is a design with a repo.*
+*Phase 1 is shipping; marketplace publication is pending personal-use validation. For now, fork or clone and pin to a commit you've audited.*
 
 Once published:
 
@@ -167,7 +167,7 @@ Bitácora is the *glue* — the opinionated workflow layer that ties these tools
 
 ## Contributing
 
-Currently in alpha. Issues and design discussion are welcome via GitHub Issues. Pull requests may not be accepted until Phase 1 stabilizes; once it does, contribution guidelines will appear in `CONTRIBUTING.md`.
+Currently in alpha. Issues and design discussion are welcome via GitHub Issues — every change starts as an issue. See [CONTRIBUTING.md](CONTRIBUTING.md) for the issue-first flow, branch naming, and maintainer guardrails.
 
 If you want to use Bitácora during alpha, fork it and pin to whatever commit you've audited. That's the safest path while the API is still settling.
 
