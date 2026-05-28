@@ -59,4 +59,31 @@ else
   fail=1
 fi
 
+# CRLF regression: per the file header, CRLF line endings are accepted as content.
+# Bash glob `*` matches \r, so "Status:"* matches "Status:\r" without a strip pass.
+# Lock that in so a future refactor doesn't break it. (See review 2026-05-28.)
+printf '[CTX] x\r\nStatus: y\r\nNext: z\r\n' | "$VALIDATOR" >"$mkstdin" 2>/dev/null; code=$?
+if [[ "$(cat "$mkstdin")" == "compliant" && "$code" == "0" ]]; then
+  echo "PASS: CRLF-encoded compliant → compliant (0)"
+else
+  echo "FAIL: CRLF-encoded compliant → got '$(cat "$mkstdin")' ($code)"
+  fail=1
+fi
+
+printf '[CTX] x\r\nStatus: y\r\n' | "$VALIDATOR" >"$mkstdin" 2>/dev/null; code=$?
+if [[ "$(cat "$mkstdin")" == "malformed" && "$code" == "1" ]]; then
+  echo "PASS: CRLF + missing Next → malformed (1)"
+else
+  echo "FAIL: CRLF + missing Next → got '$(cat "$mkstdin")' ($code)"
+  fail=1
+fi
+
+printf '[CTX] x\r\nStatus: y\r\nNext: z\r\nhttps://bare.example.com\r\n' | "$VALIDATOR" >"$mkstdin" 2>/dev/null; code=$?
+if [[ "$(cat "$mkstdin")" == "malformed" && "$code" == "1" ]]; then
+  echo "PASS: CRLF + bare URL → malformed (1)"
+else
+  echo "FAIL: CRLF + bare URL → got '$(cat "$mkstdin")' ($code)"
+  fail=1
+fi
+
 exit $fail
