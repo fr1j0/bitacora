@@ -140,8 +140,6 @@ Next:
 - Token refresh implementation
 ```
 
-No hand-typed date — the comment's own timestamp is authoritative. A blank line separates every section so the labels render as headings, not as part of the previous bullet.
-
 Agents reading the ticket for `/bitacora:resume`, `/bitacora:status`, `/bitacora:next`, or cross-ticket queries use only `[CTX]`-prefixed comments — free-form human discussion is ignored for state extraction. (`/bitacora:improve` and `/bitacora:handoff`'s continuity-read are the lenient exceptions: they read everything, because requirements and prior-handoff context often live in human discussion.)
 
 This creates a virtuous loop: the more team members adopt the format, the more useful the shared memory layer becomes. See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](docs/JIRA_AGENT_COMMENT_FORMAT.md) for the full spec.
