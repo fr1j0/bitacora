@@ -22,7 +22,8 @@ deliberately simple: **every change starts as an issue.**
 Bitácora has a [tight scope](README.md#what-lives-where--status-vs-scratch) — it tracks
 status and continuity on Jira tickets, and *not* ticket-authoring, spike-running, or
 other workflows that have been considered and parked. Triaging first saves you from
-writing code that won't be accepted.
+writing code that won't be accepted; see [docs/TRIAGE.md](docs/TRIAGE.md) for the
+maintainer-side scope guardrails.
 
 ## Maintainer exceptions
 
