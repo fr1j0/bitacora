@@ -54,6 +54,15 @@ validator checks only the `[CTX]` prefix and the presence of `Status:`/`Next:` l
 - One comment per logical update, not one per turn.
 - **Open questions placement:** team/PM-facing questions go in the `Open questions:`
   section of the `[CTX]` comment; next-session-only questions go to Remember scratch.
+- **URLs must be wrapped, never bare.** Jira's ADF renderer does **not** auto-linkify
+  text. A bare `https://...` will display as plain text and won't click through. Write
+  every URL as either a markdown link `[label](https://...)` (preferred — readable label)
+  or an autolink `<https://...>` (label = URL). If you build ADF directly, attach a
+  `link` mark to the URL text node. See `examples/malformed-bare-url.txt`.
+- **No tool-call XML in the body.** Substrings like `<parameter name=`, `</commentBody>`,
+  `<invoke name=` are agent-tool-call sentinels — they indicate the authoring agent
+  serialized part of its own MCP call into the comment. Never appears in a legitimate
+  `[CTX]`. See `examples/malformed-tool-leak.txt`.
 
 ## Write mechanics (rendering-safe)
 
@@ -93,8 +102,10 @@ correctly.
   `Note: 4 comments excluded (3 not in [CTX] format, 1 malformed). Run with --include-all to see them.`
 
 The script `../../scripts/validate-ctx.sh` (i.e. `plugins/bitacora/scripts/validate-ctx.sh`
-from the repo root) encodes this exact rule and can classify any single comment
-(`compliant` / `malformed` / `not-in-format`).
+from the repo root) encodes these rules and can classify any single comment
+(`compliant` / `malformed` / `not-in-format`). It also catches the *Write rules* hygiene
+classes — bare URLs and tool-arg-leak sentinels — as `malformed`, with a one-line reason
+on stderr. **Handoff pipes every drafted body through it before writing.**
 
 ## Strict vs lenient by operation
 

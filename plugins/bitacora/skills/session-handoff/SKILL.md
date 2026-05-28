@@ -85,11 +85,27 @@ Never write to Jira before this gate.
    to screen** for manual save, and ask whether to still attempt the Jira writes.
 2. **Resolve the Atlassian site:** `getAccessibleAtlassianResources` → `cloudId`. If
    multiple sites, ask which (or use a `jira_cloud_id` override if configured).
-3. **Write each approved ticket's `[CTX]`** via `addCommentToJiraIssue`, following the
-   *Write mechanics* rule in `jira-comment-format` (blank line before/after every section
-   label and bullet list, or build ADF directly) so labels like `Decisions:`/`Next:` don't
-   get absorbed into the preceding bullet. **Per-ticket failures are isolated** — one
-   ticket's 404 / permission error does not abort the others.
+3. **Validate each drafted `[CTX]` body before writing.** Pipe the body through
+   `${CLAUDE_PLUGIN_ROOT}/scripts/validate-ctx.sh` (or `plugins/bitacora/scripts/validate-ctx.sh`
+   from the repo root). If the output is anything other than `compliant`, **do not write
+   that ticket's comment** — surface the validator's stderr reason to the user, keep the
+   draft, and offer: edit-and-retry / skip-this-ticket / cancel-all. Other tickets are
+   unaffected. The validator catches the structural rule (missing `Status:`/`Next:`) and
+   the *Write rules* hygiene classes from `jira-comment-format` — bare URLs (Jira won't
+   linkify) and tool-arg-leak sentinels (`<parameter name=`, `</commentBody>`, …).
+   Example:
+
+   ```bash
+   printf '%s\n' "$body" | "${CLAUDE_PLUGIN_ROOT}/scripts/validate-ctx.sh" >/dev/null
+   # exit 0 = compliant; 1 = malformed (reason on stderr); 2 = not-in-format
+   ```
+
+4. **Write each approved+validated ticket's `[CTX]`** via `addCommentToJiraIssue`,
+   following the *Write mechanics* rule in `jira-comment-format` (blank line before/after
+   every section label and bullet list, or build ADF directly) so labels like
+   `Decisions:`/`Next:` don't get absorbed into the preceding bullet. **Per-ticket
+   failures are isolated** — one ticket's 404 / permission error does not abort the
+   others.
 
 ## 6. Report
 
