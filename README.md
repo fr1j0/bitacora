@@ -63,10 +63,10 @@ Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local ha
 | Command | Status | What it does |
 |---------|--------|--------------|
 | `/bitacora:handoff` | ✅ **Phase 1** | Wrap up a session cleanly. Writes a structured `[CTX]` comment to each touched Jira ticket plus a local handoff for next-session continuity. |
-| `/bitacora:help` | ✅ **Phase 1** | Print the Bitácora command reference — shipped commands and the planned roadmap. |
+| `/bitacora:help` | ✅ **Phase 1** | Print the Bitácora command reference. |
 | `/bitacora:resume` | ✅ **Phase 1** | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
 | `/bitacora:status` | ✅ **Phase 1** | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary — PM (`--for-pm`), engineer (`--for-eng`), or self (`--for-self`, default). Read-only: prints the summary and offers a clipboard copy. |
-| `/bitacora:next` | 🚧 Planned | Smart morning ticket picker. Reads your boards, categorizes by pickup cost, and surfaces reasoning for each candidate. |
+| `/bitacora:next` | ✅ **Phase 1** | Morning ticket picker. Reads the tickets assigned to you, categorizes by pickup cost (Continue / Ready / Quick wins + a Needs-attention tail), annotates each with a `[CTX]`-grounded reason-to-pick, recommends one, and chains into `/bitacora:resume <KEY>`. Read-only. |
 
 > Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
 

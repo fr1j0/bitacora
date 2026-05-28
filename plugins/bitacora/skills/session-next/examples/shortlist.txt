@@ -1,0 +1,18 @@
+Picked up 23 tickets assigned to you. Today's shortlist:
+
+━━ Continue where you left off ━━
+★ PROJ-1234  OAuth callback handling            [In Progress]
+  Last handoff: "callback wired, next is token refresh" · 3d ago
+  → near completion, lowest context cost
+
+━━ Ready to start ━━
+  PROJ-1287  Migrate user prefs to new schema   [Ready]  P1
+  → spec finalized; unblocks PROJ-1290 + PROJ-1291
+
+━━ Quick wins ━━
+  PROJ-1311  Fix flaky auth integration test    [Ready]  P2
+  → ~1-2h, isolated race in mock setup
+
+Needs attention: 1 blocked (PROJ-1298, 6d silent) · 1 stale (PROJ-1156, 47d)
+
+→ Continue: /bitacora:resume PROJ-1234   ·   → re-run /bitacora:next for a different cut
