@@ -59,6 +59,19 @@ validator checks only the `[CTX]` prefix and the presence of `Status:`/`Next:` l
   every URL as either a markdown link `[label](https://...)` (preferred — readable label)
   or an autolink `<https://...>` (label = URL). If you build ADF directly, attach a
   `link` mark to the URL text node. See `examples/malformed-bare-url.txt`.
+- **Identifiers get backticks.** Wrap file paths, branch names, commit SHAs, symbol
+  names, and config keys in inline code (`` `splitPortfolioName` ``,
+  `` `features/client-portfolios/portfolio-utils.ts` ``). They render as `code` marks
+  in ADF and stand out from prose, making the comment scannable. Bare-text identifiers
+  blend into surrounding text and slow the reader.
+- **Compact references over bare URLs.** When you mention a PR or a cross-ticket, link
+  the short reference, not the full URL. Write ``PR [#7951](https://github.com/org/repo/pull/7951)``
+  or ``[AT-4537](https://wgen4.atlassian.net/browse/AT-4537)``. The visible label stays
+  the short token humans naturally read (`#7951`, `AT-4537`); the URL is hidden behind
+  it. Same rationale as the URL bullet above, applied to references humans write as
+  short tokens rather than full URLs. The validator does not enforce this — bare
+  `#7951` or `AT-4537` tokens are too easy to false-positive on (commit messages,
+  branch names) — but writers should follow the convention.
 - **No tool-call XML in the body.** Substrings like `<parameter name=`, `</commentBody>`,
   `<invoke name=` are agent-tool-call sentinels — they indicate the authoring agent
   serialized part of its own MCP call into the comment. Never appears in a legitimate
