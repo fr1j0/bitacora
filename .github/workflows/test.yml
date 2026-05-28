@@ -5,9 +5,26 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
-  validate-ctx:
+  lint:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: ShellCheck (severity warning+)
+        # ShellCheck binary ships preinstalled on ubuntu-latest runners.
+        # Severity threshold suppresses info-level findings (SC1091 unresolved
+        # source paths, SC2015 intentional A&&B||C assertion idiom in test harnesses).
+        run: shellcheck --severity=warning plugins/bitacora/scripts/*.sh plugins/bitacora/statusline/*.sh
+
+  shell-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - name: Run [CTX] validator tests
