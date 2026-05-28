@@ -81,8 +81,10 @@ Never write to Jira before this gate.
 ## 5. Write — LOCAL FIRST
 
 1. **Save the consolidated scratch via Remember:** invoke the `remember:remember` skill,
-   passing the scratch content prepared in step 3. If it fails, warn, **print the scratch
-   to screen** for manual save, and ask whether to still attempt the Jira writes.
+   passing the scratch content prepared in step 3. If it fails, warn and **print the
+   scratch to screen** for manual save, then proceed to the Jira writes — the existing
+   per-ticket confirmation gate in step 4 still applies; do **not** add a second
+   "still attempt Jira writes?" prompt here.
 2. **Resolve the Atlassian site:** `getAccessibleAtlassianResources` → `cloudId`. If
    multiple sites, ask which (or use a `jira_cloud_id` override if configured).
 3. **Validate each drafted `[CTX]` body before writing.** Pipe the body through
@@ -135,8 +137,10 @@ Exact command:
 - **Atlassian MCP absent / auth fails / site unresolvable:** treat exactly like the
   no-ticket path — skip the Jira half gracefully, complete the local scratch, report the
   reason. **No retry loop.**
-- **Ticket 404 / no write permission:** surface for that ticket, keep its draft, offer
-  retry with a different key or skip; other tickets unaffected.
+- **Ticket 404 / 403 / no write permission:** surface for that ticket, keep its draft,
+  offer retry with a different key or skip; other tickets unaffected. (`getJiraIssue`
+  may succeed while `addCommentToJiraIssue` returns 403 — Jira's project-level comment
+  permission is a distinct grant from view permission.)
 - **Empty/trivial session:** say "nothing substantive to hand off" and write nothing
   unless the user insists.
 - **Remember unavailable:** warn, print the scratch for manual save, still offer the Jira
