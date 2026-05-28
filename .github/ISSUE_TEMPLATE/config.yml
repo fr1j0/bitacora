@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Read the scope notes first
+    url: https://github.com/fr1j0/bitacora#what-lives-where--status-vs-scratch
+    about: Before opening an issue, skim "What lives where" in the README.
