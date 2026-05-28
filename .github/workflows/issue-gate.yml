@@ -75,13 +75,13 @@ jobs:
             }' -F owner="$OWNER" -F name="$NAME" -F number="$PR")
 
           # Extract: array of "number:label1,label2,..." strings
-          linked=$(jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[] | "\(.number):\([.labels.nodes[].name] | join(","))"' <<<"$response")
+          linked=$(jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[] | "\(.number):\([.labels.nodes[].name] | join(","))"' <<<"$response" || true)
 
           # ------------------------------------------------------------------
           # No linked issues at all -> fail
           # ------------------------------------------------------------------
           if [ -z "$linked" ]; then
-            msg=$(cat <<'MSG'
+            msg=$(cat <<'MSG' | sed 's/^          //'
           Gate failed — no linked issue found.
 
           Add `Closes #<N>` (or `Fixes #<N>` / `Resolves #<N>`) to the PR body, or link an
@@ -120,7 +120,7 @@ jobs:
           # Linked issues exist but none are ready-for-dev -> fail
           # ------------------------------------------------------------------
           list=$(IFS=,; echo "${unapproved[*]}" | sed 's/,/, #/g')
-          msg=$(cat <<MSG
+          msg=$(cat <<MSG | sed 's/^          //'
           Gate failed — linked issue(s) #${list} are not yet approved for coding.
 
           A maintainer needs to triage them and apply the \`ready-for-dev\` label before
