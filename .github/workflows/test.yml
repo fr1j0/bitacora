@@ -14,3 +14,7 @@ jobs:
         run: bash plugins/bitacora/scripts/test-validate-ctx.sh
       - name: "Run /bit: alias sync tests"
         run: bash plugins/bitacora/scripts/test-sync-bit-aliases.sh
+      - name: Run statusline tests
+        run: bash plugins/bitacora/scripts/test-statusline.sh
+      - name: Run statusline sync tests
+        run: bash plugins/bitacora/scripts/test-sync-statusline.sh
