@@ -98,6 +98,22 @@ scratch result, offer to retry any failed tickets within this same invocation (t
 is already safe; a new invocation would overwrite it), and
 note it's safe to `/clear`.
 
+## 7. Mark the session handed off (for the statusLine indicator)
+
+After a successful Report — whether full Jira-writing or local-only — write the current
+epoch seconds to `.bitacora/last-handoff` in the project root. Create `.bitacora/` if it
+does not exist. This marker is read by the opt-in Bitácora statusLine to clear the
+`✎ handoff pending` segment. Resetting the clock on local-only handoffs is harmless and
+keeps the indicator from going stale forever on Jira-less work. Skip silently if the
+working directory is not a git repo (no `.git`) — the indicator is git-scoped, and there
+is nothing for it to read in that case.
+
+Exact command:
+
+```bash
+[ -d .git ] && { mkdir -p .bitacora && date +%s > .bitacora/last-handoff; } || true
+```
+
 ## Error / edge behavior
 
 - **Atlassian MCP absent / auth fails / site unresolvable:** treat exactly like the
