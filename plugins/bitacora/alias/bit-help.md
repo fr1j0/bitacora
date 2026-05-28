@@ -18,10 +18,10 @@ Bitácora — commands
                                 ticket's latest [CTX] (read-only).
   /bitacora:status [KEY]        Summarize a ticket's latest [CTX] for an
                                 audience (--for-pm/--for-eng/--for-self).
+  /bitacora:next                Morning ticket picker — categorized
+                                shortlist of your assigned tickets
+                                grounded in [CTX] (read-only).
   /bitacora:help                Show this command reference.
 
-  Planned
-  /bitacora:next      Morning ticket picker across your boards.
-
-  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:help (opt-in — see plugin README)
+  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:next, /bit:help (opt-in — see plugin README)
 ```
