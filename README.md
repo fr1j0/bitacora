@@ -15,7 +15,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an `improve` rewriter for vague tickets, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
@@ -25,8 +25,8 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 ## At a glance
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
-- **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, and morning ticket picking.
-- **Today** — Phase 1 is complete: `handoff`, `resume`, `status`, `next`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
+- **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, morning ticket picking, and corpus-grounded ticket sharpening.
+- **Today** — Phase 1 is complete: `handoff`, `resume`, `status`, `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
 ## What it does
@@ -36,11 +36,11 @@ Bitácora is a small plugin that builds on the Claude Code ecosystem:
 - **Atlassian Rovo MCP** — the Jira and Confluence primitives Bitácora reads and writes through *(required)*
 - **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears *(optional companion)*
 
-What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, and picking work — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
+What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, picking work, and sharpening vague tickets — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
 ## What lives where — status vs. scratch
 
-Bitácora's job is **status** — the durable, ticket-level narrative a teammate would care about: where the work stands, the decisions behind it, and what's next. That belongs in Jira, on the ticket, in the open. That's what `[CTX]` comments are.
+Bitácora's job is **status** — the durable, ticket-level narrative a teammate would care about: where the work stands, the decisions behind it, and what's next. That belongs in Jira, on the ticket, in the open. That's what `[CTX]` comments are. `/bitacora:improve` extends the same principle to the ticket itself — sharpening a vague description or title is durable, shared, in-the-open work too, just on Jira fields instead of comments.
 
 What Bitácora deliberately *doesn't* manage is the **high-frequency scratch** between sessions — the running breadcrumbs, the small "just did X" notes, the granular working state that turns over every few minutes. That data is local, personal, and churny, and it has its own tools:
 
@@ -142,7 +142,7 @@ Next:
 
 No hand-typed date — the comment's own timestamp is authoritative. A blank line separates every section so the labels render as headings, not as part of the previous bullet.
 
-Agents reading the ticket for `/bitacora:status` synthesis, `/bitacora:handoff` resume, or cross-ticket queries use only `[CTX]`-prefixed comments — free-form human discussion is ignored for state extraction.
+Agents reading the ticket for `/bitacora:resume`, `/bitacora:status`, `/bitacora:next`, or cross-ticket queries use only `[CTX]`-prefixed comments — free-form human discussion is ignored for state extraction. (`/bitacora:improve` and `/bitacora:handoff`'s continuity-read are the lenient exceptions: they read everything, because requirements and prior-handoff context often live in human discussion.)
 
 This creates a virtuous loop: the more team members adopt the format, the more useful the shared memory layer becomes. See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](docs/JIRA_AGENT_COMMENT_FORMAT.md) for the full spec.
 
