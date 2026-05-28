@@ -69,6 +69,7 @@ All commands below are **Phase 1 — shipped.**
 | `/bitacora:resume` | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
 | `/bitacora:status` | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary — PM (`--for-pm`), engineer (`--for-eng`), or self (`--for-self`, default). Read-only: prints the summary and offers a clipboard copy. |
 | `/bitacora:next` | Morning ticket picker. Reads the tickets assigned to you, categorizes by pickup cost (Continue / Ready / Quick wins + a Needs-attention tail), annotates each with a `[CTX]`-grounded reason-to-pick, recommends one, and chains into `/bitacora:resume <KEY>`. Read-only. |
+| `/bitacora:improve` | Sharpen a ticket — corpus-grounded structured rewrite (Story / Bug / Epic / Subtask aware) with a snapshot to an `[ARCHIVE]` Jira comment before any field edit. Read + write; description by default, title opt-in per invocation. |
 
 > Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
 

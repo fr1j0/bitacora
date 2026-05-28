@@ -21,7 +21,10 @@ Bitácora — commands
   /bitacora:next                Morning ticket picker — categorized
                                 shortlist of your assigned tickets
                                 grounded in [CTX] (read-only).
+  /bitacora:improve             Sharpen a ticket — corpus-grounded
+                                rewrite (Story/Bug/Epic-aware) with a
+                                snapshot to [ARCHIVE] before the edit.
   /bitacora:help                Show this command reference.
 
-  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:next, /bit:help (opt-in — see plugin README)
+  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:next, /bit:improve, /bit:help (opt-in — see plugin README)
 ```

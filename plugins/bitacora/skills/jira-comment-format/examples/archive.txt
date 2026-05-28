@@ -1,0 +1,14 @@
+[ARCHIVE] Pre-improve snapshot — 2026-05-28T14:23:11Z
+
+Posted by /bitacora:improve before rewriting the fields. The block(s)
+below are the verbatim pre-edit content; safe to scroll past.
+
+---
+
+Title (pre-edit):
+
+> Make the export pipeline faster
+
+Description (pre-edit):
+
+> Users want this faster. Should work on mobile too.

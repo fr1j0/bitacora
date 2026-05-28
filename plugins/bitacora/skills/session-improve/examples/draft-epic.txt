@@ -1,0 +1,64 @@
+Improving PROJ-2010 — "Multi-tenant data isolation"  (Epic, In Progress)
+Corpus: 6 [CTX] comments · 11 free-form comments · 9 Remember hits · 17 commits · 4 PRs
+
+3 clarifying questions before rewriting:
+
+1. "data isolation" — row-level (RLS) or schema-per-tenant? Two [CTX] comments mention
+   both approaches — confirm direction. (anchor: [CTX] #2 + comment #5 from arch@)
+2. comment #7 references AT-1801 as the "billing tenant" prerequisite — is that
+   blocking, supporting, or out of scope? (anchor: comment #7)
+3. The 4 child stories named in comments span 6 weeks of work — is the timeline a
+   constraint, or driven by the team's other commitments? (anchor: comment #11)
+
+Answers (or "skip"): > schema-per-tenant · blocking prereq · timeline is hard
+
+--- description (proposed) ---
+
+Goal
+
+Isolate every tenant's data at the database level so a buggy or compromised query
+cannot leak rows across tenants. Today shared tables + a `tenant_id` filter at the
+ORM layer is the only boundary; we need defense-in-depth.
+
+Scope outline
+
+- Schema-per-tenant boundary at the Postgres level (chosen over row-level security
+  for read-path performance — see [CTX] #2)
+- Migration tooling that runs DDL once and replays per-tenant
+- Connection-pool changes to route to the right schema by tenant context
+- Backfill of existing tenants in batches (no downtime)
+- The 4 child stories referenced across the comment trail cover the four phases
+  above; see them for sequencing — this epic does not duplicate their detail.
+
+Success criteria
+
+- Zero cross-tenant data visible in any query path, verified by the new isolation
+  test suite (introduced in this epic)
+- No tenant request hits the wrong schema during a one-week staging soak; p99 read
+  latency stays within 5% of the pre-change baseline
+- Backfill completes for all current tenants without a maintenance window
+- AT-1801 (billing tenant prereq) lands before the connection-pool changes ship
+
+Risks
+
+- Connection-pool routing is the most under-spec'd piece (parked thread with arch@
+  in comment #5); design lands or this epic stalls
+- AT-1801 is on the critical path — slippage there blocks the second half
+- Backfill batches may hit migration timeouts on the largest tenants; mitigation
+  parked in comment #9
+
+Out of scope
+
+- Row-level security (rejected for read-path cost; see [CTX] #2)
+- Per-tenant encryption-at-rest (separate epic, NOT this one)
+- Tenant-onboarding UI changes (product epic, not platform)
+
+--- title (proposed) ---
+- (current)  "Multi-tenant data isolation"
+- (new)      "Multi-tenant isolation: schema-per-tenant + zero-downtime backfill"
+
+MCP write pending:
+  - 1 [ARCHIVE] snapshot comment
+  - 2 field edits — description + title
+
+Confirm? (y/N)
