@@ -136,7 +136,8 @@ Read `issuetype.name` from the API; pick a section template:
 |------|---------------------|
 | **Story** *(default — also `Task`, `Improvement`, unknown)* | Acceptance criteria · Technical notes · Out of scope · Open questions |
 | **Bug** | Steps to reproduce · Expected · Actual · Environment · Notes |
-| **Epic** | Goal · Scope · Constituent stories · Risks · Out of scope |
+| **Epic** | Goal · Scope outline · Success criteria · Risks · Out of scope |
+| **Spike** | Question · Approach · Timebox · Out of scope · Recommendation *(left empty until the spike concludes)* |
 | **Subtask** | Acceptance criteria · Technical notes *(lighter shape; just these two)* |
 
 Compose the new description from the chosen template, populating each section from the
