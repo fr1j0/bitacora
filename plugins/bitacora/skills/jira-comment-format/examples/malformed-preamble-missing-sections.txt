@@ -1,0 +1,7 @@
+(Housekeeping note: replaces an earlier draft.)
+
+[CTX] Status update
+
+Status: In Progress
+Done:
+  - OAuth provider client implemented and tested

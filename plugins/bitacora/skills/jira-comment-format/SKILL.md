@@ -87,12 +87,17 @@ correctly.
 
 ## Read-side compliance
 
-- **Strict prefix match.** Use `trimmed_text.startswith("[CTX]")`, NOT substring
-  containment. A comment that mentions `[CTX]` mid-sentence (e.g. `"as we noted in
-  yesterday's [CTX]..."`) is *non-`[CTX]`* — never an attempt at compliance. See
-  `examples/non-ctx.txt`.
-- **Compliant** = starts with `[CTX]` header + has a `Status:` line + a `Next:` line.
-  Optional sections never affect compliance.
+- **Prefix match, with optional preamble.** A comment is treated as `[CTX]` if its
+  first *non-preamble* line starts with `[CTX]`. Preamble = zero or more leading lines
+  that are blank or whose trimmed content begins with `_`, `*`, or `(` (italic-markdown
+  or parenthesized housekeeping notes — e.g. `_(Replaces malformed comment 58307.)_`).
+  A short note above the header is established practice; the structural check skips
+  past it but hygiene rules still scan the full body. A comment that mentions `[CTX]`
+  mid-sentence (e.g. `"as we noted in yesterday's [CTX]..."`) is *non-`[CTX]`* — never
+  an attempt at compliance. See `examples/non-ctx.txt` and
+  `examples/compliant-with-preamble.txt`.
+- **Compliant** = `[CTX]` header (after any preamble) + a `Status:` line + a `Next:`
+  line. Optional sections never affect compliance.
 - **Two failure classes, surfaced separately:**
   - *non-`[CTX]`* (free-form human comment) → skip, count as "not in format".
   - *malformed `[CTX]`* (starts with `[CTX]` but missing `Status`/`Next`) → skip,
