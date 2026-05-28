@@ -28,3 +28,6 @@ statusline-debug.log
 node_modules/
 dist/
 build/
+
+# Bitácora per-project state (handoff marker for the statusLine indicator)
+.bitacora/
