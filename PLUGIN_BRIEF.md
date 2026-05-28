@@ -1,5 +1,25 @@
 # Bitácora — Jira-Aware Workflow Plugin for Claude Code
 
+> [!IMPORTANT]
+> **Historical document — pre-ship design brief (drafted 2026-05-27).**
+>
+> This brief documents the **original design intent**. Several claims have since diverged from what shipped:
+>
+> - **Phase 2** (`/improve-ticket`) was dropped on 2026-05-27, then revived as `/bitacora:improve` (PR #45). The Phase 2 section below has been updated inline to reflect the revival, but the working name `/improve-ticket` is used throughout that block.
+> - **Phase 3** (`/status`) shipped as `/bitacora:status` (PR #26, audience-tailored: `--for-pm` / `--for-eng` / `--for-self`).
+> - **Phase 4** (`/spike`) was **dropped** (PR #29). Out of scope; do not propose rebuilding.
+> - **Phase 5** (`/what-next`) shipped as `/bitacora:next` (PR #42).
+> - **Phase 6** (statusLine) shipped (PR #30) — opt-in, with a `✎ handoff pending` segment.
+> - The [Repository layout](#repository-layout) sketch (the directory tree near the top) is the *original* design — the actual layout has diverged: no `agents/` directory, skills live as `skills/<name>/SKILL.md` directories, and several files have been added or renamed.
+> - The [CTX] example block under [Cross-cutting: agent-comment format discipline](#cross-cutting-agent-comment-format-discipline) shows a date in the header (`[CTX] Status update — <YYYY-MM-DD>`). The **shipped format forbids dates** in headers — the Jira comment's own `created` timestamp is authoritative.
+> - The strict/lenient compliance table in the same section labels `/handoff` resume-read as **strict**. The shipped skill (`plugins/bitacora/skills/jira-comment-format/SKILL.md`) defines it as **lenient** — that table row contradicts the operational source of truth and should not be trusted.
+>
+> **For the shipped surface, see** [`README.md`](README.md) (intro + commands), [`plugins/bitacora/README.md`](plugins/bitacora/README.md) (plugin docs), and the skill files under `plugins/bitacora/skills/*/SKILL.md` (operational source of truth). The skill files always win on any disagreement.
+>
+> Treat the rest of this document as the design narrative that produced the shipped artifacts. Do not implement claims here without cross-checking the README and skills.
+
+---
+
 > **Brand name:** Bitácora (with accent, for human-facing surfaces)
 > **Technical identifier:** `bitacora` (lowercase, ASCII, for repo names, package slugs, shell commands)
 >
