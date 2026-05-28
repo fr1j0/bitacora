@@ -6,7 +6,7 @@
 
 **Architecture:** Two shell scripts under `plugins/bitacora/statusline/` (`statusline.sh` + sourceable `handoff-pending.sh` pure function) — the pure-function-plus-thin-I/O pattern from `validate-ctx.sh`. A new `plugins/bitacora/scripts/sync-statusline.sh` mirrors `sync-bit-aliases.sh` for the opt-in copy. `session-handoff` skill is extended to write `.bitacora/last-handoff` (the marker the indicator reads). Two new test scripts wired into CI.
 
-**Tech Stack:** bash 4+, `jq`, `git` (each git call wrapped in `timeout 1` so the statusLine never hangs), Claude Code `statusLine.command` JSON-over-stdin contract.
+**Tech Stack:** bash 3.2+ (so it runs on stock macOS), `jq`, `git` (each git call wrapped in `timeout 1` when available — falls back to no-op on stock macOS), Claude Code `statusLine.command` JSON-over-stdin contract.
 
 **Spec:** `docs/superpowers/specs/2026-05-28-bitacora-statusline-design.md`
 

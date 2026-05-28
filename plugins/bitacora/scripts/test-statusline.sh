@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# Tests statusline.sh — pure function + full-render fixtures.
-# (Full-render section is added in Task 4.)
+# Tests statusline.sh — pure function (Part 1) + full-render fixtures (Part 2).
 set -uo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
 STATUSLINE_DIR="$DIR/../statusline"
