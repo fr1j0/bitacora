@@ -214,6 +214,3 @@ improve:
   remember_paths:             # extra paths to scan for the ticket key (cwd is always scanned)
     - ~/.claude/projects
 ```
-
-See `examples/draft-story.txt` and `examples/draft-bug.txt` for rendered examples of
-the two most common section templates.
