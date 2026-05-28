@@ -52,6 +52,52 @@ shows up automatically (on the next session) — no need to re-run the snippet. 
 is **opt-in and additive**: it does nothing until that dir exists, and it only adds or
 updates files, never deletes them.
 
+## Optional: the statusLine
+
+A single-line Claude Code statusLine that shows what ticket/branch you're on, how full
+your context window is, and whether you have un-handed-off ticket work. Bolds + reds at
+≥85% context — the moment to run `/bitacora:handoff` then `/clear` + `/bitacora:resume`.
+
+```
+AT-4104  ·  ctx ██████░░ 76%  ·  ✎ handoff pending
+```
+
+Opt in once (per machine):
+
+```bash
+mkdir -p ~/.claude/bitacora
+src_file="$(find ~/.claude/plugins -path '*bitacora/statusline/statusline.sh' | head -1)"
+if [ -z "$src_file" ]; then
+  echo "bitacora statusline not found — is the plugin installed?" >&2
+else
+  cp "$(dirname "$src_file")"/*.sh ~/.claude/bitacora/
+fi
+```
+
+Then add this to `~/.claude/settings.json`:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/bitacora/statusline.sh"
+  }
+}
+```
+
+After opt-in, a `SessionStart` hook keeps the scripts in sync at `~/.claude/bitacora/`
+so future plugin releases pick up automatically — no need to re-run the snippet.
+
+**Caveats**
+
+- **Claude Code permits exactly one `statusLine.command`** — installing this **replaces**
+  any existing statusLine. Wrap our script if you have your own (unsupported in v1).
+- The `✎ handoff pending` segment appears only on ticket branches (`PROJ-1234`-style names)
+  with unsaved work since the last `/bitacora:handoff`.
+- Set `NO_COLOR=1` to disable ANSI; a `⚠ ` prefix substitutes at the escalation threshold.
+- Per-segment toggles via env vars: `BITACORA_SHOW_BRANCH`, `BITACORA_SHOW_METER`,
+  `BITACORA_SHOW_HANDOFF`, `BITACORA_THRESHOLD` (default `85`).
+
 ## The `[CTX]` format
 
 See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](../../docs/JIRA_AGENT_COMMENT_FORMAT.md). The
