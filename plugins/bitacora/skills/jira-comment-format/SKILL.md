@@ -142,6 +142,26 @@ Phase 1 ships and exercises the **write** path. The strict-read machinery is def
 here for later consumers; the only read Phase 1 performs is handoff's lenient
 continuity-read, which falls back gracefully when there is no prior `[CTX]`.
 
+## Sibling prefixes (out-of-format)
+
+Bitácora reserves the `[CTX]` prefix for state-extraction reads. Other prefixes are
+written by specific commands for distinct purposes; `validate-ctx.sh` classifies them
+as `not-in-format` (exit 2) and strict readers (`/bitacora:resume`,
+`/bitacora:status`, `/bitacora:next`) skip them — intentionally, because they are
+not state updates.
+
+| Prefix | Written by | Purpose |
+|--------|------------|---------|
+| `[ARCHIVE]` | `/bitacora:improve` | Pre-edit snapshot of the ticket's description and/or title, posted **before** the field rewrite so the original is reversible by copy-paste. |
+
+`[ARCHIVE]` is the only sibling prefix in v1. A future command adding a new sibling
+prefix should land here with the same row shape: prefix, writer command, purpose. The
+validator's prefix check is intentional: anything that doesn't start with `[CTX]` is
+classified `not-in-format` and skipped by strict readers, no further machinery
+required.
+
+See `examples/archive.txt` for a rendered `[ARCHIVE]` body.
+
 ## Configuration
 
 Defaults (used inline unless overridden):
