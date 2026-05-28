@@ -75,8 +75,6 @@ All commands below are **Phase 1 — shipped.**
 
 ✅ **statusLine** *(opt-in)* — a single-line context-window meter that bolds red at ≥85% so you know when to `/bitacora:handoff` then `/clear` + `/bitacora:resume`. Also shows the active ticket and a `✎ handoff pending` marker. Opt-in setup in the [plugin README](plugins/bitacora/README.md#optional-the-statusline).
 
-🚧 **`[CTX]` commit anchor** *(idea)* — an optional anchor line tying a `[CTX]` comment to the commit/PR it reflects, so resume and debugging can ground state in real code: verify "done" against the diff, or bisect a regression from a known-good point. Uses a PR-relative form (e.g. `PR #17 @ 4a29459`) to survive squash-merges.
-
 ## Why this exists
 
 The short version: long Claude Code sessions degrade. The context window fills up, attention spreads, decisions drift. The honest move is to clear and resume — but resuming cleanly requires a structured handoff somewhere. And if you do that handoff in Jira (where work already lives), in a format other agents can read, you get something better than personal memory: a shared external memory layer for the whole team.
