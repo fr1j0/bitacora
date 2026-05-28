@@ -33,8 +33,10 @@ resume cannot do its job without Jira read access.
 
 ## 3. Read the ticket
 
-`getJiraIssue` for the resolved key, **requesting comments**. Extract `[CTX]` comments per
-the **READ** rules in `bitacora:jira-comment-format`:
+`getJiraIssue` for the resolved key, **requesting comments**. Extract `[CTX]` comments
+using **strict** compliance per the READ rules in `bitacora:jira-comment-format`
+(compliant `[CTX]` only — comments missing `Status:`/`Next:` are tallied as malformed,
+non-`[CTX]` comments as not-in-format; never silently dropped):
 
 - The **latest** `[CTX]` is authoritative for `Status` and `Next`.
 - Read up to `resume.ctx_lookback` prior `[CTX]` comments (default 1) to reconstruct a

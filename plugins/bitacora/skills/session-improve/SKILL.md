@@ -38,8 +38,10 @@ cannot do its job without Jira read + write access.
 `summary` (title), `issuetype.name`, `status`, and **all comments** (lenient — `[CTX]`
 and free-form both, per `bitacora:jira-comment-format`).
 
-- **404 / no edit permission on the ticket:** hard stop; name the cause. Improve writes
-  to the ticket; read-only access is not enough.
+- **Ticket 404 on read:** hard stop; name the cause. (Edit permission cannot be
+  preflighted here — `getJiraIssue` is a read call. A 403 on `editJiraIssue` in
+  step 9 is treated as a write failure per the failure-mode table in that step,
+  not as a hard stop at read time.)
 
 ## 4. Ask scope (title / description / both)
 
@@ -188,9 +190,10 @@ No clipboard, no chained command. Read-and-confirm-then-write is the discipline.
 
 ## Error / edge behavior
 
-- **Atlassian MCP absent / auth fails / site unresolvable / 404 / no edit permission
-  on the ticket:** **hard stop.** Name the cause; do not pretend a local-only
-  fallback.
+- **Atlassian MCP absent / auth fails / site unresolvable / ticket 404 on read:**
+  **hard stop.** Name the cause; do not pretend a local-only fallback. (Edit-permission
+  failures surface at *write* time, in step 9 — see "Failure modes during writes"
+  there.)
 - **Empty description + zero comments + zero Remember hits + zero git hits:** decline
   with a clear message — there is nothing to ground a rewrite on. Suggest the user
   post a free-form comment describing the goal, then retry.

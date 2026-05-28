@@ -37,10 +37,12 @@ type, `updated`, effort estimate (story points or time-tracking, whichever the p
 populates), and issue links (outward `blocks`, inward `is blocked by`).
 
 The `[CTX]` read is **bounded for cost**: deep-read comments (strict `[CTX]` per
-`bitacora:jira-comment-format`) **only for likely Continue candidates** — tickets that are
-`In Progress` or `updated` within the last few days. Do **not** fetch comments for all
-~50 tickets every morning (that is ~50 extra calls); other buckets rank from search
-fields alone.
+`bitacora:jira-comment-format`) **only for likely Continue candidates** — tickets that
+are `In Progress` *or* `updated` within the last 7 days. Do **not** fetch comments for
+all ~50 tickets every morning (that is ~50 extra calls); other buckets rank from
+search fields alone. (The 7-day deep-read cutoff is intentionally tighter than
+`next.stale_days` (default 30, which gates the Needs-attention tail) — the deep-read
+cutoff governs morning latency cost, not what counts as "stale".)
 
 For each Continue candidate, pull the latest compliant `[CTX]`'s `Status` and `Next` lines.
 
@@ -115,6 +117,14 @@ Print, then stop. Read-only — no gate, no write.
   default — that would hide the user's config mistake.
 - **No `[CTX]` on Continue candidates:** fine — fall back to activity / status signals for
   the reason-to-pick; never block.
+- **HTTP 429 / rate-limit during the bounded `[CTX]` read loop** (up to ~50 candidates
+  is the cost ceiling that makes this realistic): stop fetching comments immediately,
+  use available search-field signals for remaining Continue candidates, and surface a
+  one-line rate-limit note in the footer. Do **not** retry mid-loop — back off until
+  the next invocation.
+- **Per-ticket `getJiraIssue` failure** (timeout, transient 5xx, isolated 403): log the
+  failure, fall back to activity/status signals for that ticket's reason-to-pick, and
+  continue the loop. One bad fetch should not abort the shortlist.
 - **All tickets fall in Needs attention** (nothing fresh enough to surface above): still
   render the tail; recommend nothing (no `★`) and suggest the user pick from the tail
   manually or revisit `next.stale_days`.
