@@ -18,11 +18,14 @@ check() {
   fi
 }
 
-check "$FIXTURES/compliant.txt"          compliant     0
-check "$FIXTURES/malformed.txt"          malformed     1
-check "$FIXTURES/malformed-bare-url.txt" malformed     1
-check "$FIXTURES/malformed-tool-leak.txt" malformed    1
-check "$FIXTURES/non-ctx.txt"            not-in-format 2
+check "$FIXTURES/compliant.txt"                       compliant     0
+check "$FIXTURES/compliant-with-preamble.txt"         compliant     0
+check "$FIXTURES/malformed.txt"                       malformed     1
+check "$FIXTURES/malformed-bare-url.txt"              malformed     1
+check "$FIXTURES/malformed-tool-leak.txt"             malformed     1
+check "$FIXTURES/malformed-preamble-bare-url.txt"     malformed     1
+check "$FIXTURES/malformed-preamble-missing-sections.txt" malformed 1
+check "$FIXTURES/non-ctx.txt"                         not-in-format 2
 
 # startswith, not substring: a comment mentioning [CTX] mid-line is NOT compliant
 mkstdin="$(mktemp)"
