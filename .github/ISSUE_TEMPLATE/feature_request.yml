@@ -7,8 +7,9 @@ body:
     attributes:
       value: |
         Bitácora has a [tight scope](https://github.com/fr1j0/bitacora#what-lives-where--status-vs-scratch) —
-        status-tracking and continuity. Ticket-authoring, /improve, /spike, and similar
-        are out of scope. Please confirm fit before filing.
+        status-tracking, continuity, and corpus-grounded sharpening of existing
+        tickets. Ticket-authoring from scratch and `/spike` are out of scope. Please
+        confirm fit before filing.
 
   - type: textarea
     id: problem

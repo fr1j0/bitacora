@@ -24,14 +24,14 @@ For each issue in the inbox, do **one** of:
 
 ## Scope guardrails
 
-Bitácora's scope is **status-tracking and continuity** — `[CTX]` comments, handoff,
-resume, status synthesis, and (planned) ticket-picking. Out of scope:
+Bitácora's scope is **status-tracking, continuity, and corpus-grounded sharpening of
+existing tickets** — `[CTX]` comments, handoff, resume, status synthesis, morning
+ticket-picking (`/bitacora:next`), and ticket rewriting (`/bitacora:improve`). Out of
+scope:
 
-- Ticket-authoring (creating Jira tickets from scratch).
-- `/improve` (sharpening vague tickets) — considered and dropped; native Jira AI suffices.
-- `/spike` (running spikes from prompts) — considered and dropped; reads status, not
-  authors.
-- Anything that mutates Jira ticket fields beyond comments.
+- Ticket-authoring (creating new Jira tickets from scratch).
+- `/spike` (creating timeboxed exploratory tickets from prompts) — considered and
+  dropped; ticket-creation falls outside Bitácora's read-and-sharpen scope.
 
 If an issue proposes any of the above, it's a polite close.
 
