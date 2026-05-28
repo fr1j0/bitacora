@@ -35,7 +35,7 @@ fake_repo() {
   rm -rf "$repo"
   mkdir -p "$repo"
   (
-    cd "$repo"
+    cd "$repo" || exit 1
     git init -q
     git checkout -q -b "$branch"
     : > f
@@ -59,7 +59,7 @@ fake_repo "$repo" "AT-1234"
 # at the commit timestamp so the baseline state is "already handed off" (clean).
 printf '.bitacora/\n' >> "$repo/.gitignore"
 (
-  cd "$repo"
+  cd "$repo" || exit 1
   git add .gitignore
   GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t \
     git commit -q -m "chore: ignore .bitacora"
