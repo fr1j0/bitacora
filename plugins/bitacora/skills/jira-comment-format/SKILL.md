@@ -129,8 +129,8 @@ on stderr. **Handoff pipes every drafted body through it before writing.**
 
 | Operation | Mode | Phase |
 |-----------|------|-------|
-| `/status`, `/what-next`, cross-ticket JQL | strict | 3 / 5 / later |
-| `/improve-ticket` source read, onboarding, decision archaeology | lenient | 2+ |
+| `/bitacora:status`, `/bitacora:next`, cross-ticket JQL | strict | 3 / 5 / later |
+| `/bitacora:improve` source read, onboarding, decision archaeology | lenient | 2+ |
 | `/bitacora:handoff` continuity read (read latest `[CTX]` to thread `Status`/`Next`, avoid restating `Done`) | lenient | 1 |
 
 - **strict** = count a comment only if it is *compliant* (starts with `[CTX]` and has
@@ -148,8 +148,8 @@ Defaults (used inline unless overridden):
 
 ```yaml
 comment_compliance:
-  status_extraction: strict          # /status, /what-next, JQL
-  requirements_reading: lenient      # /improve-ticket, onboarding
+  status_extraction: strict          # /bitacora:status, /bitacora:next, JQL
+  requirements_reading: lenient      # /bitacora:improve, onboarding
   show_excluded_count: true
   partial_match: false               # strict prefix only
 project_key_pattern: "[A-Z][A-Z0-9]+-\\d+"   # top-level; shared by detection + JQL. DEFAULT only.
