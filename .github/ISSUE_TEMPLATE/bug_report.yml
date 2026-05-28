@@ -1,0 +1,71 @@
+name: Bug report
+description: Something Bitácora does but shouldn't, or doesn't but should.
+title: "[bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. The more concrete the repro, the faster we can fix.
+        Please skim open issues first to avoid duplicates.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One or two sentences. What broke?
+      placeholder: "/bitacora:handoff fails when the ticket has no [CTX] comments yet."
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro_steps
+    attributes:
+      label: Steps to reproduce
+      description: Numbered steps from a clean state.
+      placeholder: |
+        1. Open a Jira ticket with no comments.
+        2. Run `/bitacora:handoff TICKET-123`.
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected_vs_actual
+    attributes:
+      label: Expected vs actual
+      placeholder: |
+        Expected: a draft [CTX] comment is generated.
+        Actual: command errors with "no comments found".
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Claude Code version, Atlassian MCP version, OS.
+      placeholder: |
+        Claude Code: 1.x.x
+        Atlassian Rovo MCP: x.y.z
+        OS: macOS 15.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / screenshots
+      description: Paste relevant log output. Redact ticket IDs and tokens.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues and didn't find a duplicate.
+          required: true
+        - label: I'm running the latest `main` (or have noted the version above).
+          required: true

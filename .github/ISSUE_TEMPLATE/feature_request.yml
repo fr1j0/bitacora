@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest a new command, workflow, or capability.
+title: "[feat] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bitácora has a [tight scope](https://github.com/fr1j0/bitacora#what-lives-where--status-vs-scratch) —
+        status-tracking and continuity. Ticket-authoring, /improve, /spike, and similar
+        are out of scope. Please confirm fit before filing.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What can't you do today, or what's painful?
+      placeholder: "When I resume on a ticket I haven't touched in a week, I want a 30-second recap..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: Roughly how would Bitácora address this?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you weighed, including doing nothing.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: scope_check
+    attributes:
+      label: Scope check
+      options:
+        - label: I've read the "What lives where" section and believe this is within scope (status-tracking / continuity, not ticket-authoring).
+          required: true

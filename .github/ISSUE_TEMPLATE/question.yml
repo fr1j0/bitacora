@@ -1,0 +1,33 @@
+name: Question
+description: You're stuck and the README didn't help.
+title: "[question] "
+labels: ["question", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions may be converted to a Discussion or closed without triage if they're
+        better suited elsewhere. That's not a rejection — it just helps keep the issue
+        tracker focused on bugs and features.
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: What are you trying to do?
+      placeholder: "I'm trying to wire /bitacora:resume into my existing handoff workflow..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+    validations:
+      required: true
+
+  - type: textarea
+    id: stuck_where
+    attributes:
+      label: Where are you stuck?
+    validations:
+      required: true

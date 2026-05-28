@@ -1,0 +1,131 @@
+# This workflow uses `pull_request_target` so it runs with the target repo's
+# write token even when the PR comes from a fork (required to post the sticky
+# comment). It does NOT check out PR head code; it only reads metadata via the
+# GitHub API. That keeps the security surface small — see issue-gate spec §Risks.
+name: Issue gate
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, edited, reopened, labeled, unlabeled]
+
+permissions:
+  pull-requests: write
+  issues: read
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run gate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          OWNER: ${{ github.repository_owner }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          MARKER='<!-- bitacora-issue-gate -->'
+          NAME="${REPO#*/}"
+
+          # ------------------------------------------------------------------
+          # post_or_update_sticky: write the marker comment, or edit it in place
+          # ------------------------------------------------------------------
+          post_or_update_sticky() {
+            local body="$1"
+            local full="${MARKER}"$'\n'"${body}"
+            # Look for an existing comment authored by github-actions[bot] with the marker.
+            local existing
+            existing=$(gh api "repos/${REPO}/issues/${PR}/comments" --paginate \
+              --jq ".[] | select(.user.login==\"github-actions[bot]\") | select(.body | startswith(\"${MARKER}\")) | .id" \
+              | head -n1 || true)
+            if [ -n "$existing" ]; then
+              gh api -X PATCH "repos/${REPO}/issues/comments/${existing}" -f body="$full" >/dev/null
+            else
+              gh pr comment "$PR" --repo "$REPO" --body "$full" >/dev/null
+            fi
+          }
+
+          # ------------------------------------------------------------------
+          # Override: PR carries skip-issue-check label?
+          # ------------------------------------------------------------------
+          pr_labels=$(gh pr view "$PR" --repo "$REPO" --json labels --jq '.labels[].name')
+          if grep -qx "skip-issue-check" <<<"$pr_labels"; then
+            post_or_update_sticky "$(printf 'Gate skipped — `skip-issue-check` applied by a maintainer.')"
+            exit 0
+          fi
+
+          # ------------------------------------------------------------------
+          # Query linked closing issues + their labels
+          # ------------------------------------------------------------------
+          response=$(gh api graphql -f query='
+            query($owner: String!, $name: String!, $number: Int!) {
+              repository(owner: $owner, name: $name) {
+                pullRequest(number: $number) {
+                  closingIssuesReferences(first: 20) {
+                    nodes {
+                      number
+                      labels(first: 30) { nodes { name } }
+                    }
+                  }
+                }
+              }
+            }' -F owner="$OWNER" -F name="$NAME" -F number="$PR")
+
+          # Extract: array of "number:label1,label2,..." strings
+          linked=$(jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[] | "\(.number):\([.labels.nodes[].name] | join(","))"' <<<"$response" || true)
+
+          # ------------------------------------------------------------------
+          # No linked issues at all -> fail
+          # ------------------------------------------------------------------
+          if [ -z "$linked" ]; then
+            msg=$(cat <<'MSG' | sed 's/^          //'
+          Gate failed — no linked issue found.
+
+          Add `Closes #<N>` (or `Fixes #<N>` / `Resolves #<N>`) to the PR body, or link an
+          issue manually in the right-hand sidebar. The linked issue must carry the
+          `ready-for-dev` label.
+
+          See [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) for the full flow.
+          MSG
+            )
+            post_or_update_sticky "$msg"
+            exit 1
+          fi
+
+          # ------------------------------------------------------------------
+          # At least one linked issue carries ready-for-dev -> pass
+          # ------------------------------------------------------------------
+          approved=()
+          unapproved=()
+          while IFS= read -r entry; do
+            num="${entry%%:*}"
+            labels="${entry#*:}"
+            if [[ ",${labels}," == *",ready-for-dev,"* ]]; then
+              approved+=("$num")
+            else
+              unapproved+=("$num")
+            fi
+          done <<<"$linked"
+
+          if [ "${#approved[@]}" -gt 0 ]; then
+            list=$(IFS=,; echo "${approved[*]}" | sed 's/,/, #/g')
+            post_or_update_sticky "Gate passed — linked to approved issue(s) #${list}."
+            exit 0
+          fi
+
+          # ------------------------------------------------------------------
+          # Linked issues exist but none are ready-for-dev -> fail
+          # ------------------------------------------------------------------
+          list=$(IFS=,; echo "${unapproved[*]}" | sed 's/,/, #/g')
+          msg=$(cat <<MSG | sed 's/^          //'
+          Gate failed — linked issue(s) #${list} are not yet approved for coding.
+
+          A maintainer needs to triage them and apply the \`ready-for-dev\` label before
+          this PR can merge. See [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md).
+          MSG
+          )
+          post_or_update_sticky "$msg"
+          exit 1
