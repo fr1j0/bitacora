@@ -1,0 +1,55 @@
+Improving PROJ-4055 — "spike: is partial prerendering worth it?"  (Spike, To Do)
+Corpus: 0 [CTX] comments · 3 free-form comments · 2 Remember hits · 0 commits · 0 PRs
+
+2 clarifying questions before rewriting:
+
+1. "worth it" — measuring against what? TTFB on /home, conversion rate, both? The
+   parked Slack link in comment #1 only mentions TTFB. (anchor: comment #1)
+2. Timebox in comment #2 says "a few days" — concrete number? Spikes need a hard
+   wall. (anchor: comment #2 from eng-lead@)
+
+Answers (or "skip"): > TTFB on /home + /pricing · 3 days
+
+--- description (proposed) ---
+
+Question
+
+Does Next.js partial prerendering (PPR) cut TTFB on /home and /pricing meaningfully
+(target ≥ 30% improvement at p75), and is the migration cost low enough to justify
+rolling it out across the rest of the public site?
+
+Approach
+
+- Day 1: enable PPR locally on /home only; measure TTFB cold + warm against the
+  current baseline; identify which components must be marked dynamic.
+- Day 2: try /pricing (more dynamic content); identify any blockers (third-party
+  scripts, the A/B framework integration); measure the same metrics.
+- Day 3: write a thumbs-up / thumbs-down recommendation with the per-page-class
+  migration cost estimate. Land a `[CTX] Spike concluded` comment with the
+  decision either way.
+
+Timebox
+
+3 working days. Hard wall — if we hit day 3 without numbers, we stop and recommend
+"insufficient data" rather than extending. No silent timebox creep.
+
+Out of scope
+
+- Migrating any production page in this spike. Findings go into a follow-up epic
+  (or a no-build decision).
+- Comparing against alternatives (full SSG, ISR). PPR-specific only.
+- Mobile-network simulation. Desktop fast-3G + cable in the experiments.
+
+Recommendation
+
+(left empty — pending spike conclusion)
+
+--- title (proposed) ---
+- (current)  "spike: is partial prerendering worth it?"
+- (new)      "Spike: measure TTFB impact of Next.js PPR on /home + /pricing (3d timebox)"
+
+MCP write pending:
+  - 1 [ARCHIVE] snapshot comment
+  - 2 field edits — description + title
+
+Confirm? (y/N)
