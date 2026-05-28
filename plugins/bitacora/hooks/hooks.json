@@ -7,6 +7,11 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/sync-bit-aliases.sh\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/sync-statusline.sh\"",
+            "timeout": 10
           }
         ]
       }
