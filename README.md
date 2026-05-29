@@ -103,14 +103,39 @@ At minimum you need the **Atlassian Rovo MCP** (so Bitácora can read and write 
 
 ## Installation
 
-Run these in Claude Code:
+Submit each command **separately** in Claude Code — pasting all four in one prompt will be read as a single argument and fail.
+
+**1. Add the marketplace.**
 
 ```
 /plugin marketplace add fr1j0/bitacora
+```
+
+> `Successfully added marketplace: bitacora`
+
+**2. Install the plugin.**
+
+```
 /plugin install bitacora@bitacora
 ```
 
-After install, run `/bitacora:help` to confirm the commands are loaded. Plugin hooks (statusLine sync + handoff guardrail) activate on the next Claude Code session start.
+> `✓ Installed bitacora. Run /reload-plugins to apply.`
+
+**3. Reload to register commands and hooks.**
+
+```
+/reload-plugins
+```
+
+> `Reloaded: N plugins · M skills · …`
+
+**4. Verify.**
+
+```
+/bitacora:help
+```
+
+> Prints the Bitácora command reference.
 
 The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional-the-statusline) and the [`/bit:` aliases](plugins/bitacora/README.md#optional-the-shorter-bit-alias) — are documented inline in the plugin README; pick them up when you want them.
 
