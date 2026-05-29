@@ -41,6 +41,11 @@ non-`[CTX]` comments as not-in-format; never silently dropped):
 - The **latest** `[CTX]` is authoritative for `Status` and `Next`.
 - Read up to `resume.ctx_lookback` prior `[CTX]` comments (default 1) to reconstruct a
   short `Done` trajectory without re-quoting everything.
+- **Adaptive lookback for long absences:** if days-since-the-latest-`[CTX]` exceeds
+  `resume.long_absence_days` (default 7), bump the lookback **for this invocation
+  only** to `resume.long_absence_lookback` (default 3). Do not mutate the config;
+  the bump is invocation-local. Intent: give the engineer a recap proportional to
+  how long they've been away.
 - Use each comment's own `created` timestamp from the API — **never a hand-typed date**.
 - Surface excluded-comment counts (non-`[CTX]`, malformed) per the format skill; never
   silently drop.
@@ -52,6 +57,7 @@ Preserve PR links / URLs verbatim. Suggested shape:
 
 ```
 Resuming PROJ-1234 — "<ticket title>"  (Jira status: In Progress)
+Last touched: 12 days ago (2026-05-17)
 https://<site>/browse/PROJ-1234
 
 Where you left off:  <latest Status line>
@@ -62,6 +68,10 @@ Blockers / open Qs:  <only if present>
 
 Suggested next step: <derived from the first Next item>
 ```
+
+The `Last touched:` line is computed from the latest compliant `[CTX]`'s own `created`
+timestamp (from the Jira API; never hand-typed). If the ticket has zero `[CTX]`
+comments, the line reads `Last touched: never (no [CTX] yet)` instead of a date.
 
 ### Vagueness hint (footer suggestion, after the briefing)
 
@@ -124,6 +134,8 @@ then `~/.claude/bitacora.yml`; absence is normal). One optional addition:
 ```yaml
 resume:
   ctx_lookback: 1               # how many prior [CTX] comments to stitch for the Done trajectory
+  long_absence_days: 7          # threshold (days since last [CTX]) above which the lookback widens
+  long_absence_lookback: 3      # invocation-local ctx_lookback when over the threshold
   improve_suggest:
     enabled: true               # set to false to silence the vagueness hint
     min_description_words: 50   # threshold; tickets with shorter descriptions are flagged
