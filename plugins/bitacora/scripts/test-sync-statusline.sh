@@ -14,9 +14,11 @@ trap 'rm -rf "$work"' EXIT
 
 plugin="$work/plugin"
 mkdir -p "$plugin/statusline"
+mkdir -p "$plugin/scripts"
 printf 'x\n' > "$plugin/statusline/statusline.sh"
 printf 'y\n' > "$plugin/statusline/handoff-pending.sh"
 printf 'z\n' > "$plugin/statusline/README.md"   # non *.sh → must be ignored
+printf 'hook\n' > "$plugin/scripts/precompact-handoff-check.sh"
 
 fakehome="$work/home"
 export HOME="$fakehome"
@@ -31,8 +33,9 @@ bash "$SCRIPT"
 # 2. Opted in → copies both scripts; non-.sh ignored.
 mkdir -p "$dest"
 bash "$SCRIPT"
-[ -f "$dest/statusline.sh" ]       && pass "copies statusline.sh"           || bad "missing statusline.sh"
-[ -f "$dest/handoff-pending.sh" ]  && pass "copies handoff-pending.sh"      || bad "missing handoff-pending.sh"
+[ -f "$dest/statusline.sh" ]              && pass "copies statusline.sh"                || bad "missing statusline.sh"
+[ -f "$dest/handoff-pending.sh" ]         && pass "copies handoff-pending.sh"           || bad "missing handoff-pending.sh"
+[ -f "$dest/precompact-handoff-check.sh" ] && pass "copies precompact-handoff-check.sh" || bad "missing precompact-handoff-check.sh"
 [ ! -e "$dest/README.md" ]         && pass "ignores non *.sh files"         || bad "copied a non-.sh file"
 [ -x "$dest/statusline.sh" ]       && pass "copy is executable"             || bad "copy is not executable"
 

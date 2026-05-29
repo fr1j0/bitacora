@@ -102,6 +102,82 @@ so future plugin releases pick up automatically — no need to re-run the snippe
 - Per-segment toggles via env vars: `BITACORA_SHOW_BRANCH`, `BITACORA_SHOW_METER`,
   `BITACORA_SHOW_HANDOFF`, `BITACORA_THRESHOLD` (default `85`).
 
+## Optional: the handoff guardrail hook
+
+A Claude Code `UserPromptSubmit` hook that intercepts `/clear` and `/compact` when
+Bitácora detects pending handoff work on the current ticket branch, prints a clear
+action-oriented message suggesting `/bitacora:handoff`, and exposes a one-shot
+escape hatch via a `.bitacora/skip-handoff-once` marker file. The friction it
+catches: typing `/clear` to recover from context pressure without first writing the
+`[CTX]` comment that would have shared the session's outcomes with teammates.
+
+The hook only blocks when **all** of these hold:
+
+- The prompt body starts with `/clear` or `/compact` (after trimming leading whitespace).
+- The current directory is inside a git repository.
+- The current branch matches a project-key pattern (e.g. `PROJ-1234`).
+- Bitácora's existing handoff-pending check (the same one the statusLine uses) is true.
+
+Anything else → silent no-op. The hook also exits silently (fail-open) on any
+infrastructure trouble — missing `jq`, missing source files, hook timeouts, malformed
+input — so it can never brick a `/clear` you genuinely needed.
+
+Opt in once (per machine):
+
+```bash
+mkdir -p ~/.claude/bitacora  # already exists if the statusLine is installed
+src_file="$(find ~/.claude/plugins -path '*bitacora/scripts/precompact-handoff-check.sh' | head -1)"
+if [ -z "$src_file" ]; then
+  echo "bitacora hook not found — is the plugin installed?" >&2
+else
+  cp "$src_file" ~/.claude/bitacora/
+  chmod +x ~/.claude/bitacora/precompact-handoff-check.sh
+fi
+```
+
+Then add this to `~/.claude/settings.json` (merge with any existing `hooks` block):
+
+```json
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash $HOME/.claude/bitacora/precompact-handoff-check.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+After opt-in, the same `SessionStart` hook that syncs the statusLine scripts also
+keeps `precompact-handoff-check.sh` in sync at `~/.claude/bitacora/` — no need to
+re-run the snippet on plugin updates.
+
+**Bypassing the check:**
+
+- **One attempt:** `touch .bitacora/skip-handoff-once` and re-issue `/clear`. The
+  marker is consumed on use; the next `/clear` with pending work fires the check
+  again.
+- **Permanent:** remove the `UserPromptSubmit` entry from `~/.claude/settings.json`.
+
+**Caveats**
+
+- **Plugin-side activation also exists.** Installing the plugin via Claude Code's
+  plugin system activates the hook automatically via `hooks/hooks.json`. The
+  manual `settings.json` route above is for users who want to install just the
+  hook (without the rest of the plugin) or who want per-machine control.
+- **The hook does not catch auto-compact.** Auto-compact preserves context
+  (it summarises), so handoff is not actually at risk. Manual `/compact` is
+  caught by the same `/clear` matcher.
+- **`jq` is required.** If `jq` isn't on PATH the hook fails open (silent), so
+  `/clear` proceeds and the handoff is lost. Same dependency as the statusLine.
+
 ## The `[CTX]` format
 
 See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](../../docs/JIRA_AGENT_COMMENT_FORMAT.md). The

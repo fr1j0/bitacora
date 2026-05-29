@@ -38,4 +38,17 @@ for f in "$src"/*.sh; do
   chmod +x "$dest/$name" 2>/dev/null || true
 done
 
+# Also copy the UserPromptSubmit hook (lives in scripts/, not statusline/).
+# Same opt-in semantics: the dest dir already exists (the guard above passed),
+# so the user has opted in. Additive: never deletes; always exits 0.
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  hook_src="${CLAUDE_PLUGIN_ROOT}/scripts/precompact-handoff-check.sh"
+else
+  hook_src="$(cd "$(dirname "$0")" 2>/dev/null && pwd)/precompact-handoff-check.sh"
+fi
+if [ -r "$hook_src" ]; then
+  cp -- "$hook_src" "$dest/precompact-handoff-check.sh" 2>/dev/null || true
+  chmod +x "$dest/precompact-handoff-check.sh" 2>/dev/null || true
+fi
+
 exit 0
