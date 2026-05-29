@@ -47,8 +47,13 @@ setup_repo() {
     cd "$r" || exit 1
     git init -q
     git checkout -q -b "$branch"
+    # Seed .gitignore so Bitácora's own .bitacora/ metadata directory doesn't
+    # show up as untracked (matching the install convention documented in the
+    # plugin README — users are expected to .gitignore .bitacora/).
+    printf '.bitacora/\n' > .gitignore
+    git add .gitignore
     GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t \
-      git commit --allow-empty -q -m "initial"
+      git commit -q -m "initial"
     if [ "$marker_ts" -gt 0 ]; then
       mkdir -p .bitacora
       printf '%s\n' "$marker_ts" > .bitacora/last-handoff

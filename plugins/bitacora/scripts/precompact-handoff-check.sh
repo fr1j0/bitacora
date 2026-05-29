@@ -61,10 +61,7 @@ ticket_key="$(printf '%s' "$branch" | grep -oE "$project_key_pattern" | head -n 
 # 9. Gather signals.
 is_ticket="true"
 tree_dirty="false"
-# Exclude .bitacora/ from the dirty check — it is always untracked by design
-# (repos typically gitignore it; we must not false-positive on its presence).
-if git -C "$repo_root" status --porcelain 2>/dev/null \
-    | grep -qv '^?? \.bitacora/'; then
+if [ -n "$(git -C "$repo_root" status --porcelain 2>/dev/null || true)" ]; then
   tree_dirty="true"
 fi
 last_commit_ts="$(git -C "$repo_root" log -1 --format=%ct 2>/dev/null || echo 0)"
