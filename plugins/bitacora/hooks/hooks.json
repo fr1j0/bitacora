@@ -15,6 +15,17 @@
           }
         ]
       }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/precompact-handoff-check.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   }
 }
