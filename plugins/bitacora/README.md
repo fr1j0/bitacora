@@ -1,9 +1,9 @@
 # Bitácora (plugin)
 
 Jira-aware workflow layer for Claude Code. **Phase 1 (shipped):** `/bitacora:handoff`,
-`/bitacora:resume`, `/bitacora:status`, `/bitacora:next`, `/bitacora:help`, an opt-in
-statusLine context meter, and the `[CTX]` comment-format discipline. Every bit of
-context, logged.
+`/bitacora:resume`, `/bitacora:status`, `/bitacora:next`, `/bitacora:improve`,
+`/bitacora:help`, an opt-in statusLine context meter, and the `[CTX]` comment-format
+discipline. Every bit of context, logged.
 
 ## Integrations
 

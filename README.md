@@ -15,7 +15,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an `improve` rewriter for vague tickets, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
