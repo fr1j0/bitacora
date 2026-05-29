@@ -17,24 +17,29 @@ need() { command -v "$1" >/dev/null 2>&1 || { echo "SKIP: $1 not on PATH"; exit 
 need jq
 need git
 
-# Stage the hook + its sourceable sibling in a single temp dir so the hook's
-# DIR-relative source resolves to handoff-pending.sh in that same dir.
+# Mirror the real plugin layout: scripts/ and statusline/ as sibling dirs.
+# A flat single-dir stage silently fixes the hook's DIR-relative source path
+# under the test's own feet — which is exactly how the bug fixed in this
+# commit slipped past CI. Keep the two-dir layout to exercise real path
+# resolution.
 stage="$(mktemp -d)"
 work="$(mktemp -d)"
 trap 'rm -rf "$stage" "$work"' EXIT
-cp "$HOOK_SRC" "$stage/precompact-handoff-check.sh"
-cp "$HANDOFF_PENDING_SRC" "$stage/handoff-pending.sh"
-chmod +x "$stage/precompact-handoff-check.sh"
+mkdir -p "$stage/scripts" "$stage/statusline"
+cp "$HOOK_SRC" "$stage/scripts/precompact-handoff-check.sh"
+cp "$HANDOFF_PENDING_SRC" "$stage/statusline/handoff-pending.sh"
+chmod +x "$stage/scripts/precompact-handoff-check.sh"
+hook="$stage/scripts/precompact-handoff-check.sh"
 
 # Helper: feed a JSON prompt on stdin to the hook (no cwd change).
 run_hook() {
-  printf '%s' "$1" | "$stage/precompact-handoff-check.sh"
+  printf '%s' "$1" | "$hook"
 }
 
 # Helper: feed a JSON prompt on stdin to the hook, with cwd inside a repo.
 cd_run() {
   local r="$1" json="$2"
-  ( cd "$r" || exit 1; printf '%s' "$json" | "$stage/precompact-handoff-check.sh" )
+  ( cd "$r" || exit 1; printf '%s' "$json" | "$hook" )
 }
 
 # Helper: make a temp repo on a given branch with optional dirty + extra commits + marker.
@@ -149,7 +154,7 @@ out="$(run_hook 'not json at all')"
 [ -z "$out" ] && pass "malformed JSON → silent" || bad "malformed JSON → got: $out"
 
 # Case 12: Empty stdin → silent.
-out="$(printf '' | "$stage/precompact-handoff-check.sh")"
+out="$(printf '' | "$hook")"
 [ -z "$out" ] && pass "empty stdin → silent" || bad "empty stdin → got: $out"
 
 # Case 13: Corrupted last-handoff (non-numeric content) → block without crash.
