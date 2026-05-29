@@ -147,6 +147,8 @@ The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional
 
 **Pinning to a specific revision.** Until a versioned release ships, the marketplace points at `main`. To pin to an audited revision, fork the repo and `marketplace add <your-fork>` instead — or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
 
+**Troubleshooting — `/bitacora:help` says "Not logged in" after `/login`.** The in-session `/login` writes the auth token to disk but doesn't always refresh the running Claude Code process's in-memory auth state — most likely on a freshly bootstrapped profile where Claude Code prompted for login *during* the session. Restart the session: Ctrl+C, re-run `claude` (or `HOME=/whatever claude` if you're testing in an isolated profile), then `/bitacora:help` should work. Sessions that were already logged-in before the install are unaffected.
+
 ## The `[CTX]` comment format
 
 Bitácora writes Jira comments in a strict structured format so other agents (and humans) can parse them reliably:
