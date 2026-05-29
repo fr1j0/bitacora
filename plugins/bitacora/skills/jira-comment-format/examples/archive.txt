@@ -1,4 +1,4 @@
-[ARCHIVE] Pre-improve snapshot — 2026-05-28T14:23:11Z
+[ARCHIVE] Pre-improve snapshot
 
 Posted by /bitacora:improve before rewriting the fields. The block(s)
 below are the verbatim pre-edit content; safe to scroll past.
