@@ -69,7 +69,7 @@ last_commit_ts="$(git -C "$repo_root" log -1 --format=%ct 2>/dev/null || echo 0)
 marker_ts=0
 handoff_marker="$repo_root/.bitacora/last-handoff"
 if [ -r "$handoff_marker" ]; then
-  marker_ts="$(cat "$handoff_marker" 2>/dev/null || echo 0)"
+  marker_ts="$(tr -dc '0-9' < "$handoff_marker" 2>/dev/null)"
   [ -z "$marker_ts" ] && marker_ts=0
 fi
 
