@@ -22,7 +22,7 @@ The first cut intended for an internal alpha audience. Validated end-to-end on a
 - **Installation section rewritten** with the verified direct-from-repo install path (`/plugin marketplace add fr1j0/bitacora` → `/plugin install bitacora@bitacora` → `/reload-plugins` → `/bitacora:help` to verify). Each step in its own code fence to prevent the paste-both-and-submit failure. ([#65](https://github.com/fr1j0/bitacora/pull/65), [#66](https://github.com/fr1j0/bitacora/pull/66))
 - Auth-restart troubleshooting note added for the Claude Code quirk where in-session `/login` doesn't refresh the running process's auth state. ([#67](https://github.com/fr1j0/bitacora/pull/67))
 - StatusLine and guardrail-hook opt-in instructions now use `jq`-in-place merges rather than heredoc clobbering — fixes a real risk where a colleague following the instructions verbatim could silently destroy their plugin install. ([#68](https://github.com/fr1j0/bitacora/pull/68))
-- New top-level [`USAGE.md`](USAGE.md) with banking-domain conventions: `/improve` on formally controlled requirement tickets, `/status` as recall not source of truth, the load-bearing `Decisions:` line. ([#65](https://github.com/fr1j0/bitacora/pull/65))
+- New top-level [`USAGE.md`](USAGE.md) with usage conventions for teams whose work passes through formal review or audit: `/improve` on formally controlled requirement tickets, `/status` as recall not source of truth, the load-bearing `Decisions:` line. ([#65](https://github.com/fr1j0/bitacora/pull/65))
 - Project-key-pattern caveat added — the guardrail hook hardcodes the default uppercase pattern (`[A-Z][A-Z0-9]+-[0-9]+`) and does not yet read `.bitacora.yml` overrides. Tracked for a future enhancement. ([#65](https://github.com/fr1j0/bitacora/pull/65))
 - Both READMEs' "Phase 1 shipped" intro lists now include every command. ([#69](https://github.com/fr1j0/bitacora/pull/69))
 
@@ -30,7 +30,7 @@ The first cut intended for an internal alpha audience. Validated end-to-end on a
 
 - `/plugin install bitacora@bitacora` always installs from `main`. Pinning to a specific revision currently requires a fork. Versioned-tag install is on the roadmap once Claude Code's marketplace supports it.
 - Atlassian Rovo MCP auth is account-scoped (lives outside `~/.claude/`). Revoking access in `claude.ai → Settings` affects every session for that account, not the testing profile alone.
-- See [USAGE.md](USAGE.md) for banking-domain conventions that aren't enforced by the plugin.
+- See [USAGE.md](USAGE.md) for usage conventions that aren't enforced by the plugin.
 
 ## [v0.2.0] — 2026-05-28
 
