@@ -38,6 +38,23 @@ fixes. Everything else needs an approved issue.
 - Squash-merge is the default. Keep commits descriptive but don't over-engineer the
   history — squash collapses it.
 
+## Local checks
+
+CI runs ShellCheck (`--severity=warning`) and five shell-test suites on every PR. To
+match it locally before pushing:
+
+```bash
+# One-time: install ShellCheck
+brew install shellcheck         # macOS
+# apt install shellcheck        # Debian/Ubuntu
+
+# Lint
+shellcheck --severity=warning plugins/bitacora/scripts/*.sh plugins/bitacora/statusline/*.sh
+
+# Tests (each script self-reports PASS/FAIL)
+for t in plugins/bitacora/scripts/test-*.sh; do bash "$t" || break; done
+```
+
 ## Code of Conduct
 
 Be kind. Assume good faith. If something feels off, open an issue or reach out to a
