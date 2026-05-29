@@ -1,20 +1,11 @@
 Improving PROJ-9821 — "logout broken sometimes"  (Bug, To Do)
 Corpus: 0 [CTX] comments · 4 free-form comments · 0 Remember hits · 0 commits · 0 PRs
 
-2 clarifying questions before rewriting:
-
-1. "broken sometimes" — what fraction of attempts, and any pattern (browser / region /
-   tenant)? (anchor: description, sentence 1)
-2. comment #2 mentions a 401 — is the bug that logout fails silently, or that it
-   returns 401? (anchor: comment #2 from qa@)
-
-Answers (or "skip"): > ~10% on Safari only · 401 in console, UI shows "logged out"
-
 --- description (proposed) ---
 
 Steps to reproduce
 
-1. Log in on Safari (any version observed so far: 16, 17).
+1. Log in on Safari (16 or 17 observed).
 2. Click "Log out" in the user menu.
 3. Observe the UI returns to the login screen.
 4. Open DevTools → Network and inspect the /api/session/end request.
@@ -26,19 +17,24 @@ Expected
 
 Actual
 
-- /api/session/end returns 401 (~10% of the time, Safari only).
+- /api/session/end returns 401 (~10% of attempts, Safari only — see QA repro in
+  comment #2).
 - The UI shows the login screen as if logout succeeded.
-- The session cookie persists in some cases — reloading the page restores the session.
+- The session cookie persists in some cases; reloading the page restores the session.
 
 Environment
 
-- Safari 16 + 17 confirmed; Chrome / Firefox not reproducible.
-- All tenants observed; no region pattern.
+- Safari 16 + 17 confirmed (comment #2). Chrome / Firefox not reproducible.
+- All tenants observed; no region pattern (comment #4 from oncall@).
 
 Notes
 
-- Suspected timing race in the session-end handler; see comment #4 from oncall@.
-- Reproduction script in comment #2 attachments.
+- Suspected timing race in the session-end handler (oncall@ in comment #4); the 401
+  shape matches a stale-CSRF code path the recent middleware refactor touched.
+- QA's reproduction script is attached to comment #2.
+- Assumption: the bug is "logout fails silently" (cookie persists, user thinks they
+  logged out) rather than "logout returns 401 visibly" — based on comment #2's
+  "looks logged out, isn't" framing. Validate before fixing.
 
 --- title (proposed) ---
 - (current)  "logout broken sometimes"
@@ -48,4 +44,4 @@ MCP write pending:
   - 1 [ARCHIVE] snapshot comment
   - 2 field edits — description + title
 
-Confirm? (y/N)
+Accept? (y/N)
