@@ -72,9 +72,10 @@ and **before** step 5's local-scratch reconciliation:
 - The ticket's `description` field is shorter than
   `resume.improve_suggest.min_description_words` (default 50; whitespace-split count
   on the description text — *not* on `[CTX]` comments or other fields)
-- No `[ARCHIVE]`-prefixed comment exists on the ticket whose `created` timestamp
-  is within `resume.improve_suggest.suppress_window_days` (default 7) of now —
-  i.e., the ticket has not already been improved recently
+- No `[ARCHIVE]`-prefixed comment (see `bitacora:jira-comment-format`'s sibling-prefix
+  section) exists on the ticket whose `created` timestamp is within
+  `resume.improve_suggest.suppress_window_days` (default 7) of now — i.e., the ticket
+  has not already been improved recently
 
 Suggested format:
 
@@ -124,7 +125,7 @@ then `~/.claude/bitacora.yml`; absence is normal). One optional addition:
 resume:
   ctx_lookback: 1               # how many prior [CTX] comments to stitch for the Done trajectory
   improve_suggest:
-    enabled: true               # silence the vagueness hint entirely
+    enabled: true               # set to false to silence the vagueness hint
     min_description_words: 50   # threshold; tickets with shorter descriptions are flagged
     suppress_window_days: 7     # skip the hint if an [ARCHIVE] landed within this window
 ```
