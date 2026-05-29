@@ -60,10 +60,10 @@ validator checks only the `[CTX]` prefix and the presence of `Status:`/`Next:` l
   or an autolink `<https://...>` (label = URL). If you build ADF directly, attach a
   `link` mark to the URL text node. See `examples/malformed-bare-url.txt`.
 - **Identifiers get backticks.** Wrap file paths, branch names, commit SHAs, symbol
-  names, and config keys in inline code (`` `splitPortfolioName` ``,
-  `` `features/client-portfolios/portfolio-utils.ts` ``). They render as `code` marks
-  in ADF and stand out from prose, making the comment scannable. Bare-text identifiers
-  blend into surrounding text and slow the reader.
+  names, config keys, and slash commands in inline code (`` `splitPortfolioName` ``,
+  `` `features/client-portfolios/portfolio-utils.ts` ``, `` `/bitacora:improve` ``).
+  They render as `code` marks in ADF and stand out from prose, making the comment
+  scannable. Bare-text identifiers blend into surrounding text and slow the reader.
 - **Compact references over bare URLs.** When you mention a PR or a cross-ticket, link
   the short reference, not the full URL. Write ``PR [#7951](https://github.com/org/repo/pull/7951)``
   or ``[AT-4537](https://wgen4.atlassian.net/browse/AT-4537)``. The visible label stays
