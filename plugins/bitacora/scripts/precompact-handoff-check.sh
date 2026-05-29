@@ -69,7 +69,8 @@ last_commit_ts="$(git -C "$repo_root" log -1 --format=%ct 2>/dev/null || echo 0)
 marker_ts=0
 handoff_marker="$repo_root/.bitacora/last-handoff"
 if [ -r "$handoff_marker" ]; then
-  marker_ts="$(tr -dc '0-9' < "$handoff_marker" 2>/dev/null)"
+  marker_ts="$(cat "$handoff_marker" 2>/dev/null || echo 0)"
+  marker_ts="${marker_ts//[^0-9]/}"
   [ -z "$marker_ts" ] && marker_ts=0
 fi
 
@@ -81,7 +82,10 @@ fi
 # 11. Count commits since the marker (best-effort; 0 if anything goes sideways).
 pending_commits=0
 if [ "$last_commit_ts" -gt "$marker_ts" ]; then
-  pending_commits="$(git -C "$repo_root" log --oneline --since="@$marker_ts" 2>/dev/null | wc -l | tr -d ' ')"
+  # --max-age (raw epoch) avoids `--since="@$marker_ts"` — git's approxidate
+  # parser flakes intermittently on @<epoch>, returning an empty result for
+  # repos that clearly contain matching commits.
+  pending_commits="$(git -C "$repo_root" rev-list --count --max-age="$marker_ts" HEAD 2>/dev/null)"
   [ -z "$pending_commits" ] && pending_commits=0
 fi
 
