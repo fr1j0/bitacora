@@ -129,7 +129,7 @@ on stderr. **Handoff pipes every drafted body through it before writing.**
 
 | Operation | Mode | Phase |
 |-----------|------|-------|
-| `/bitacora:status`, `/bitacora:next`, cross-ticket JQL | strict | 3 / 5 / later |
+| `/bitacora:resume`, `/bitacora:status`, `/bitacora:next`, cross-ticket JQL | strict | 3 / 5 / later |
 | `/bitacora:improve` source read, onboarding, decision archaeology | lenient | 2+ |
 | `/bitacora:handoff` continuity read (read latest `[CTX]` to thread `Status`/`Next`, avoid restating `Done`) | lenient | 1 |
 

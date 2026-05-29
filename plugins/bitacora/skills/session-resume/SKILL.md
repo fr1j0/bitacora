@@ -43,9 +43,12 @@ non-`[CTX]` comments as not-in-format; never silently dropped):
   short `Done` trajectory without re-quoting everything.
 - **Adaptive lookback for long absences:** if days-since-the-latest-`[CTX]` exceeds
   `resume.long_absence_days` (default 7), bump the lookback **for this invocation
-  only** to `resume.long_absence_lookback` (default 3). Do not mutate the config;
-  the bump is invocation-local. Intent: give the engineer a recap proportional to
-  how long they've been away.
+  only** to `max(resume.ctx_lookback, resume.long_absence_lookback)` (defaults: 1
+  and 3, so the bump lands on 3). The `max` guard preserves intent: a misconfigured
+  `long_absence_lookback` smaller than `ctx_lookback` would otherwise *narrow* the
+  trajectory on a long absence — exactly the wrong direction. Do not mutate the
+  config; the bump is invocation-local. Intent: give the engineer a recap
+  proportional to how long they've been away.
 - Use each comment's own `created` timestamp from the API — **never a hand-typed date**.
 - Surface excluded-comment counts (non-`[CTX]`, malformed) per the format skill; never
   silently drop.
@@ -85,7 +88,10 @@ and **before** step 5's local-scratch reconciliation:
 - No `[ARCHIVE]`-prefixed comment (see `bitacora:jira-comment-format`'s sibling-prefix
   section) exists on the ticket whose `created` timestamp is within
   `resume.improve_suggest.suppress_window_days` (default 7) of now — i.e., the ticket
-  has not already been improved recently
+  has not already been improved recently. **Scan the full comment list** returned by
+  step 3's `getJiraIssue` for this check, not the strict-`[CTX]` subset: `[ARCHIVE]`
+  is a sibling prefix and is intentionally classified `not-in-format` by the strict
+  reader, so it never appears in the filtered subset
 
 Suggested format:
 

@@ -84,7 +84,7 @@ Then add this to `~/.claude/settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "$HOME/.claude/bitacora/statusline.sh"
+    "command": "\"$HOME\"/.claude/bitacora/statusline.sh"
   }
 }
 ```
@@ -145,7 +145,7 @@ Then add this to `~/.claude/settings.json` (merge with any existing `hooks` bloc
         "hooks": [
           {
             "type": "command",
-            "command": "bash $HOME/.claude/bitacora/precompact-handoff-check.sh",
+            "command": "bash \"$HOME\"/.claude/bitacora/precompact-handoff-check.sh",
             "timeout": 5
           }
         ]
