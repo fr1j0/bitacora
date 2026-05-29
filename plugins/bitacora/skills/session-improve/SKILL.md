@@ -136,7 +136,7 @@ On `y`:
 **8.1 Archive comment** via `addCommentToJiraIssue`. Body:
 
 ```
-[ARCHIVE] Pre-improve snapshot — <ISO 8601 UTC timestamp>
+[ARCHIVE] Pre-improve snapshot
 
 Posted by /bitacora:improve before rewriting the fields. The block(s)
 below are the verbatim pre-edit content; safe to scroll past.
@@ -152,9 +152,11 @@ Description (pre-edit):
 > <original description verbatim, each line prefixed with "> ">
 ```
 
-Include each block (title, description) only if the corresponding field is in scope
-for this invocation. The archive comment always captures the *pre*-state of every
-field about to be overwritten — no more, no less.
+No timestamp in the header — the comment's `created` metadata is authoritative, per
+the same rule `bitacora:jira-comment-format` enforces for `[CTX]` headers. Include
+each block (title, description) only if the corresponding field is in scope for
+this invocation. The archive comment always captures the *pre*-state of every field
+about to be overwritten — no more, no less.
 
 **8.2 Description edit** via `editJiraIssue` *(only if scope includes description)*.
 
