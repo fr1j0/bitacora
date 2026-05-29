@@ -16,7 +16,7 @@
 set -uo pipefail   # no -e: errors are handled explicitly via guard chains
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
-SOURCE_HANDOFF_PENDING="$DIR/handoff-pending.sh"
+SOURCE_HANDOFF_PENDING="$DIR/../statusline/handoff-pending.sh"
 
 # 1. Read stdin (Claude Code's JSON input). Drop silently on read failure.
 input="$(cat 2>/dev/null || true)"
@@ -55,7 +55,7 @@ ticket_key="$(printf '%s' "$branch" | grep -oE "$project_key_pattern" | head -n 
 
 # 8. Source the handoff-pending decision function.
 [ -r "$SOURCE_HANDOFF_PENDING" ] || exit 0
-# shellcheck source=./handoff-pending.sh
+# shellcheck source=../statusline/handoff-pending.sh
 . "$SOURCE_HANDOFF_PENDING"
 
 # 9. Gather signals.
