@@ -40,9 +40,8 @@ cd_run() {
 # Helper: make a temp repo on a given branch with optional dirty + extra commits + marker.
 setup_repo() {
   local branch="$1" dirty="$2" extra_commits="$3" marker_ts="$4"
-  local r="$work/repo-$RANDOM-$$"
-  rm -rf "$r"
-  mkdir -p "$r"
+  local r
+  r="$(mktemp -d "$work/repo.XXXXXX")"
   (
     cd "$r" || exit 1
     git init -q
@@ -152,5 +151,74 @@ out="$(run_hook 'not json at all')"
 # Case 12: Empty stdin → silent.
 out="$(printf '' | "$stage/precompact-handoff-check.sh")"
 [ -z "$out" ] && pass "empty stdin → silent" || bad "empty stdin → got: $out"
+
+# Case 13: Corrupted last-handoff (non-numeric content) → block without crash.
+# Regression: the hook reads marker_ts via `tr -dc '0-9'`, so non-numeric
+# content sanitizes to empty → 0 — never propagates into the arithmetic
+# comparison in handoff-pending.sh. Pre-fix this would have surfaced as
+# "integer expression expected" on stderr.
+repo="$(setup_repo "AT-1234" "true" "0" "0")"
+mkdir -p "$repo/.bitacora"
+printf 'not a number at all\n' > "$repo/.bitacora/last-handoff"
+out="$(cd_run "$repo" '{"prompt":"/clear"}' 2>/dev/null)"
+err="$(cd_run "$repo" '{"prompt":"/clear"}' 2>&1 >/dev/null)"
+if printf '%s' "$out" | grep -q '"decision":"block"' && ! printf '%s' "$err" | grep -q 'integer expression'; then
+  pass "corrupted last-handoff → block, no stderr noise"
+else
+  bad "corrupted marker → out: '$out', err: '$err'"
+fi
+
+# Case 14: Detached HEAD on a commit (no current branch) → silent.
+# `git branch --show-current` returns empty in detached state, so the
+# project-key extraction at step 7 yields no key and the hook exits before
+# touching signals.
+repo="$(setup_repo "AT-1234" "true" "0" "0")"
+sha="$(cd "$repo" && git rev-parse HEAD)"
+( cd "$repo" && git checkout -q --detach "$sha" )
+out="$(cd_run "$repo" '{"prompt":"/clear"}')"
+[ -z "$out" ] && pass "detached HEAD + /clear → silent" || bad "detached HEAD → got: $out"
+
+# Case 15: Second /clear after the marker has been consumed → blocks.
+# Case 7 only proves the marker is removed on first /clear; this case
+# verifies the bypass is truly one-shot (second invocation re-engages the
+# guardrail) rather than seeding a persistent silence.
+repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+mkdir -p "$repo/.bitacora"
+touch "$repo/.bitacora/skip-handoff-once"
+first="$(cd_run "$repo" '{"prompt":"/clear"}')"        # consumes marker, silent
+second="$(cd_run "$repo" '{"prompt":"/clear"}')"       # marker gone → should block
+if [ -z "$first" ] && printf '%s' "$second" | grep -q '"decision":"block"'; then
+  pass "second /clear after marker consumed → block"
+else
+  bad "second /clear → first: '$first', second: '$second'"
+fi
+
+# Case 16: Git worktree on a ticket branch → behaves like a normal repo.
+# `git rev-parse --show-toplevel` returns the worktree root and
+# `git branch --show-current` returns the worktree's branch, so the hook
+# treats a worktree the same as a primary checkout.
+main_repo="$(setup_repo "main" "false" "0" "0")"
+wt_path="$(mktemp -d "$work/wt.XXXXXX")"
+rmdir "$wt_path"   # `git worktree add` wants the path absent or empty
+( cd "$main_repo" && git worktree add -q -b "AT-9999" "$wt_path" >/dev/null 2>&1 )
+echo wip > "$wt_path/work.txt"   # dirty the worktree
+out="$(cd_run "$wt_path" '{"prompt":"/clear"}')"
+if printf '%s' "$out" | grep -q '"decision":"block"' && printf '%s' "$out" | grep -q "AT-9999"; then
+  pass "worktree on ticket branch + /clear → block + names ticket"
+else
+  bad "worktree → got: $out"
+fi
+
+# Case 17: /compact with arguments (focus hints) → still matches and blocks.
+# Claude Code allows `/compact <focus instructions>`; the `'/compact '*`
+# arm of the case statement covers this. Regression guard against future
+# changes that tighten the match to bare `/compact` only.
+repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+out="$(cd_run "$repo" '{"prompt":"/compact focus on the auth flow"}')"
+if printf '%s' "$out" | grep -q '"decision":"block"'; then
+  pass "/compact with focus hint → block"
+else
+  bad "/compact with args → got: $out"
+fi
 
 exit $fail
