@@ -78,7 +78,7 @@ else
 fi
 ```
 
-Then add this to `~/.claude/settings.json`:
+Then **merge** this `statusLine` block into `~/.claude/settings.json`:
 
 ```json
 {
@@ -88,6 +88,16 @@ Then add this to `~/.claude/settings.json`:
   }
 }
 ```
+
+⚠️ **Don't overwrite the file.** After `/plugin install bitacora@bitacora`, the file already contains `extraKnownMarketplaces` and `enabledPlugins` entries that Claude Code needs to keep the plugin loaded. A heredoc that replaces the whole file will silently break the install. Use `jq` to add the key in place:
+
+```bash
+jq '.statusLine = {"type": "command", "command": "\"$HOME\"/.claude/bitacora/statusline.sh"}' ~/.claude/settings.json > /tmp/settings.json && mv /tmp/settings.json ~/.claude/settings.json
+```
+
+(Shell single-quotes around the jq program prevent `$HOME` from expanding at the bash level — jq writes the literal `"$HOME"` string so Claude Code itself expands it at statusLine-call time.)
+
+If `~/.claude/settings.json` doesn't exist yet (rare — you'd have to opt in *before* installing), create it with just the `statusLine` block above.
 
 After opt-in, a `SessionStart` hook keeps the scripts in sync at `~/.claude/bitacora/`
 so future plugin releases pick up automatically — no need to re-run the snippet.
@@ -135,7 +145,7 @@ else
 fi
 ```
 
-Then add this to `~/.claude/settings.json` (merge with any existing `hooks` block):
+Then **merge** the hook into `~/.claude/settings.json`. The shape to add:
 
 ```json
 {
@@ -154,6 +164,14 @@ Then add this to `~/.claude/settings.json` (merge with any existing `hooks` bloc
   }
 }
 ```
+
+⚠️ **Don't overwrite the file** — see the warning under [Optional: the statusLine](#optional-the-statusline). The same `jq`-in-place pattern works:
+
+```bash
+jq '.hooks.UserPromptSubmit = [{"hooks":[{"type":"command","command":"bash \"$HOME\"/.claude/bitacora/precompact-handoff-check.sh","timeout":5}]}]' ~/.claude/settings.json > /tmp/settings.json && mv /tmp/settings.json ~/.claude/settings.json
+```
+
+If you already have a different `UserPromptSubmit` hook chain, append to it rather than replacing — `jq '.hooks.UserPromptSubmit += [...]'` instead of `=`.
 
 After opt-in, the same `SessionStart` hook that syncs the statusLine scripts also
 keeps `precompact-handoff-check.sh` in sync at `~/.claude/bitacora/` — no need to
