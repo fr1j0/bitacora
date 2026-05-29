@@ -138,6 +138,11 @@ then `~/.claude/bitacora.yml`; absence is normal). Two optional additions:
 
 ```yaml
 next:
-  jql: ""            # overrides the default query verbatim when set
+  # The default JQL is:
+  #   assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC
+  # Override below for team-scoped pickers (account-id or email per teammate;
+  # accountId form is more stable across renames):
+  jql: ""            # overrides the default query verbatim when set; e.g.:
+                     #   "assignee in (currentUser(), 5a17b8c2..., 5b22d9e3...) AND statusCategory != Done ORDER BY updated DESC"
   stale_days: 30     # "stale" threshold for the Needs-attention tail
 ```
