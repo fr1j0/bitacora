@@ -9,7 +9,7 @@
     {
       "name": "bitacora",
       "description": "Clean session handoffs, session resume, and audience-tailored status summaries, anchored on the [CTX] Jira-comment-format discipline. Uses the Atlassian Rovo MCP; Remember optional.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "source": "./plugins/bitacora",
       "author": {
         "name": "Bitácora contributors"
