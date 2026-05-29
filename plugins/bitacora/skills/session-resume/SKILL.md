@@ -134,7 +134,7 @@ then `~/.claude/bitacora.yml`; absence is normal). One optional addition:
 ```yaml
 resume:
   ctx_lookback: 1               # how many prior [CTX] comments to stitch for the Done trajectory
-  long_absence_days: 7          # threshold (days since last [CTX]) above which the lookback widens
+  long_absence_days: 7          # widen the lookback when days-since-latest-compliant-[CTX] strictly exceeds this
   long_absence_lookback: 3      # invocation-local ctx_lookback when over the threshold
   improve_suggest:
     enabled: true               # set to false to silence the vagueness hint
