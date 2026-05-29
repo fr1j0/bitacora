@@ -41,6 +41,11 @@ non-`[CTX]` comments as not-in-format; never silently dropped):
 - The **latest** `[CTX]` is authoritative for `Status` and `Next`.
 - Read up to `resume.ctx_lookback` prior `[CTX]` comments (default 1) to reconstruct a
   short `Done` trajectory without re-quoting everything.
+- **Adaptive lookback for long absences:** if days-since-the-latest-`[CTX]` exceeds
+  `resume.long_absence_days` (default 7), bump the lookback **for this invocation
+  only** to `resume.long_absence_lookback` (default 3). Do not mutate the config;
+  the bump is invocation-local. Intent: give the engineer a recap proportional to
+  how long they've been away.
 - Use each comment's own `created` timestamp from the API — **never a hand-typed date**.
 - Surface excluded-comment counts (non-`[CTX]`, malformed) per the format skill; never
   silently drop.
@@ -52,6 +57,7 @@ Preserve PR links / URLs verbatim. Suggested shape:
 
 ```
 Resuming PROJ-1234 — "<ticket title>"  (Jira status: In Progress)
+Last touched: 12 days ago (2026-05-17)
 https://<site>/browse/PROJ-1234
 
 Where you left off:  <latest Status line>
@@ -62,6 +68,37 @@ Blockers / open Qs:  <only if present>
 
 Suggested next step: <derived from the first Next item>
 ```
+
+The `Last touched:` line is computed from the latest compliant `[CTX]`'s own `created`
+timestamp (from the Jira API; never hand-typed). If the ticket has zero `[CTX]`
+comments, the line reads `Last touched: never (no [CTX] yet)` instead of a date.
+
+### Vagueness hint (footer suggestion, after the briefing)
+
+If **all three** conditions hold, emit a one-line suggestion **after** the briefing
+and **before** step 5's local-scratch reconciliation:
+
+- `resume.improve_suggest.enabled` is true (default true; see Configuration)
+- The ticket's `description` field is shorter than
+  `resume.improve_suggest.min_description_words` (default 50; whitespace-split count
+  on the description text — *not* on `[CTX]` comments or other fields)
+- No `[ARCHIVE]`-prefixed comment (see `bitacora:jira-comment-format`'s sibling-prefix
+  section) exists on the ticket whose `created` timestamp is within
+  `resume.improve_suggest.suppress_window_days` (default 7) of now — i.e., the ticket
+  has not already been improved recently
+
+Suggested format:
+
+```
+💡 This ticket's description is brief (<N> words, no recent [ARCHIVE]).
+    Consider /bitacora:improve <KEY> before starting — corpus-grounded rewrite
+    grounded in [CTX] history, comments, Remember scratch, and git/PR refs.
+```
+
+The hint is a **suggestion, not a gate** — the engineer can ignore it and proceed.
+Never block the briefing on this check. If the suppression check encounters an error
+(`getJiraIssue` did not return comments, for example), skip the hint silently rather
+than failing the briefing.
 
 ## 5. Reconcile local scratch (optional, additive)
 
@@ -96,5 +133,11 @@ then `~/.claude/bitacora.yml`; absence is normal). One optional addition:
 
 ```yaml
 resume:
-  ctx_lookback: 1     # how many prior [CTX] comments to stitch for the Done trajectory
+  ctx_lookback: 1               # how many prior [CTX] comments to stitch for the Done trajectory
+  long_absence_days: 7          # widen the lookback when days-since-latest-compliant-[CTX] strictly exceeds this
+  long_absence_lookback: 3      # invocation-local ctx_lookback when over the threshold
+  improve_suggest:
+    enabled: true               # set to false to silence the vagueness hint
+    min_description_words: 50   # threshold; tickets with shorter descriptions are flagged
+    suppress_window_days: 7     # skip the hint if an [ARCHIVE] landed within this window
 ```

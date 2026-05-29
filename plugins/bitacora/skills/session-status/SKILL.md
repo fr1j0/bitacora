@@ -19,6 +19,10 @@ so there is no confirmation gate. Follow the **READ** rules in
 - **Ticket key:** any `project_key_pattern` match in the arguments forces the target.
 - **`--include-all`:** optional; reveal the excluded (non-`[CTX]` / malformed) comments
   instead of only counting them.
+- **`--copy-as-slack`:** optional; re-render the summary in Slack `mrkdwn` and copy to
+  clipboard automatically (skipping the prompt in step 6). Compatible with all three
+  mode flags. See step 5's *Slack mrkdwn rendering* sub-section for the rendering
+  rules.
 
 ## 2. Resolve the target ticket (single, focused)
 
@@ -95,16 +99,42 @@ What's next:   <Next in plain language>
 Risks / needs: <Blockers + Open questions, framed as asks>   (only if present)
 ```
 
+### Slack mrkdwn rendering (when `--copy-as-slack` is set)
+
+Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--for-pm`),
+but with Slack `mrkdwn` conventions instead of Markdown:
+
+- `*bold*` instead of `**bold**` (single asterisks for emphasis)
+- `<https://example.com|label>` instead of `[label](https://example.com)` (Slack
+  angle-bracket link form with `|` as the label separator)
+- Plain bulleted lines (`• item` with U+2022) instead of Markdown lists (`- item`) —
+  Slack renders Markdown lists inconsistently
+- **No Markdown tables.** If a mode would have used a table (none currently do, but
+  defensive), fall back to one bullet per row
+- Surface the ticket key + URL prominently as the leading line, e.g.:
+  `*PROJ-1234* — <https://site/browse/PROJ-1234|OAuth callback handling>`
+
+All read semantics (strict `[CTX]` extraction, ticket resolution, error handling) are
+unchanged from the default render path.
+
 See `examples/self.txt`, `examples/eng.txt`, `examples/pm.txt` — the same `[CTX]` rendered
 in all three modes.
 
 ## 6. Print, then offer a clipboard copy
 
-Print the rendered summary into the conversation. Then offer to copy it to the clipboard —
-**read-only, no Jira write, no gate**. Clipboard is best-effort: pipe the rendered text to
-the first available of `pbcopy` (macOS), `wl-copy` or `xclip -selection clipboard` (Linux),
-or `clip` (Windows). If none is found, skip the offer silently — the printed summary always
-stands on its own.
+Print the rendered summary into the conversation. Then:
+
+- **Default** (no `--copy-as-slack`): offer to copy to clipboard, gated by user
+  confirmation. **Read-only, no Jira write, no gate beyond the copy prompt.**
+- **`--copy-as-slack` set:** **always** copy to clipboard (skip the prompt — the user
+  has declared intent). If clipboard delivery fails (no `pbcopy` / `wl-copy` / `xclip` /
+  `clip` available), print a one-line note that the rendered text was not copied; the
+  printed summary still stands on its own.
+
+Clipboard is best-effort: pipe the rendered text to the first available of `pbcopy`
+(macOS), `wl-copy` or `xclip -selection clipboard` (Linux), or `clip` (Windows). If
+none is found in the default path, skip the offer silently. With `--copy-as-slack`,
+surface the absence as a one-line note (see above) so the user knows to copy manually.
 
 ## Error / edge behavior
 
