@@ -23,7 +23,7 @@ input="$(cat 2>/dev/null || true)"
 [ -z "$input" ] && exit 0
 
 # 2. Need jq to parse the prompt; fail-open if unavailable.
-command -v jq >/dev/null 2>&1 || exit 0
+command -v jq >/dev/null 2>&1 || { printf 'bitacora: jq not on PATH; handoff guardrail disabled\n' >&2; exit 0; }
 
 # 3. Extract the prompt body.
 prompt="$(printf '%s' "$input" | jq -r '.prompt // empty' 2>/dev/null)"

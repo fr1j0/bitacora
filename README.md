@@ -103,19 +103,24 @@ At minimum you need the **Atlassian Rovo MCP** (so Bitácora can read and write 
 
 ## Installation
 
-*Phase 1 is shipping; marketplace publication is pending personal-use validation. For now, fork or clone and pin to a commit you've audited.*
-
-Once published:
+Run these in Claude Code:
 
 ```
-/plugin marketplace add <owner>/bitacora
+/plugin marketplace add fr1j0/bitacora
 /plugin install bitacora@bitacora
 ```
 
-Prerequisites:
+After install, run `/bitacora:help` to confirm the commands are loaded. Plugin hooks (statusLine sync + handoff guardrail) activate on the next Claude Code session start.
 
-- Atlassian MCP configured with read/write access to your team's Jira instance *(required)*
-- Remember, claude-mem, or another local memory tool *(optional — for the between-sessions scratch Bitácora doesn't manage)*
+The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional-the-statusline) and the [`/bit:` aliases](plugins/bitacora/README.md#optional-the-shorter-bit-alias) — are documented inline in the plugin README; pick them up when you want them.
+
+**Prerequisites**
+
+- `git`, `jq`, and `bash` 3.2+ on `PATH`. `jq` is required by the handoff guardrail hook; without it the guard fails open with a one-line stderr note rather than silently disabling.
+- Atlassian Rovo MCP configured with read/write access to your team's Jira instance *(optional — handoff runs local-only without it, drafting comments to screen instead of writing them)*.
+- The [Remember](https://github.com/anthropics/claude-code/tree/main/plugins/remember) plugin or another local memory tool *(optional — for the between-sessions scratch Bitácora delegates rather than manages)*.
+
+**Pinning to a specific revision.** Until a versioned release ships, the marketplace points at `main`. To pin to an audited revision, fork the repo and `marketplace add <your-fork>` instead — or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
 
 ## The `[CTX]` comment format
 
