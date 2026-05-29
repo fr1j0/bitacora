@@ -175,8 +175,17 @@ re-run the snippet on plugin updates.
 - **The hook does not catch auto-compact.** Auto-compact preserves context
   (it summarises), so handoff is not actually at risk. Manual `/compact` is
   caught by the same `/clear` matcher.
-- **`jq` is required.** If `jq` isn't on PATH the hook fails open (silent), so
+- **`jq` is required.** If `jq` isn't on PATH the hook fails open and prints a
+  one-line `bitacora: jq not on PATH; handoff guardrail disabled` note to stderr.
   `/clear` proceeds and the handoff is lost. Same dependency as the statusLine.
+- **Project key pattern is fixed.** The hook recognises tickets matching the
+  default `[A-Z][A-Z0-9]+-[0-9]+` pattern (e.g. `PROJ-1234`, `AT-4539`) only.
+  The skills honour a `project_key_pattern` override in
+  `${CLAUDE_PROJECT_DIR}/.bitacora.yml`, but the hook does not — it has no yaml
+  parser baked in. If your team uses lowercase or non-standard alphanumeric
+  keys, the guard will silently skip and `/clear` will proceed unchecked.
+  Tracked in [#64](https://github.com/fr1j0/bitacora/issues/64) as a future
+  enhancement.
 
 ## The `[CTX]` format
 
