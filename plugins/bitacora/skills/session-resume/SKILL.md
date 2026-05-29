@@ -63,6 +63,32 @@ Blockers / open Qs:  <only if present>
 Suggested next step: <derived from the first Next item>
 ```
 
+### Vagueness hint (footer suggestion, after the briefing)
+
+If **all three** conditions hold, emit a one-line suggestion **after** the briefing
+and **before** step 5's local-scratch reconciliation:
+
+- `resume.improve_suggest.enabled` is true (default true; see Configuration)
+- The ticket's `description` field is shorter than
+  `resume.improve_suggest.min_description_words` (default 50; whitespace-split count
+  on the description text — *not* on `[CTX]` comments or other fields)
+- No `[ARCHIVE]`-prefixed comment exists on the ticket whose `created` timestamp
+  is within `resume.improve_suggest.suppress_window_days` (default 7) of now —
+  i.e., the ticket has not already been improved recently
+
+Suggested format:
+
+```
+💡 This ticket's description is brief (<N> words, no recent [ARCHIVE]).
+    Consider /bitacora:improve <KEY> before starting — corpus-grounded rewrite
+    grounded in [CTX] history, comments, Remember scratch, and git/PR refs.
+```
+
+The hint is a **suggestion, not a gate** — the engineer can ignore it and proceed.
+Never block the briefing on this check. If the suppression check encounters an error
+(`getJiraIssue` did not return comments, for example), skip the hint silently rather
+than failing the briefing.
+
 ## 5. Reconcile local scratch (optional, additive)
 
 If a clean read of the Remember scratch is available, surface its private gotchas (dead
@@ -96,5 +122,9 @@ then `~/.claude/bitacora.yml`; absence is normal). One optional addition:
 
 ```yaml
 resume:
-  ctx_lookback: 1     # how many prior [CTX] comments to stitch for the Done trajectory
+  ctx_lookback: 1               # how many prior [CTX] comments to stitch for the Done trajectory
+  improve_suggest:
+    enabled: true               # silence the vagueness hint entirely
+    min_description_words: 50   # threshold; tickets with shorter descriptions are flagged
+    suppress_window_days: 7     # skip the hint if an [ARCHIVE] landed within this window
 ```
