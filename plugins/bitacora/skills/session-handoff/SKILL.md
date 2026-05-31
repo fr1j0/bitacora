@@ -54,9 +54,12 @@ the session actually did and populate the matching optional sections from the
 | `*.tf`, `Dockerfile`, k8s / `helm/` manifests, or CI config touched | `Deploy/Ops:` + `Impact: infra` |
 | `migrations/` or schema files touched | `Impact: schema` + a contract note in `Decisions:` |
 | `*.ipynb`, mlflow/wandb references, model files, or eval scripts | `Model/Eval:` + `Impact: model-serving` |
-| component/route files touched or Figma links present | `Artifacts:` design link + `Impact: ui` |
+| component/route files touched | `Impact: ui` (add an `Artifacts:` design link only when a Figma URL is actually present) |
 | API spec / server route files touched | `Impact: api` + a contract delta in `Decisions:` |
 | other ticket keys mentioned this session | `Dependencies:` |
+
+When several rows match, **merge their surfaces into a single `Impact:` line** (e.g.
+`Impact: infra, schema`) — never emit more than one `Impact:` line.
 
 When the evidence is weak or ambiguous, **omit the section rather than guess** — the confirm
 gate (step 4) shows the conservative draft and the user can add detail. `Risk:` is not
