@@ -148,7 +148,7 @@ PROJ-1234 "<title>"
 https://<site>/browse/PROJ-1234
 
 Status:          <on track / at risk / blocked — plain words> (confidence: <cue, if present>)
-Business impact: <what this delivers, in plain language — no implementation detail>
+Business impact: <what this delivers, in plain language, derived from Status/Done — no implementation detail. If the [CTX] states no concrete outcome, give the ticket's goal plainly; do not invent results, ratings, or compliance/revenue claims.>
 Cost:            <infra + inference $ from Deploy/Ops or Model/Eval, only if present>
 Risks / needs:   <Risk + Blockers + Dependencies, framed as decisions or asks>
 Next milestone:  <Next as an outcome-level goal; if Next is all implementation detail, summarize the goal>
