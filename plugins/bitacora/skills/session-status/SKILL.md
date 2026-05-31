@@ -22,7 +22,7 @@ so there is no confirmation gate. Follow the **READ** rules in
 - **`--include-all`:** optional; reveal the excluded (non-`[CTX]` / malformed) comments
   instead of only counting them.
 - **`--copy-as-slack`:** optional; re-render the summary in Slack `mrkdwn` and copy to
-  clipboard automatically (skipping the prompt in step 6). Compatible with all three
+  clipboard automatically (skipping the prompt in step 6). Compatible with all five
   mode flags. See step 5's *Slack mrkdwn rendering* sub-section for the rendering
   rules.
 
@@ -158,8 +158,8 @@ Strip PR/commit hashes, file paths, flag names, and tool jargon. Keep the ticket
 
 ### Slack mrkdwn rendering (when `--copy-as-slack` is set)
 
-Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--for-pm`),
-but with Slack `mrkdwn` conventions instead of Markdown:
+Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--for-ops` /
+`--for-pm` / `--for-exec`), but with Slack `mrkdwn` conventions instead of Markdown:
 
 - `*bold*` instead of `**bold**` (single asterisks for emphasis)
 - `<https://example.com|label>` instead of `[label](https://example.com)` (Slack
