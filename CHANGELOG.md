@@ -2,6 +2,35 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.3.0] — 2026-06-01 · CTX enrichment
+
+Makes the `[CTX]` record role-aware for a diverse org — frontend, backend, data science,
+MLOps, AI staff, devops, infra, product, tech leads, and leadership — **without growing the
+interface**. The net surface change across the whole cycle is two new flags on `/status`;
+everything else is automatic. Fully backward-compatible: a minimal `[CTX]` (header + `Status:`
++ `Next:`) still validates, the validator's rules are unchanged, and the single-ticket
+`/status` path is untouched.
+
+### Added
+
+- **Optional `[CTX]` enrichment vocabulary.** Beyond `Done`/`Decisions`/`Blockers`, a `[CTX]`
+  can now carry `Artifacts:` (typed links), `Deploy/Ops:` (env · flag · rollback · watch-list ·
+  infra $), `Model/Eval:` (model/prompt version · eval delta · inference $ · model rollback),
+  `Dependencies:`, and `Risk:` — plus an `Impact:` surface line, an optional `Status:`
+  `(confidence: …)` cue, and inline `Decisions:` tags (`[precedent]`/`[debt]`/`[blast-radius]`).
+  `/handoff` populates these automatically from what the session actually did (work-type
+  detection), from real evidence only. None affect compliance. ([#73](https://github.com/fr1j0/bitacora/pull/73))
+- **Two new `/status` audience lenses** — `--for-ops` (deploy/operational) and `--for-exec`
+  (business/risk/cost) — joining `--for-self`/`--for-eng`/`--for-pm`. A documented role→lens
+  table maps 14 roles onto the 5 lenses; each lens routes the enrichment sections it cares about
+  and strips what it doesn't (`pm`/`exec` drop internal references, keep the ticket link).
+  ([#74](https://github.com/fr1j0/bitacora/pull/74))
+- **Epic roll-up in `/status`.** Point `/status` at an Epic and it transparently fans out across
+  the children, strict-reads each one's latest `[CTX]`, and renders a portfolio aggregate —
+  health, confidence distribution, risk concentration, intra-epic dependency graph, and an
+  approximate cost roll-up — in the chosen lens (epic default: `exec`). No new command; a
+  story/bug still renders as a single ticket. ([#75](https://github.com/fr1j0/bitacora/pull/75))
+
 ## [v0.2.1] — 2026-05-29 · Alpha-ready
 
 The first cut intended for an internal alpha audience. Validated end-to-end on a clean Claude Code profile.
