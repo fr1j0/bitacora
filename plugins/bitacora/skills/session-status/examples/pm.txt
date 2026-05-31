@@ -1,7 +1,7 @@
-AUTH-204 "OAuth login"
-https://acme.atlassian.net/browse/AUTH-204
+CHURN-42 "Churn model v2 rollout"
+https://acme.atlassian.net/browse/CHURN-42
 
-Status:        On track, in progress — core sign-in works; finishing the "stay signed in" piece.
-Progress:      Users can sign in, and their session now renews automatically in the background.
-What's next:   Hook the auto-renew into the web app, then settle how long a session stays active.
-Risks / needs: Need a product decision on idle timeout (30 vs 60 min). Open question: should "remember me" keep people signed in longer, and for how long?
+Status:        On track, in progress — new model is on staging, finishing validation. (confidence: medium)
+Progress:      Retrained the churn model; it predicts better and passed the fairness checks.
+What's next:   Watch it on staging for two days, then turn it on in production.
+Risks / needs: Needs a data backfill (DATA-77) before go-live. Watching for prediction drift under May traffic.

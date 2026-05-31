@@ -17,7 +17,7 @@ Bitácora — commands
   /bitacora:resume [KEY]        Rehydrate a cleared session from a
                                 ticket's latest [CTX] (read-only).
   /bitacora:status [KEY]        Summarize a ticket's latest [CTX] for an
-                                audience (--for-pm/--for-eng/--for-self).
+                                audience — 5 lenses (self/eng/ops/pm/exec).
   /bitacora:next                Morning ticket picker — categorized
                                 shortlist of your assigned tickets
                                 grounded in [CTX] (read-only).
