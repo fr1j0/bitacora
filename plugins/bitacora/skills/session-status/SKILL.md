@@ -79,9 +79,10 @@ A lens **degrades gracefully**: if the `[CTX]` lacks a section the lens would le
 
 ```
 PROJ-1234 "<title>" — <Jira status>
-Left off:   <latest Status>
+Left off:   <latest Status, incl. (confidence: …) if present>
 Next:       <Next bullets>
-Decisions:  <decision bullets>        (only if present)
+Decisions:  <decision bullets, keep [precedent]/[debt]/[blast-radius] tags>  (only if present)
+Risk:       <Risk bullets>            (only if present)
 Blockers:   <bullets>                 (only if present)
 ```
 
@@ -91,15 +92,42 @@ Blockers:   <bullets>                 (only if present)
 PROJ-1234 "<title>" — <Jira status>
 https://<site>/browse/PROJ-1234
 
+Impact:     <Impact surfaces>          (only if present)
 Done recently:
 - <Done across the lookback window>
 Decisions:
-- <decision + rationale>
+- <decision + rationale, keep [precedent]/[debt]/[blast-radius] tags>
+Model/Eval:                            (only if present)
+- <version, eval delta, inference $, model rollback>
+Artifacts:                             (only if present)
+- <PR / design / run / dashboard / runbook links>
+Dependencies:                          (only if present)
+- <cross-team / cross-ticket items>
 Next:
 - <Next bullets>
-Blockers / open questions:
-- <only if present>
+Risk / blockers / open questions:
+- <Risk + Blockers + open questions, only if present>
 ```
+
+### --for-ops — deploy / operational (devops, infra, MLOps; keep links, lead with operational posture)
+
+```
+PROJ-1234 "<title>" — <Jira status>
+https://<site>/browse/PROJ-1234
+
+Impact:      <Impact surfaces>          (only if present)
+Deploy/Ops:                             (only if present)
+- <environment, feature flag, rollback plan, infra $>
+Watch:                                  (only if present — the watch-list from Deploy/Ops)
+- <what to monitor>
+Model rollback: <rollback plan from Model/Eval — only if present>
+Next:
+- <deploy / promote / cutover steps>
+Risk / blockers:
+- <Risk + Blockers, only if present>
+```
+
+If the ticket has no `Deploy/Ops:` or `Model/Eval:`, ops degrades to the latest Status + Next (nothing operational to lead with).
 
 ### --for-pm — plain-language stakeholder status (strip jargon and PR/commit hashes, but keep the ticket link; lead with state/risk)
 
@@ -107,11 +135,26 @@ Blockers / open questions:
 PROJ-1234 "<title>"
 https://<site>/browse/PROJ-1234
 
-Status:        <on track / blocked / in progress — plain words>
+Status:        <on track / at risk / blocked — plain words> (confidence: <cue, if present>)
 Progress:      <outcome-oriented Done across the lookback, jargon stripped>
 What's next:   <Next in plain language>
-Risks / needs: <Blockers + Open questions, framed as asks>   (only if present)
+Risks / needs: <Risk + Blockers + Dependencies + Open questions, framed as asks>   (only if present)
 ```
+
+### --for-exec — business / risk / cost (CTO, CRAIO; strip implementation detail, keep the ticket link, lead with state and money)
+
+```
+PROJ-1234 "<title>"
+https://<site>/browse/PROJ-1234
+
+Status:          <on track / at risk / blocked — plain words> (confidence: <cue, if present>)
+Business impact: <what this delivers, in plain language — no implementation detail>
+Cost:            <infra + inference $ from Deploy/Ops or Model/Eval, only if present>
+Risks / needs:   <Risk + Blockers + Dependencies, framed as decisions or asks>
+Next milestone:  <Next as an outcome-level goal; if Next is all implementation detail, summarize the goal>
+```
+
+Strip PR/commit hashes, file paths, flag names, and tool jargon. Keep the ticket link. Invent nothing — if there is no cost line in the `[CTX]`, omit `Cost:`.
 
 ### Slack mrkdwn rendering (when `--copy-as-slack` is set)
 
