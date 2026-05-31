@@ -18,6 +18,8 @@ so there is no confirmation gate. Follow the **READ** rules in
   default `self`). An unknown flag or more than one mode flag is an error — name the five
   valid modes and stop; never guess. See the role→lens table in §5 for which lens a given
   role should pass.
+  For an **epic** target with no flag, the default is `status.epic_default_mode` (default `exec`),
+  not `self` — see §5's *Aggregate render*.
 - **Ticket key:** any `project_key_pattern` match in the arguments forces the target.
 - **`--include-all`:** optional; reveal the excluded (non-`[CTX]` / malformed) comments
   instead of only counting them.
@@ -230,6 +232,57 @@ the same **no-invention** rule applies; never synthesize a number or claim a chi
   label it **approximate** and note how many children contributed. Omit if no child reports cost.
 - **Coverage** — `N children (M reporting, K no [CTX], J malformed)`, plus any truncation note from
   §4b. Always shown so the reader knows the rollup's basis.
+
+### Aggregate render
+
+Render the aggregate signals **in the chosen lens**. **Epic default lens:** when the target is an
+epic and no `--for-*` flag was given, use `status.epic_default_mode` (default `exec`) instead of the
+single-ticket default `self` — a portfolio's natural audience is leadership. An explicit flag always
+wins. Lenses degrade gracefully: omit any signal that is empty (no risks → no `Top risks:` block).
+
+**--for-exec** (default for epics):
+
+```
+EPIC-1 "<title>" — Epic · <coverage>
+https://<site>/browse/EPIC-1
+
+Health:       <one-line rollup + reason>
+Confidence:   high ×A · medium ×B · low ×C   (across M reporting children)
+Top risks:                                   (omit if none)
+- <CHILD-KEY: risk one-liner, business framing; risk-bearing children first>
+Dependencies:                                (omit if none)
+- <CHILD-A → CHILD-B: what blocks what>
+Cost:         <summed infra + inference $ — approximate, from K children>   (omit if none)
+By child:
+- <CHILD-KEY "<title>" — plain status (confidence)>
+Not yet reporting: <CHILD-KEY, …>            (omit if none)
+```
+
+**--for-eng**:
+
+```
+EPIC-1 "<title>" — Epic · <coverage>
+https://<site>/browse/EPIC-1
+
+Dependency graph:                            (omit if none)
+- <CHILD-A → CHILD-B (what blocks what)>
+By child:
+- <CHILD-KEY "<title>" — Status; next: <first Next bullet>; risk: <Risk if any, else —>>
+Open risks / blockers:                       (omit if none)
+- <CHILD-KEY: risk/blocker>
+Excluded: <K no [CTX] (J malformed)>         (omit if zero)
+```
+
+**--for-ops / --for-pm / --for-self** reuse the same aggregate structure, shaped by that lens's
+single-ticket emphasis:
+- **ops** — `By child` leads each reporting child with its `Deploy/Ops:` posture (env/flag/rollback)
+  and a combined `Watch:` list across children; keeps links. Children with no `Deploy/Ops:` show
+  Status + Next only.
+- **pm** — plain-language portfolio: `Health` and `Confidence` first, `By child` as one plain
+  sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
+- **self** — terse: `Health` line + the `By child` list only.
+
+All five keep the `Coverage` line so the reader knows how complete the rollup is.
 
 See `examples/self.txt`, `examples/eng.txt`, `examples/ops.txt`, `examples/pm.txt`,
 `examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses.
