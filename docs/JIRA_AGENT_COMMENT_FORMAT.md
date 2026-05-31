@@ -49,6 +49,17 @@ Blockers:
 - Team/PM-facing open questions go in an `Open questions:` section; next-session-only
   questions stay in local scratch.
 
+### Optional enrichment sections
+
+Beyond `Done`/`Decisions`/`Blockers`/`Open questions`, a `[CTX]` may carry optional
+role-specific sections — `Artifacts:` (typed links), `Deploy/Ops:` (env, flag, rollback,
+watch-list), `Model/Eval:` (model/prompt version, eval delta, safety, cost, model
+rollback), `Dependencies:` (cross-team/ticket), and `Risk:` (latent risk, distinct from a
+current `Blockers:`) — plus an `Impact:` surface line, an optional `Status:` confidence cue,
+and inline `Decisions:` tags (`[precedent]`/`[debt]`/`[blast-radius]`). These are populated
+automatically by `/bitacora:handoff` from what the session did — don't hand-fill them; they
+are **optional and never affect compliance**. The literal catalog and rules live in the skill (source of truth above).
+
 ## How agents read it
 
 State-extraction operations (status synthesis, ranking, resume) read **strictly**: a
