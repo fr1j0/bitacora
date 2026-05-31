@@ -282,7 +282,7 @@ single-ticket emphasis:
   sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
 - **self** — terse: `Health` line + the `By child` list only.
 
-All five keep the `Coverage` line so the reader knows how complete the rollup is.
+All five keep the coverage figure in the header line (`Epic · <coverage>`) so the reader knows how complete the rollup is.
 
 See `examples/self.txt`, `examples/eng.txt`, `examples/ops.txt`, `examples/pm.txt`,
 `examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses; and
