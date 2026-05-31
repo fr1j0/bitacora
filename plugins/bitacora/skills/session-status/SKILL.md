@@ -70,6 +70,30 @@ Only the epic issue type triggers aggregation. A Story with subtasks is **not** 
 this version (it renders as a single ticket). This keeps the trigger unambiguous and matches the
 "point `status` at an epic → portfolio view" rule.
 
+### 4b. Read the epic's children (aggregate path)
+
+Runs only when §4a found an Epic. Read-only throughout.
+
+1. **List children via JQL.** Call `searchJiraIssuesUsingJql` with
+   `jql: "parent = <EPIC-KEY> ORDER BY created ASC"`, requesting `summary,issuetype,status`.
+   If that errors or returns zero, retry once with `jql: "\"Epic Link\" = <EPIC-KEY> ORDER BY created ASC"`
+   (classic-project epics use the `Epic Link` field instead of `parent`). If both forms fail,
+   see *Error / edge behavior*.
+2. **Cap the set.** Read at most `status.epic_children_cap` children (default 50). If the epic has
+   more, read the first N by creation order and **surface the truncation** in the render
+   (`showing first N of T children`) — never silently drop.
+3. **Strict-read each child.** For each child, `getJiraIssue` **requesting comments** and extract
+   its latest compliant `[CTX]` per the strict READ rules in `bitacora:jira-comment-format` (same
+   rules §4 uses). Classify each child as:
+   - **reporting** — has a compliant `[CTX]` (its latest is authoritative for that child);
+   - **no-`[CTX]`** — no compliant `[CTX]` yet;
+   - **malformed** — has a `[CTX]` attempt missing `Status:`/`Next:`.
+4. **Never silently drop.** Carry the no-`[CTX]` and malformed counts into the render
+   (`Not yet reporting: …`, and a malformed tally), exactly like §4's excluded-count discipline.
+
+Child reads are independent; one child's 404 / permission error is isolated — count it as
+unreadable and continue with the rest.
+
 ## 5. Render for the selected mode
 
 Faithful, condensed, **no invention**. Omit any section the `[CTX]` did not contain.
