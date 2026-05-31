@@ -39,6 +39,48 @@ each bullet list). This is not cosmetic — see *Write mechanics* below.
 
 See `examples/compliant.txt` for a full compliant example.
 
+## Optional enrichment sections
+
+Beyond `Done`/`Decisions`/`Blockers`/`Open questions`, these optional sections carry
+role-specific signal. Each appears **only when the session actually produced it** and
+obeys the same blank-line *Write mechanics* below. The handoff agent populates them from
+session evidence (see `bitacora:session-handoff`) — never hand-fill, never invent. None
+of them affect compliance: `Header + Status: + Next:` remain the only required elements.
+
+- `Artifacts:` — typed links, one per bullet: PR · design (Figma) · run (mlflow/wandb) ·
+  dashboard · runbook · doc. URLs wrapped per the URL rule below.
+- `Deploy/Ops:` — deployment/operational state: environment, feature flag, rollback plan,
+  watch-list (what to monitor), and an infra cost (`$`) line when relevant.
+- `Model/Eval:` — ML/AI state: model or prompt version, eval-suite delta, a safety/guardrail
+  note, inference or training cost (`$`), and model rollback (distinct from app rollback).
+- `Dependencies:` — cross-team / cross-surface / cross-ticket items this work is blocked on
+  or that depend on it. Distinct from `Blockers:` (a hard stop you own right now).
+- `Risk:` — a latent risk that could bite later (what could go wrong, plus any mitigation).
+  Distinct from `Blockers:` (a hard stop now).
+
+One single-line field:
+
+- `Impact: <surfaces>` — a comma-separated list of surfaces touched, from the convention
+  vocabulary `api · schema · ui · data-pipeline · model-serving · infra · config · docs`,
+  so a reader self-selects relevance. Convention only — the validator does not enforce the
+  vocabulary.
+
+Cost is not a section of its own: write it as a `$` line **folded into** `Deploy/Ops:`
+(infra) or `Model/Eval:` (inference/training).
+
+Two elements you already write can also take an optional enrichment:
+
+The `Status:` line may carry an optional confidence cue —
+`Status: In Progress (confidence: high)`, with `confidence ∈ {high, medium, low}`. Omit it
+when not assessed.
+
+`Decisions:` bullets may carry trailing inline tags so senior readers scan the org-shaping
+choices without reading every local one: `[precedent]` (sets a pattern others should
+follow), `[debt]` (incurs tech debt, ideally ticketed), `[blast-radius]` (touches
+widely-shared code). Convention only; the validator does not enforce them.
+
+See `examples/compliant-enriched.txt` for a body exercising several of these.
+
 **No date in the header.** Every Jira comment already carries an authoritative
 `created` timestamp (returned by the API, shown in the UI next to the author) — a
 hand-typed date just duplicates it and can drift or be wrong. Read the date from
