@@ -57,6 +57,19 @@ the **strict** READ rules in `bitacora:jira-comment-format`:
 - Surface excluded counts separately (non-`[CTX]`, malformed); never silently drop. With
   `--include-all`, print the excluded comments too.
 
+### 4a. Single ticket or epic?
+
+The `getJiraIssue` response in §4 carries `fields.issuetype`. Branch on it:
+
+- **Epic** (issue type name equals the configured `status.epic_type`, default `Epic`) → run the
+  **aggregate path** (§4b + §5's *Aggregate render*). The epic's own `[CTX]` is not required.
+- **Anything else** (Story / Bug / Subtask / …) → the single-ticket path of §4 + §5 stands as
+  today; skip §4b entirely.
+
+Only the epic issue type triggers aggregation. A Story with subtasks is **not** rolled up in
+this version (it renders as a single ticket). This keeps the trigger unambiguous and matches the
+"point `status` at an epic → portfolio view" rule.
+
 ## 5. Render for the selected mode
 
 Faithful, condensed, **no invention**. Omit any section the `[CTX]` did not contain.
