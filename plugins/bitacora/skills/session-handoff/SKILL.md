@@ -56,7 +56,7 @@ the session actually did and populate the matching optional sections from the
 | `*.ipynb`, mlflow/wandb references, model files, or eval scripts | `Model/Eval:` + `Impact: model-serving` |
 | component/route files touched | `Impact: ui` (add an `Artifacts:` design link only when a Figma URL is actually present) |
 | API spec / server route files touched | `Impact: api` + a contract delta in `Decisions:` |
-| other ticket keys mentioned this session | `Dependencies:` |
+| other ticket keys this work blocks or is blocked by | `Dependencies:` |
 
 When several rows match, **merge their surfaces into a single `Impact:` line** (e.g.
 `Impact: infra, schema`) — never emit more than one `Impact:` line.
