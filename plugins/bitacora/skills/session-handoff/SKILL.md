@@ -45,6 +45,25 @@ PR), no speculation. For a ticket that was only *mentioned* while you worked on 
 ticket's branch, its `[CTX]` should capture only the outcomes or decisions directly about
 that ticket (e.g. a blocker found, a dependency noted) — not a re-summary of the session.
 
+**Work-type enrichment (auto-populate the optional sections).** While drafting, detect what
+the session actually did and populate the matching optional sections from the
+`bitacora:jira-comment-format` skill — **from real evidence only, never invented.** Cues:
+
+| Detected signal | Populate |
+|---|---|
+| `*.tf`, `Dockerfile`, k8s / `helm/` manifests, or CI config touched | `Deploy/Ops:` + `Impact: infra` |
+| `migrations/` or schema files touched | `Impact: schema` + a contract note in `Decisions:` |
+| `*.ipynb`, mlflow/wandb references, model files, or eval scripts | `Model/Eval:` + `Impact: model-serving` |
+| component/route files touched or Figma links present | `Artifacts:` design link + `Impact: ui` |
+| API spec / server route files touched | `Impact: api` + a contract delta in `Decisions:` |
+| other ticket keys mentioned this session | `Dependencies:` |
+
+When the evidence is weak or ambiguous, **omit the section rather than guess** — the confirm
+gate (step 4) shows the conservative draft and the user can add detail. `Risk:` is not
+auto-detected from file signals; add it at the confirm gate when a latent risk is apparent
+from the session. Separately, add the `Status:` confidence cue and the `[precedent]` /
+`[debt]` / `[blast-radius]` decision tags when warranted.
+
 **Optional continuity-read (lenient):** before drafting, you may read the latest `[CTX]`
 on the ticket via `getJiraIssue` (request the comments) to thread `Status`/`Next` and
 avoid restating `Done`. Fall back gracefully if there is no prior `[CTX]` or the read
