@@ -285,7 +285,9 @@ single-ticket emphasis:
 All five keep the `Coverage` line so the reader knows how complete the rollup is.
 
 See `examples/self.txt`, `examples/eng.txt`, `examples/ops.txt`, `examples/pm.txt`,
-`examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses.
+`examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses; and
+`examples/epic-exec.txt`, `examples/epic-eng.txt` — an epic (CHECKOUT-100) rolled up across its
+children.
 
 ## 6. Print, then offer a clipboard copy
 
