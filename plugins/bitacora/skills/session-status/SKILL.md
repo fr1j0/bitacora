@@ -310,6 +310,13 @@ surface the absence as a one-line note (see above) so the user knows to copy man
 - **No `[CTX]` on the ticket:** say so plainly; show the Jira workflow status + title for
   orientation; suggest running `/bitacora:handoff` so future summaries have something to
   read.
+- **Epic with no children:** say so; show the epic's own workflow status + title (and its own
+  `[CTX]` if it has one). Nothing to roll up.
+- **Epic whose children have no `[CTX]` yet:** report `N children, none reporting a [CTX] yet`;
+  suggest `/bitacora:handoff` on the children. Still show the per-child Status/title list for
+  orientation.
+- **Child listing fails (both `parent` and `Epic Link` JQL error):** report that children could
+  not be fetched; fall back to rendering the epic itself as a single ticket. No retry loop.
 - **Ticket 404 / no read permission:** surface the reason for that key; offer to retry with
   a different key. No retry loop.
 - **No ticket resolved:** say so; suggest passing a key.
@@ -326,4 +333,7 @@ Two optional additions:
 status:
   ctx_lookback: 2        # prior [CTX] stitched for the Done/progress trajectory
   default_mode: self     # self | eng | ops | pm | exec — overrides the built-in default mode
+  epic_type: Epic            # issue type name that triggers aggregation (override for renamed epic types)
+  epic_children_cap: 50      # max children read per epic; truncation is surfaced, never silent
+  epic_default_mode: exec    # lens for an epic target when no --for-* flag is given
 ```
