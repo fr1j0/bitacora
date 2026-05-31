@@ -60,8 +60,8 @@ the **strict** READ rules in `bitacora:jira-comment-format`:
 ## 5. Render for the selected mode
 
 Faithful, condensed, **no invention**. Omit any section the `[CTX]` did not contain.
-Preserve the ticket URL verbatim. PM mode is the only one that strips anything — internal references like PR/commit hashes — and it still keeps the ticket link (below). Rephrasing the `Status:`
-value into plain language for PM is allowed; inventing facts is not.
+Preserve the ticket URL verbatim. The `pm` and `exec` lenses strip internal references like PR/commit hashes while keeping the ticket link (below); the other lenses keep the references. Rephrasing the `Status:`
+value into plain language for `pm`/`exec` is allowed; inventing facts is not.
 
 **Role → lens.** Five lenses cover the org; pass the flag for the reader's role:
 
