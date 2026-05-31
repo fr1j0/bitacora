@@ -211,6 +211,26 @@ Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--
 All read semantics (strict `[CTX]` extraction, ticket resolution, error handling) are
 unchanged from the default render path.
 
+### Aggregate signals (epic)
+
+When §4a routed to the aggregate path, compute these from the children's `[CTX]`s (facts only —
+the same **no-invention** rule applies; never synthesize a number or claim a child did not report):
+
+- **Per-child line** — `CHILD-KEY "<title>" — <status> (confidence)`, one per reporting child.
+- **Health** — a one-line rollup: if any child is `Blockers:`-blocked → *blocked*; else if any child
+  has `confidence: low` or an open `Risk:` → *at risk*; else *on track*. State the reason briefly.
+- **Confidence distribution** — tally the `(confidence: …)` cues across reporting children
+  (`high ×A · medium ×B · low ×C`). Omit children that carry no cue from the tally.
+- **Risk concentration** — the children carrying `Risk:` or `Blockers:`, listed risk-bearing first,
+  one line each. Empty if none.
+- **Dependency graph** — parse each child's `Dependencies:`; when a dependency names another child
+  of the same epic, render it as an edge `CHILD-A → CHILD-B (what blocks what)`. Cross-epic deps are
+  listed as plain bullets. Empty if none.
+- **Cost rollup** — sum the numeric infra + inference `$` values across children that report them;
+  label it **approximate** and note how many children contributed. Omit if no child reports cost.
+- **Coverage** — `N children (M reporting, K no [CTX], J malformed)`, plus any truncation note from
+  §4b. Always shown so the reader knows the rollup's basis.
+
 See `examples/self.txt`, `examples/eng.txt`, `examples/ops.txt`, `examples/pm.txt`,
 `examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses.
 
