@@ -93,9 +93,9 @@ PROJ-1234 "<title>" — <Jira status>
 https://<site>/browse/PROJ-1234
 
 Impact:     <Impact surfaces>          (only if present)
-Done recently:
+Done recently:                         (only if present)
 - <Done across the lookback window>
-Decisions:
+Decisions:                             (only if present)
 - <decision + rationale, keep [precedent]/[debt]/[blast-radius] tags>
 Model/Eval:                            (only if present)
 - <version, eval delta, inference $, model rollback>
@@ -105,8 +105,8 @@ Dependencies:                          (only if present)
 - <cross-team / cross-ticket items>
 Next:
 - <Next bullets>
-Risk / blockers / open questions:
-- <Risk + Blockers + open questions, only if present>
+Risk / blockers / open questions:      (only if present)
+- <Risk + Blockers + open questions>
 ```
 
 ### --for-ops — deploy / operational (devops, infra, MLOps; keep links, lead with operational posture)
@@ -122,9 +122,9 @@ Watch:                                  (only if present — the watch-list from
 - <what to monitor>
 Model rollback: <rollback plan from Model/Eval — only if present>
 Next:
-- <deploy / promote / cutover steps>
-Risk / blockers:
-- <Risk + Blockers, only if present>
+- <Next; deploy/promote/cutover steps first if present>
+Risk / blockers:                        (only if present)
+- <Risk + Blockers>
 ```
 
 If the ticket has no `Deploy/Ops:` or `Model/Eval:`, ops degrades to the latest Status + Next (nothing operational to lead with).
@@ -150,7 +150,7 @@ https://<site>/browse/PROJ-1234
 Status:          <on track / at risk / blocked — plain words> (confidence: <cue, if present>)
 Business impact: <what this delivers, in plain language, derived from Status/Done — no implementation detail. If the [CTX] states no concrete outcome, give the ticket's goal plainly; do not invent results, ratings, or compliance/revenue claims.>
 Cost:            <infra + inference $ from Deploy/Ops or Model/Eval, only if present>
-Risks / needs:   <Risk + Blockers + Dependencies, framed as decisions or asks>
+Risks / needs:   <Risk + Blockers + Dependencies, framed as decisions or asks>   (only if present)
 Next milestone:  <Next as an outcome-level goal; if Next is all implementation detail, summarize the goal>
 ```
 
