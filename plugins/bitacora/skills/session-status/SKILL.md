@@ -63,6 +63,18 @@ Faithful, condensed, **no invention**. Omit any section the `[CTX]` did not cont
 Preserve the ticket URL verbatim. PM mode is the only one that strips anything — internal references like PR/commit hashes — and it still keeps the ticket link (below). Rephrasing the `Status:`
 value into plain language for PM is allowed; inventing facts is not.
 
+**Role → lens.** Five lenses cover the org; pass the flag for the reader's role:
+
+| Lens | Flag | Roles it serves | Leads with / strips |
+|------|------|-----------------|---------------------|
+| self | `--for-self` | you | terse recall — latest Status + Next |
+| eng  | `--for-eng`  | frontend, backend, full-stack, staff, AI staff, tech lead | contract, `Artifacts:`, `Model/Eval:`, `Decisions:`+tags; keeps PR/commit links |
+| ops  | `--for-ops`  | devops, infra, MLOps | `Deploy/Ops:`, rollback, watch-list, `Impact:`; keeps links |
+| pm   | `--for-pm`   | product, technical managers | plain language; confidence; `Risk:`/`Dependencies:` as asks; strips PR/commit hashes, keeps ticket link |
+| exec | `--for-exec` | CTO, CRAIO | business/risk/cost + confidence; strips implementation detail, keeps ticket link |
+
+A lens **degrades gracefully**: if the `[CTX]` lacks a section the lens would lead with, omit it silently (a UI ticket under `--for-ops` simply has no `Deploy/Ops:` to show).
+
 ### --for-self (default) — terse personal recall: latest Status, no Done trajectory (use --for-eng for that). Jargon + PR links fine.
 
 ```
