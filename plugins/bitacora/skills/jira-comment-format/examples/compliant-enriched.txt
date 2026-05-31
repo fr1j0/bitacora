@@ -1,0 +1,37 @@
+[CTX] Status update
+
+Status: In Progress (confidence: high)
+
+Impact: model-serving, infra
+
+Done:
+
+- Retrained churn model and deployed to staging
+
+Decisions:
+
+- Promote behind a feature flag, not a hard cutover [blast-radius]
+
+Model/Eval:
+
+- churn v2: AUC 0.82 → 0.87; precision@0.5 0.71 → 0.79
+- inference $ ≈ +0.4¢/call vs v1
+- model rollback = pin registry alias `churn:prod` back to v1
+
+Deploy/Ops:
+
+- On staging behind flag `churn_v2`; rollback = flip the flag off
+- Watch: p95 inference latency, null-feature rate
+
+Artifacts:
+
+- run [mlflow#441](https://mlflow.acme.internal/runs/441)
+- PR [#812](https://github.com/acme/ml/pull/812)
+
+Dependencies:
+
+- Needs DATA-77 feature backfill before prod
+
+Next:
+
+- 48h staging soak, then promote `churn_v2` to prod

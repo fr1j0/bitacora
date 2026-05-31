@@ -27,6 +27,9 @@ check "$FIXTURES/malformed-preamble-bare-url.txt"     malformed     1
 check "$FIXTURES/malformed-preamble-missing-sections.txt" malformed 1
 check "$FIXTURES/non-ctx.txt"                         not-in-format 2
 check "$FIXTURES/archive.txt"                         not-in-format 2
+check "$FIXTURES/compliant-enriched.txt"              compliant     0
+check "$FIXTURES/compliant-core-only.txt"             compliant     0
+check "$FIXTURES/malformed-artifacts-bare-url.txt"    malformed     1
 
 # startswith, not substring: a comment mentioning [CTX] mid-line is NOT compliant
 mkstdin="$(mktemp)"
