@@ -1,6 +1,6 @@
 ---
 name: session-status
-description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary — --for-self (terse recall), --for-eng (technical handoff), or --for-pm (plain-language stakeholder status). Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
+description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses — --for-self (terse recall), --for-eng (technical handoff), --for-ops (deploy/operational), --for-pm (plain-language stakeholder status), --for-exec (business/risk/cost). Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
 ---
 
 Read a ticket's latest `[CTX]` state and synthesize an **audience-tailored summary**, then
@@ -13,9 +13,11 @@ so there is no confirmation gate. Follow the **READ** rules in
 
 ## 1. Parse arguments
 
-- **Mode flag:** `--for-pm`, `--for-eng`, or `--for-self`. An explicit flag always wins;
-  with no flag, fall back to `status.default_mode` (built-in default `self`). An unknown
-  flag or more than one mode flag is an error — name the valid modes and stop; never guess.
+- **Mode flag:** one of `--for-self`, `--for-eng`, `--for-ops`, `--for-pm`, `--for-exec`.
+  An explicit flag always wins; with no flag, fall back to `status.default_mode` (built-in
+  default `self`). An unknown flag or more than one mode flag is an error — name the five
+  valid modes and stop; never guess. See the role→lens table in §5 for which lens a given
+  role should pass.
 - **Ticket key:** any `project_key_pattern` match in the arguments forces the target.
 - **`--include-all`:** optional; reveal the excluded (non-`[CTX]` / malformed) comments
   instead of only counting them.
@@ -158,5 +160,5 @@ Two optional additions:
 ```yaml
 status:
   ctx_lookback: 2        # prior [CTX] stitched for the Done/progress trajectory
-  default_mode: self     # self | eng | pm — overrides the built-in default mode
+  default_mode: self     # self | eng | ops | pm | exec — overrides the built-in default mode
 ```
