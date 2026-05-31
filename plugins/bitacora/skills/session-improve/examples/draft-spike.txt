@@ -3,13 +3,13 @@ Corpus: 0 [CTX] comments · 3 free-form comments · 2 Remember hits · 0 commits
 
 --- description (proposed) ---
 
-## Question
+### Question
 
 Does Next.js partial prerendering (PPR) cut TTFB on `/home` and `/pricing` meaningfully
 (target ≥ 30% improvement at p75), and is the migration cost low enough to justify rolling
 it out across the rest of the public site?
 
-## Approach
+### Approach
 
 - Day 1: enable PPR locally on `/home` only; measure TTFB cold + warm against the current
   baseline; identify which components must be marked dynamic.
@@ -28,16 +28,16 @@ Assumptions baked into this plan:
 - Desktop fast-3G + cable for the experiments — corpus has no mobile signal, and a
   mobile-network simulation would balloon the timebox.
 
-## Timebox
+### Timebox
 
 3 working days. Hard wall — if day 3 lands without numbers, stop and recommend "insufficient
 data" rather than extending. No silent timebox creep.
 
-## Recommendation
+### Recommendation
 
 (left empty — pending spike conclusion)
 
-## Other information
+### Other information
 
 Out of scope:
 

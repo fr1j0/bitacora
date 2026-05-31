@@ -2,6 +2,15 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.3.2] — 2026-06-01 · Improve headings: h3
+
+### Fixed
+
+- `/bitacora:improve` section headings are now **`###` (h3)**, matching Jira's native AI
+  "improve description" output (verified against the real rendered ProseMirror — every section
+  is `heading-3`). v0.3.1 emitted `##` (h2). Skill §6 templates and all four golden examples
+  updated; no other behavior change.
+
 ## [v0.3.1] — 2026-06-01 · Improve structure matches Jira's AI
 
 ### Changed
