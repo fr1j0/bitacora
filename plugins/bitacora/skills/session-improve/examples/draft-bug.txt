@@ -3,30 +3,30 @@ Corpus: 0 [CTX] comments · 4 free-form comments · 0 Remember hits · 0 commits
 
 --- description (proposed) ---
 
-## Steps to reproduce
+### Steps to reproduce
 
 1. Log in on Safari (16 or 17 observed).
 2. Click "Log out" in the user menu.
 3. Observe the UI returns to the login screen.
 4. Open DevTools → Network and inspect the `POST /api/session/end` request.
 
-## Expected
+### Expected
 
 - `POST /api/session/end` returns `204`.
 - The session cookie is cleared.
 
-## Actual
+### Actual
 
 - `POST /api/session/end` returns `401` (~10% of attempts, Safari only — see QA repro in comment #2).
 - The UI shows the login screen as if logout succeeded.
 - The session cookie persists in some cases; reloading the page restores the session.
 
-## Environment
+### Environment
 
 - Safari 16 + 17 confirmed (comment #2). Chrome / Firefox not reproducible.
 - All tenants observed; no region pattern (comment #4 from oncall@).
 
-## Notes
+### Notes
 
 - Suspected timing race in the session-end handler (oncall@ in comment #4); the `401` shape
   matches a stale-CSRF code path the recent middleware refactor touched.

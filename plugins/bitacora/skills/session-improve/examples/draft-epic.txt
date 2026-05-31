@@ -3,13 +3,13 @@ Corpus: 6 [CTX] comments · 11 free-form comments · 9 Remember hits · 17 commi
 
 --- description (proposed) ---
 
-## Goal
+### Goal
 
 Isolate every tenant's data at the database level so a buggy or compromised query
 cannot leak rows across tenants. Today shared tables + a `tenant_id` filter at the
 ORM layer is the only boundary; we need defense-in-depth.
 
-## Scope outline
+### Scope outline
 
 - Schema-per-tenant boundary at the Postgres level (see Assumptions for direction rationale).
 - Migration tooling that runs DDL once and replays per-tenant.
@@ -18,7 +18,7 @@ ORM layer is the only boundary; we need defense-in-depth.
 - The 4 child stories referenced across the comment trail cover the four phases above;
   see them for sequencing — this epic does not duplicate their detail.
 
-## Success criteria
+### Success criteria
 
 - Zero cross-tenant data visible in any query path, verified by the new isolation test
   suite (introduced in this epic).
@@ -27,7 +27,7 @@ ORM layer is the only boundary; we need defense-in-depth.
 - Backfill completes for all current tenants without a maintenance window.
 - `AT-1801` (billing tenant prereq) lands before the connection-pool changes ship.
 
-## Assumptions
+### Assumptions
 
 - Schema-per-tenant chosen over row-level security — [CTX] #2 explicitly compared the two
   and landed on schema-per-tenant for read-path performance; comment #5 from arch@ concurs.
@@ -37,14 +37,14 @@ ORM layer is the only boundary; we need defense-in-depth.
 - Timeline is a constraint, not a guideline (comment #11) — the 4 child stories span ~6 weeks
   of work and that window is fixed. Scope cuts come from Out of scope, not from extending the timeline.
 
-## Risks
+### Risks
 
 - Connection-pool routing is the most under-spec'd piece (parked thread with arch@ in comment #5);
   design lands or this epic stalls.
 - `AT-1801` is on the critical path — slippage there blocks the second half.
 - Backfill batches may hit migration timeouts on the largest tenants; mitigation parked in comment #9.
 
-## Other information
+### Other information
 
 Out of scope:
 

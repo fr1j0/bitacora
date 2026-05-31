@@ -3,12 +3,12 @@ Corpus: 3 [CTX] comments · 5 free-form comments · 4 Remember hits · 2 commits
 
 --- description (proposed) ---
 
-## User story
+### User story
 
 As a tenant admin, when exporting large datasets, I want the export to finish quickly
 so that I'm not blocked waiting on big-tenant exports.
 
-## Context
+### Context
 
 The `export_jobs` worker currently does a per-row write; batching is the obvious lever
 for the large-tenant tiers.
@@ -17,13 +17,13 @@ for the large-tenant tiers.
 - Worker scaffolding in progress: PR `#781`.
 - Caching idea (Sarah, comment #3) is parked as a follow-up — orthogonal to the batching work.
 
-## Acceptance criteria
+### Acceptance criteria
 
 - p95 export latency drops below 4s for tenants up to 50k rows.
 - No regression in the 10k-row baseline (currently ~1.8s).
 - Responsive web only; PWA / native explicitly out of scope.
 
-## Assumptions
+### Assumptions
 
 - "Faster" measured as p95 latency at the 50k-row tier, target ≤ 4s — chosen because the
   comment thread (#1, #4) consistently framed pain around large-tenant exports, not the
@@ -31,7 +31,7 @@ for the large-tenant tiers.
 - Responsive web only — the public-facing export UI is web today; there's no signal in the
   corpus of a mobile / native client touching this path.
 
-## Other information
+### Other information
 
 Out of scope:
 
