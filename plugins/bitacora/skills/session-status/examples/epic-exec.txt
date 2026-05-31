@@ -1,0 +1,15 @@
+CHECKOUT-100 "Checkout revamp" — Epic · 3 children (3 reporting, 0 no [CTX])
+https://acme.atlassian.net/browse/CHECKOUT-100
+
+Health:       At risk — a low-confidence child with an open UI risk and an unresolved cross-child dependency.
+Confidence:   high ×1 · medium ×1 · low ×1   (across 3 reporting children)
+Top risks:
+- CHECKOUT-103: checkout layout overflows on narrow viewports, unresolved before release
+- CHECKOUT-102: model drift could exceed threshold under peak traffic (mitigated by the soak)
+Dependencies:
+- CHECKOUT-103 → CHECKOUT-102: the checkout UI waits on the new ranking model
+Cost:         ~+0.4¢ per prediction, plus extra serving nodes (approximate, from 2 children)
+By child:
+- CHECKOUT-101 "Serving cluster migration" — on track (high)
+- CHECKOUT-102 "Ranking model v3" — in progress (medium)
+- CHECKOUT-103 "Checkout summary panel" — at risk (low)

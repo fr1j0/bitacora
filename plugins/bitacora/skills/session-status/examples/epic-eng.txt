@@ -1,0 +1,13 @@
+CHECKOUT-100 "Checkout revamp" — Epic · 3 children (3 reporting, 0 no [CTX])
+https://acme.atlassian.net/browse/CHECKOUT-100
+
+Dependency graph:
+- CHECKOUT-103 → CHECKOUT-102 (checkout UI consumes the new ranking model)
+By child:
+- CHECKOUT-101 "Serving cluster migration" — In Progress; next: prod canary 24h, then 100% traffic; risk: —
+- CHECKOUT-102 "Ranking model v3" — In Progress; next: shadow eval, then promote behind a flag; risk: drift PSI under peak
+- CHECKOUT-103 "Checkout summary panel" — In Progress; next: truncation pass + design QA; risk: overflow on narrow viewports
+Open risks / blockers:
+- CHECKOUT-102: drift PSI could exceed threshold under peak traffic (mitigated by the soak)
+- CHECKOUT-103: layout overflow on narrow viewports before release
+Excluded: 0 children with no compliant [CTX]

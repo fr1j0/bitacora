@@ -18,6 +18,8 @@ so there is no confirmation gate. Follow the **READ** rules in
   default `self`). An unknown flag or more than one mode flag is an error — name the five
   valid modes and stop; never guess. See the role→lens table in §5 for which lens a given
   role should pass.
+  For an **epic** target with no flag, the default is `status.epic_default_mode` (default `exec`),
+  not `self` — see §5's *Aggregate render*.
 - **Ticket key:** any `project_key_pattern` match in the arguments forces the target.
 - **`--include-all`:** optional; reveal the excluded (non-`[CTX]` / malformed) comments
   instead of only counting them.
@@ -56,6 +58,43 @@ the **strict** READ rules in `bitacora:jira-comment-format`:
 - Use each comment's own `created` timestamp from the API — **never a hand-typed date**.
 - Surface excluded counts separately (non-`[CTX]`, malformed); never silently drop. With
   `--include-all`, print the excluded comments too.
+
+### 4a. Single ticket or epic?
+
+The `getJiraIssue` response in §4 carries `fields.issuetype`. Branch on it:
+
+- **Epic** (issue type name equals the configured `status.epic_type`, default `Epic`) → run the
+  **aggregate path** (§4b + §5's *Aggregate render*). The epic's own `[CTX]` is not required.
+- **Anything else** (Story / Bug / Subtask / …) → the single-ticket path of §4 + §5 stands as
+  today; skip §4b entirely.
+
+Only the epic issue type triggers aggregation. A Story with subtasks is **not** rolled up in
+this version (it renders as a single ticket). This keeps the trigger unambiguous and matches the
+"point `status` at an epic → portfolio view" rule.
+
+### 4b. Read the epic's children (aggregate path)
+
+Runs only when §4a found an Epic. Read-only throughout.
+
+1. **List children via JQL.** Call `searchJiraIssuesUsingJql` with
+   `jql: "parent = <EPIC-KEY> ORDER BY created ASC"`, requesting `summary,issuetype,status`.
+   If that errors or returns zero, retry once with `jql: "\"Epic Link\" = <EPIC-KEY> ORDER BY created ASC"`
+   (classic-project epics use the `Epic Link` field instead of `parent`). If both forms fail,
+   see *Error / edge behavior*.
+2. **Cap the set.** Read at most `status.epic_children_cap` children (default 50). If the epic has
+   more, read the first N by creation order and **surface the truncation** in the render
+   (`showing first N of T children`) — never silently drop.
+3. **Strict-read each child.** For each child, `getJiraIssue` **requesting comments** and extract
+   its latest compliant `[CTX]` per the strict READ rules in `bitacora:jira-comment-format` (same
+   rules §4 uses). Classify each child as:
+   - **reporting** — has a compliant `[CTX]` (its latest is authoritative for that child);
+   - **no-`[CTX]`** — no compliant `[CTX]` yet;
+   - **malformed** — has a `[CTX]` attempt missing `Status:`/`Next:`.
+4. **Never silently drop.** Carry the no-`[CTX]` and malformed counts into the render
+   (`Not yet reporting: …`, and a malformed tally), exactly like §4's excluded-count discipline.
+
+Child reads are independent; one child's 404 / permission error is isolated — count it as
+unreadable and continue with the rest.
 
 ## 5. Render for the selected mode
 
@@ -174,8 +213,81 @@ Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--
 All read semantics (strict `[CTX]` extraction, ticket resolution, error handling) are
 unchanged from the default render path.
 
+### Aggregate signals (epic)
+
+When §4a routed to the aggregate path, compute these from the children's `[CTX]`s (facts only —
+the same **no-invention** rule applies; never synthesize a number or claim a child did not report):
+
+- **Per-child line** — `CHILD-KEY "<title>" — <status> (confidence)`, one per reporting child.
+- **Health** — a one-line rollup: if any child is `Blockers:`-blocked → *blocked*; else if any child
+  has `confidence: low` or an open `Risk:` → *at risk*; else *on track*. State the reason briefly.
+- **Confidence distribution** — tally the `(confidence: …)` cues across reporting children
+  (`high ×A · medium ×B · low ×C`). Omit children that carry no cue from the tally.
+- **Risk concentration** — the children carrying `Risk:` or `Blockers:`, listed risk-bearing first,
+  one line each. Empty if none.
+- **Dependency graph** — parse each child's `Dependencies:`; when a dependency names another child
+  of the same epic, render it as an edge `CHILD-A → CHILD-B (what blocks what)`. Cross-epic deps are
+  listed as plain bullets. Empty if none.
+- **Cost rollup** — sum the numeric infra + inference `$` values across children that report them;
+  label it **approximate** and note how many children contributed. Omit if no child reports cost.
+- **Coverage** — `N children (M reporting, K no [CTX], J malformed)`, plus any truncation note from
+  §4b. Always shown so the reader knows the rollup's basis.
+
+### Aggregate render
+
+Render the aggregate signals **in the chosen lens**. **Epic default lens:** when the target is an
+epic and no `--for-*` flag was given, use `status.epic_default_mode` (default `exec`) instead of the
+single-ticket default `self` — a portfolio's natural audience is leadership. An explicit flag always
+wins. Lenses degrade gracefully: omit any signal that is empty (no risks → no `Top risks:` block).
+
+**--for-exec** (default for epics):
+
+```
+EPIC-1 "<title>" — Epic · <coverage>
+https://<site>/browse/EPIC-1
+
+Health:       <one-line rollup + reason>
+Confidence:   high ×A · medium ×B · low ×C   (across M reporting children)
+Top risks:                                   (omit if none)
+- <CHILD-KEY: risk one-liner, business framing; risk-bearing children first>
+Dependencies:                                (omit if none)
+- <CHILD-A → CHILD-B: what blocks what>
+Cost:         <summed infra + inference $ — approximate, from K children>   (omit if none)
+By child:
+- <CHILD-KEY "<title>" — plain status (confidence)>
+Not yet reporting: <CHILD-KEY, …>            (omit if none)
+```
+
+**--for-eng**:
+
+```
+EPIC-1 "<title>" — Epic · <coverage>
+https://<site>/browse/EPIC-1
+
+Dependency graph:                            (omit if none)
+- <CHILD-A → CHILD-B (what blocks what)>
+By child:
+- <CHILD-KEY "<title>" — Status; next: <first Next bullet>; risk: <Risk if any, else —>>
+Open risks / blockers:                       (omit if none)
+- <CHILD-KEY: risk/blocker>
+Excluded: <K no [CTX] (J malformed)>         (omit if zero)
+```
+
+**--for-ops / --for-pm / --for-self** reuse the same aggregate structure, shaped by that lens's
+single-ticket emphasis:
+- **ops** — `By child` leads each reporting child with its `Deploy/Ops:` posture (env/flag/rollback)
+  and a combined `Watch:` list across children; keeps links. Children with no `Deploy/Ops:` show
+  Status + Next only.
+- **pm** — plain-language portfolio: `Health` and `Confidence` first, `By child` as one plain
+  sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
+- **self** — terse: `Health` line + the `By child` list only.
+
+All five keep the coverage figure in the header line (`Epic · <coverage>`) so the reader knows how complete the rollup is.
+
 See `examples/self.txt`, `examples/eng.txt`, `examples/ops.txt`, `examples/pm.txt`,
-`examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses.
+`examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses; and
+`examples/epic-exec.txt`, `examples/epic-eng.txt` — an epic (CHECKOUT-100) rolled up across its
+children.
 
 ## 6. Print, then offer a clipboard copy
 
@@ -200,6 +312,13 @@ surface the absence as a one-line note (see above) so the user knows to copy man
 - **No `[CTX]` on the ticket:** say so plainly; show the Jira workflow status + title for
   orientation; suggest running `/bitacora:handoff` so future summaries have something to
   read.
+- **Epic with no children:** say so; show the epic's own workflow status + title (and its own
+  `[CTX]` if it has one). Nothing to roll up.
+- **Epic whose children have no `[CTX]` yet:** report `N children, none reporting a [CTX] yet`;
+  suggest `/bitacora:handoff` on the children. Still show the per-child Status/title list for
+  orientation.
+- **Child listing fails (both `parent` and `Epic Link` JQL error):** report that children could
+  not be fetched; fall back to rendering the epic itself as a single ticket. No retry loop.
 - **Ticket 404 / no read permission:** surface the reason for that key; offer to retry with
   a different key. No retry loop.
 - **No ticket resolved:** say so; suggest passing a key.
@@ -216,4 +335,7 @@ Two optional additions:
 status:
   ctx_lookback: 2        # prior [CTX] stitched for the Done/progress trajectory
   default_mode: self     # self | eng | ops | pm | exec — overrides the built-in default mode
+  epic_type: Epic            # issue type name that triggers aggregation (override for renamed epic types)
+  epic_children_cap: 50      # max children read per epic; truncation is surfaced, never silent
+  epic_default_mode: exec    # lens for an epic target when no --for-* flag is given
 ```
