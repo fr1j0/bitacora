@@ -174,8 +174,8 @@ Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--
 All read semantics (strict `[CTX]` extraction, ticket resolution, error handling) are
 unchanged from the default render path.
 
-See `examples/self.txt`, `examples/eng.txt`, `examples/pm.txt` — the same `[CTX]` rendered
-in all three modes.
+See `examples/self.txt`, `examples/eng.txt`, `examples/ops.txt`, `examples/pm.txt`,
+`examples/exec.txt` — the same enriched `[CTX]` (CHURN-42) rendered in all five lenses.
 
 ## 6. Print, then offer a clipboard copy
 

@@ -1,0 +1,14 @@
+CHURN-42 "Churn model v2 rollout" — In Progress
+https://acme.atlassian.net/browse/CHURN-42
+
+Impact:      model-serving, infra
+Deploy/Ops:
+- On staging behind flag churn_v2; rollback = flip the flag off
+- infra $: +1 GPU node on the serving pool during the soak
+Watch:
+- p95 inference latency, null-feature rate
+Model rollback: pin registry alias churn:prod back to v1
+Next:
+- 48h staging soak, then promote churn_v2 to prod once DATA-77 lands
+Risk / blockers:
+- Drift PSI could exceed threshold under May traffic; mitigated by soak + watch-list

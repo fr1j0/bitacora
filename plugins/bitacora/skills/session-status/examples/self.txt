@@ -1,9 +1,9 @@
-AUTH-204 "OAuth login" — In Progress
-Left off:   Token refresh implemented (rotating refresh tokens), covered by integration tests.
+CHURN-42 "Churn model v2 rollout" — In Progress
+Left off:   On staging behind flag churn_v2; soak in progress (confidence: medium)
 Next:
-- Wire refresh into the SPA silent-renew flow
-- Decide session idle-timeout with product
+- 48h staging soak, then promote churn_v2 to prod once DATA-77 lands
 Decisions:
-- Refresh tokens httpOnly+Secure server-side, never localStorage (XSS)
-Blockers:
-- Product to confirm idle-timeout (30m vs 60m)
+- Promote behind a feature flag, not a hard cutover [blast-radius]
+- Registry-alias rollback pattern for model services [precedent]
+Risk:
+- Drift PSI could exceed threshold under May traffic; mitigated by soak + watch-list

@@ -1,14 +1,22 @@
-AUTH-204 "OAuth login" — In Progress
-https://acme.atlassian.net/browse/AUTH-204
+CHURN-42 "Churn model v2 rollout" — In Progress
+https://acme.atlassian.net/browse/CHURN-42
 
+Impact:     model-serving, infra
 Done recently:
-- OAuth provider client (PKCE) and callback happy path
-- Token refresh with rotating refresh tokens, covered by integration tests vs the staging IdP
+- Retrained churn model on Q2 cohort, deployed v2 to staging
+- Added an offline eval gate to CI on the held-out set
 Decisions:
-- Store refresh tokens httpOnly+Secure server-side, never in localStorage — avoids XSS token theft
+- Promote behind a feature flag, not a hard cutover [blast-radius]
+- Registry-alias rollback pattern for model services [precedent]
+Model/Eval:
+- churn v2: AUC 0.82 → 0.87; no regression on the fairness slice suite
+- inference $ ≈ +0.4¢/call vs v1; rollback = pin alias churn:prod to v1
+Artifacts:
+- run mlflow#441 (https://mlflow.example.internal/runs/441)
+- PR #812 (https://github.com/example/ml/pull/812)
+Dependencies:
+- Needs DATA-77 feature backfill before prod promote
 Next:
-- Wire refresh into the SPA silent-renew flow
-- Decide session idle-timeout with product
-Blockers / open questions:
-- Blocked on product confirming idle-timeout (30m vs 60m)
-- Open: should "remember me" extend refresh lifetime, and to how long?
+- 48h staging soak, then promote to prod once DATA-77 lands
+Risk / blockers / open questions:
+- Drift PSI could exceed threshold under May traffic; mitigated by soak + watch-list

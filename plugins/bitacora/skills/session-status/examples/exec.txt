@@ -1,0 +1,8 @@
+CHURN-42 "Churn model v2 rollout"
+https://acme.atlassian.net/browse/CHURN-42
+
+Status:          On track, at low risk — improved model in final validation. (confidence: medium)
+Business impact: Better churn prediction; fairness checks pass, so no compliance exposure.
+Cost:            ~+0.4¢ per prediction, plus one extra GPU node during the trial period.
+Risks / needs:   Go-live waits on a data dependency (DATA-77); monitoring prediction drift as a precaution.
+Next milestone:  Two-day production-readiness trial, then switch on for all users.
