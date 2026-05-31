@@ -3,32 +3,40 @@ Corpus: 3 [CTX] comments · 5 free-form comments · 4 Remember hits · 2 commits
 
 --- description (proposed) ---
 
-Acceptance criteria
+## User story
 
-- p95 export latency drops below 4s for tenants up to 50k rows
-- No regression in the 10k-row baseline (currently ~1.8s)
-- Responsive web only; PWA / native explicitly out of scope
+As a tenant admin, when exporting large datasets, I want the export to finish quickly
+so that I'm not blocked waiting on big-tenant exports.
 
-Technical notes
+## Context
 
-- The export_jobs worker currently does a per-row write; batching is the obvious lever
-- See PR #781 (in progress) for the worker scaffolding
-- Sarah's caching idea (comment #3) is parked as a follow-up, not part of this story
+The `export_jobs` worker currently does a per-row write; batching is the obvious lever
+for the large-tenant tiers.
 
-Assumptions
+- Pain consistently reported around large-tenant exports (comments #1, #4), not the small baseline.
+- Worker scaffolding in progress: PR `#781`.
+- Caching idea (Sarah, comment #3) is parked as a follow-up — orthogonal to the batching work.
 
-- "Faster" measured as p95 latency at the 50k-row tier, target ≤ 4s — chosen because
-  the comment thread (#1, #4) consistently framed pain around large-tenant exports,
-  not the small baseline. Engineer can re-target if PM has a different bar.
-- Responsive web only — the public-facing export UI is web today; there's no signal
-  in the corpus of a mobile / native client touching this path.
-- Caching deferred to a follow-up ticket — Sarah's idea (comment #3) is real but
-  orthogonal to the worker batching that gets us most of the way to the target.
+## Acceptance criteria
 
-Out of scope
+- p95 export latency drops below 4s for tenants up to 50k rows.
+- No regression in the 10k-row baseline (currently ~1.8s).
+- Responsive web only; PWA / native explicitly out of scope.
 
-- Caching layer (Sarah's follow-up; see comment #3)
-- PWA / native client work
+## Assumptions
+
+- "Faster" measured as p95 latency at the 50k-row tier, target ≤ 4s — chosen because the
+  comment thread (#1, #4) consistently framed pain around large-tenant exports, not the
+  small baseline. Engineer can re-target if PM has a different bar.
+- Responsive web only — the public-facing export UI is web today; there's no signal in the
+  corpus of a mobile / native client touching this path.
+
+## Other information
+
+Out of scope:
+
+- Caching layer (Sarah's follow-up; see comment #3).
+- PWA / native client work.
 
 --- title (unchanged — scope is description-only) ---
 

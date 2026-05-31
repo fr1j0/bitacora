@@ -3,47 +3,47 @@ Corpus: 0 [CTX] comments · 3 free-form comments · 2 Remember hits · 0 commits
 
 --- description (proposed) ---
 
-Question
+## Question
 
-Does Next.js partial prerendering (PPR) cut TTFB on /home and /pricing meaningfully
-(target ≥ 30% improvement at p75), and is the migration cost low enough to justify
-rolling it out across the rest of the public site?
+Does Next.js partial prerendering (PPR) cut TTFB on `/home` and `/pricing` meaningfully
+(target ≥ 30% improvement at p75), and is the migration cost low enough to justify rolling
+it out across the rest of the public site?
 
-Approach
+## Approach
 
-- Day 1: enable PPR locally on /home only; measure TTFB cold + warm against the
-  current baseline; identify which components must be marked dynamic.
-- Day 2: try /pricing (more dynamic content); identify any blockers (third-party
-  scripts, the A/B framework integration); measure the same metrics.
-- Day 3: write a thumbs-up / thumbs-down recommendation with the per-page-class
-  migration cost estimate. Land a `[CTX] Spike concluded` comment with the
-  decision either way.
+- Day 1: enable PPR locally on `/home` only; measure TTFB cold + warm against the current
+  baseline; identify which components must be marked dynamic.
+- Day 2: try `/pricing` (more dynamic content); identify any blockers (third-party scripts,
+  the A/B framework integration); measure the same metrics.
+- Day 3: write a thumbs-up / thumbs-down recommendation with the per-page-class migration
+  cost estimate. Land a `[CTX] Spike concluded` comment with the decision either way.
 
 Assumptions baked into this plan:
 
-- "Worth it" is measured as TTFB on /home + /pricing (target ≥ 30% at p75) — the
-  parked Slack link in comment #1 only discussed TTFB, so secondary metrics
-  (conversion, bounce) are out of scope for the spike. Reopen if PM disagrees.
-- 3 working days is the timebox — comment #2 from eng-lead@ said "a few days";
-  three is the narrowest defensible read. Hard wall; no creep.
+- "Worth it" is measured as TTFB on `/home` + `/pricing` (target ≥ 30% at p75) — the parked
+  Slack link in comment #1 only discussed TTFB, so secondary metrics (conversion, bounce) are
+  out of scope for the spike. Reopen if PM disagrees.
+- 3 working days is the timebox — comment #2 from eng-lead@ said "a few days"; three is the
+  narrowest defensible read. Hard wall; no creep.
 - Desktop fast-3G + cable for the experiments — corpus has no mobile signal, and a
   mobile-network simulation would balloon the timebox.
 
-Timebox
+## Timebox
 
-3 working days. Hard wall — if day 3 lands without numbers, stop and recommend
-"insufficient data" rather than extending. No silent timebox creep.
+3 working days. Hard wall — if day 3 lands without numbers, stop and recommend "insufficient
+data" rather than extending. No silent timebox creep.
 
-Out of scope
-
-- Migrating any production page in this spike. Findings go into a follow-up epic
-  (or a no-build decision).
-- Comparing against alternatives (full SSG, ISR). PPR-specific only.
-- Mobile-network simulation.
-
-Recommendation
+## Recommendation
 
 (left empty — pending spike conclusion)
+
+## Other information
+
+Out of scope:
+
+- Migrating any production page in this spike. Findings go into a follow-up epic (or a no-build decision).
+- Comparing against alternatives (full SSG, ISR). PPR-specific only.
+- Mobile-network simulation.
 
 --- title (proposed) ---
 - (current)  "spike: is partial prerendering worth it?"

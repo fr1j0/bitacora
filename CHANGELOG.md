@@ -2,6 +2,18 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.3.1] — 2026-06-01 · Improve structure matches Jira's AI
+
+### Changed
+
+- **`/bitacora:improve` rewrites now mirror Jira's native AI "improve description" output.**
+  Sections render as Markdown `##` headings (Stories: `User story` · `Context` ·
+  `Acceptance criteria` · `Assumptions` · `Other information`) instead of bold-label lines, with
+  bulleted lists throughout and **inline-code on every technical token** — endpoint URIs, RPC /
+  service / method names, proto/field names, `package@version`, file paths, and identifiers — so the
+  rewritten ticket is scannable. Bitácora's distinctive `Assumptions` section is kept. The
+  `[ARCHIVE]` snapshot / accept-gate / no-invention discipline is unchanged.
+
 ## [v0.3.0] — 2026-06-01 · CTX enrichment
 
 Makes the `[CTX]` record role-aware for a diverse org — frontend, backend, data science,

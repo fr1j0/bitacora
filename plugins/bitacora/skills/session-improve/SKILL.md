@@ -80,13 +80,26 @@ Two more best-effort reads. Either failing only suppresses that input; neither b
 Read `issuetype.name` from the API response captured in step 3. Pick a section
 template:
 
-| Type | Sections (in order) |
+| Type | Sections — **each rendered as a Markdown `##` heading**, in order |
 |------|---------------------|
-| **Story** *(default — also `Task`, `Improvement`, unknown / custom)* | Acceptance criteria · Technical notes · Assumptions · Out of scope · Open questions |
+| **Story** *(default — also `Task`, `Improvement`, unknown / custom)* | User story · Context · Acceptance criteria · Assumptions · Other information |
 | **Bug** | Steps to reproduce · Expected · Actual · Environment · Notes |
-| **Epic** | Goal · Scope outline · Success criteria · Assumptions · Risks · Out of scope |
-| **Spike** | Question · Approach · Timebox · Out of scope · Recommendation *(left empty until the spike concludes)* |
-| **Subtask** | Acceptance criteria · Technical notes · Assumptions *(lighter shape)* |
+| **Epic** | Goal · Scope outline · Success criteria · Assumptions · Risks · Other information |
+| **Spike** | Question · Approach · Timebox · Recommendation *(left empty until the spike concludes)* · Other information |
+| **Subtask** | Context · Acceptance criteria · Assumptions *(lighter shape)* |
+
+**Formatting — match Jira's native AI "improve description" output:**
+
+- Render each section name as a Markdown `##` heading, never a bold-label line.
+- Use bulleted lists for every enumeration (criteria, affected files, services, blockers).
+- **Inline-code every technical token:** endpoint URIs (`` `POST /prices/fetch-price-by-identifiers` ``),
+  RPC / service / method names (`` `market.v1.RealtimePricesService.GetRealtimePrices` ``), proto /
+  field names (`` `last` ``), `` `package@version` ``, file paths (`` `lib/api/rest/ai-api-client.ts` ``),
+  config keys, and identifiers (`` `TRDPRC_1` ``). This is what makes the rewrite scannable in Jira.
+- **Story shape specifically:** `## User story` opens with *"As a `<role>`, when `<situation>`, I want
+  to `<action>` so that `<benefit>`."*; `## Context` is the grounding narrative (what's changing and
+  why, the services/endpoints involved, the affected files as a bulleted list); `## Other information`
+  collects blockers, cross-ticket dependencies, out-of-scope, and any open questions.
 
 Compose the new description from the chosen template, populating each section from
 the corpus. **Make confident product-engineering choices** wherever the corpus is
@@ -99,7 +112,8 @@ silent — do not interrogate the user. Surface those choices in the rewrite its
   absorb it into `Approach`.
 - **Open questions** — items that genuinely require a non-engineer stakeholder (PM,
   designer, security, legal) to weigh in. Reserved for *"we cannot ship without
-  someone-outside-engineering answering this."* Most rewrites have none.
+  someone-outside-engineering answering this."* Most rewrites have none. Place them under
+  `## Other information` (Story/Epic) rather than a heading of their own.
 
 **Empty sections are omitted**, not left as placeholders. The new title (if scope
 includes title) is a single line, ≤ 80 chars, imperative for Story/Task/Improvement,
