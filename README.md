@@ -7,6 +7,7 @@
 *Structured session handoffs, logged to Jira — so context survives context clears, sessions, and teammates.*
 
 [![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](#)
+[![Release](https://img.shields.io/github/v/release/fr1j0/bitacora?style=for-the-badge&label=release)](https://github.com/fr1j0/bitacora/releases/latest)
 [![Tests](https://img.shields.io/github/actions/workflow/status/fr1j0/bitacora/test.yml?style=for-the-badge&label=tests)](https://github.com/fr1j0/bitacora/actions/workflows/test.yml)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-D97757?style=for-the-badge&logo=claude&logoColor=white)](https://claude.com/claude-code)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)](LICENSE)
@@ -145,7 +146,7 @@ The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional
 - Atlassian Rovo MCP configured with read/write access to your team's Jira instance *(optional — handoff runs local-only without it, drafting comments to screen instead of writing them)*.
 - The [Remember](https://github.com/anthropics/claude-code/tree/main/plugins/remember) plugin or another local memory tool *(optional — for the between-sessions scratch Bitácora delegates rather than manages)*.
 
-**Pinning to a specific revision.** Until a versioned release ships, the marketplace points at `main`. To pin to an audited revision, fork the repo and `marketplace add <your-fork>` instead — or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
+**Pinning to a specific revision.** The marketplace points at `main`. To pin to an audited revision, check out a tagged release — the latest is [`v0.3.3`](https://github.com/fr1j0/bitacora/releases/tag/v0.3.3) — or fork the repo and `marketplace add <your-fork>`, or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
 
 **Troubleshooting — `/bitacora:help` says "Not logged in" after `/login`.** The in-session `/login` writes the auth token to disk but doesn't always refresh the running Claude Code process's in-memory auth state — most likely on a freshly bootstrapped profile where Claude Code prompted for login *during* the session. Restart the session: Ctrl+C, re-run `claude` (or `HOME=/whatever claude` if you're testing in an isolated profile), then `/bitacora:help` should work. Sessions that were already logged-in before the install are unaffected.
 
