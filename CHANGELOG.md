@@ -2,6 +2,17 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.3.3] — 2026-06-01 · Archive snapshot preserved verbatim
+
+### Fixed
+
+- `/bitacora:improve`'s `[ARCHIVE]` pre-improve snapshot now wraps the verbatim description in a
+  **fenced code block** instead of a Markdown blockquote. Ticket descriptions are themselves
+  Markdown, so the Markdown-to-ADF conversion dropped block-level constructs nested in the
+  blockquote — clipping the snapshot after the first heading and defeating its rollback purpose.
+  A fenced block preserves arbitrary content verbatim; the four-backtick widen rule is documented
+  for the case where the source description contains its own fence. (#80, closes #79)
+
 ## [v0.3.2] — 2026-06-01 · Improve headings: h3
 
 ### Fixed
