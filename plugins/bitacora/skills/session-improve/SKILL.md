@@ -149,7 +149,7 @@ On `y`:
 
 **8.1 Archive comment** via `addCommentToJiraIssue`. Body:
 
-```
+````
 [ARCHIVE] Pre-improve snapshot
 
 Posted by /bitacora:improve before rewriting the fields. The block(s)
@@ -159,12 +159,24 @@ below are the verbatim pre-edit content; safe to scroll past.
 
 Title (pre-edit):
 
-> <original title>
+<original title>
 
 Description (pre-edit):
 
-> <original description verbatim, each line prefixed with "> ">
 ```
+<original description verbatim, unmodified>
+```
+````
+
+**Container format — use a fenced code block, never a blockquote.** Ticket
+descriptions are themselves Markdown (`## headings`, `* lists`). Prefixing each line
+with `> ` produces `> ## heading`, and the Markdown→ADF conversion drops block-level
+constructs nested inside a blockquote, silently clipping the snapshot after the first
+heading. A fenced ` ``` ` block preserves arbitrary content verbatim, which is the
+whole point of the archive. Edge case: if the original description itself contains a
+triple-backtick fence, widen the outer fence to four backticks (or more, always one
+more than the longest run inside) so the snapshot still round-trips. The title is a
+single plain-text line and needs no fence.
 
 No timestamp in the header — the comment's `created` metadata is authoritative, per
 the same rule `bitacora:jira-comment-format` enforces for `[CTX]` headers. Include
