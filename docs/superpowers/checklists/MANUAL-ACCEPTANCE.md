@@ -29,6 +29,12 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 
 ## Multi-ticket `/status` (Phase A)
 
+> **Two test layers.** The deterministic *mechanical* contract — coverage math, blocked-only
+> selection, `--standup` window membership, and the `portfolio`→`digest` terminology — is
+> auto-checked in CI by `plugins/bitacora/scripts/test-multi-status-fixtures.sh` against the
+> committed `examples/multi-*.txt`. The items below are the **render** half: live LLM output
+> across lenses against a real Jira, which can't be unit-tested.
+
 - [ ] **M1 — `--mine` digest:** `/bitacora:status --mine` with ≥2 assigned tickets. →
       Cross-ticket digest in the `self` lens; coverage line `N tickets (M reporting, …)`;
       no-`[CTX]` tickets land in `Not yet reporting`, never dropped.

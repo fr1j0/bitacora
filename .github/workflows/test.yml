@@ -31,6 +31,8 @@ jobs:
         run: bash plugins/bitacora/scripts/test-validate-ctx.sh
       - name: Run since-window tests
         run: bash plugins/bitacora/scripts/test-since-window.sh
+      - name: Run multi-ticket status fixture tests
+        run: bash plugins/bitacora/scripts/test-multi-status-fixtures.sh
       - name: "Run /bit: alias sync tests"
         run: bash plugins/bitacora/scripts/test-sync-bit-aliases.sh
       - name: Run statusline tests

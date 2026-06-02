@@ -169,6 +169,27 @@ status_multi:
 - The deterministic parse/classify is already covered by `validate-ctx.sh`; no validator
   rule change (presence-based, enriched bodies already classify `compliant`).
 
+### Fixture-contract test (added 2026-06-02)
+
+The render itself is LLM-produced prose and is **not** unit-testable; the realistic split
+is a deterministic *mechanical* layer + a manual *render* layer.
+
+- **`scripts/test-multi-status-fixtures.sh`** (new, CI-wired bash, sibling to
+  `test-validate-ctx.sh`) — a **fixture-contract lint**. Asserts the three committed
+  `examples/multi-*.txt` renders obey the §7 rules over the shared 4-ticket scenario:
+  identical coverage line across all three; ticket-key universe within
+  `{AUTH-12, DATA-77, UI-30, PERF-9, PLATFORM-4}`; the terminology guard (no `portfolio`
+  in any multi-`*` fixture; aggregate uses `By ticket:` not `By child:`); per-lens rules
+  (aggregate surfaces `Not yet reporting: PERF-9`; `--blocked` lists only the blocked
+  ticket with `stale 2d` + `Clear: 2 of 3`; `--standup` shows `since 1d`, DATA-77 moved,
+  the others under `No movement:`, PERF-9 absent); and a `since-window.sh` smoke check.
+  Deterministic, no LLM, no Jira. Brittle by design — a fixture reformat forces a
+  deliberate test update.
+- **What it does NOT cover** (the *render* half, left to `MANUAL-ACCEPTANCE.md` M1–M8):
+  live LLM rendering, audience-altitude behavior (`exec` hash-stripping, `pm`
+  plain-language), real Jira/JQL, and the audience × query combos beyond the three `self`
+  fixtures. `MANUAL-ACCEPTANCE.md` carries a header note linking the two layers.
+
 ## Out of scope (this iteration)
 
 - Posting a digest back to Jira as a `[STATUS]` comment (D6).
