@@ -26,3 +26,26 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 - [ ] **A10 — skip + isolation:** Three tickets; "skip 3"; make [2] 404 on write. → [1]
       writes ✓, [2] reports ✗ with retry offer, [3] dropped; scratch writes ✓ regardless.
 - [ ] **`/bit:` alias:** After copying the alias file, `/bit:handoff` runs the same flow.
+
+## Multi-ticket `/status` (Phase A)
+
+- [ ] **M1 — `--mine` digest:** `/bitacora:status --mine` with ≥2 assigned tickets. →
+      Cross-ticket digest in the `self` lens; coverage line `N tickets (M reporting, …)`;
+      no-`[CTX]` tickets land in `Not yet reporting`, never dropped.
+- [ ] **M2 — explicit keys:** `/bitacora:status PROJ-1 PROJ-2`. → Multi-ticket mode (2+ keys),
+      not single-ticket. `/bitacora:status PROJ-1` alone still renders one ticket.
+- [ ] **M3 — `--blocked`:** `/bitacora:status --mine --blocked`. → Only tickets with
+      `Blockers:`/`Dependencies:`, most-stale first, `stale Nd` correct; `Nothing blocked …`
+      when none qualify.
+- [ ] **M4 — `--standup`:** `/bitacora:status --mine --standup --since 1d`. → Only tickets
+      whose latest `[CTX]` is within 1 day under `Moved:`; the rest under `No movement:`;
+      `last-working-day` default picks up Friday on a Monday run.
+- [ ] **M5 — cap disclosure:** A scope matching more than `multi_fanout_cap` (default 25). →
+      `showing N of M — narrow with --jql`; no silent truncation.
+- [ ] **M6 — empty + single + board:** `--mine` matching zero → plain "matched nothing";
+      a scope resolving to exactly one → single-ticket render; `--board X` → "not yet
+      supported" and stop.
+- [ ] **M7 — audience compose:** `/bitacora:status --mine --blocked --for-exec`. → `--blocked`
+      content rendered at exec altitude (PR/commit hashes stripped, asks framed).
+- [ ] **M8 — backward compat:** `/bitacora:status EPIC-1` still rolls up the epic; a bare
+      single key is unchanged from pre-Phase-A behavior.
