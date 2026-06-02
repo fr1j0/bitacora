@@ -2,7 +2,7 @@ Scope: --mine — 4 tickets (3 reporting, 1 no [CTX])
 
 Health: at risk — AUTH-12 blocked on an external API contract; DATA-77 carries an open drift risk
 By ticket:
-- [AUTH-12](https://example.atlassian.net/browse/AUTH-12) "OAuth token refresh" — In Progress (confidence: medium)
-- [DATA-77](https://example.atlassian.net/browse/DATA-77) "Feature store migration" — In Progress (confidence: high)
-- [UI-30](https://example.atlassian.net/browse/UI-30) "Settings page redesign" — In Review
+- AUTH-12 "OAuth token refresh" — In Progress (confidence: medium)
+- DATA-77 "Feature store migration" — In Progress (confidence: high)
+- UI-30 "Settings page redesign" — In Review
 Not yet reporting: PERF-9
