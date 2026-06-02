@@ -26,7 +26,7 @@ This design adds two things behind the existing command:
 2. **A second, orthogonal lens family — query lenses.** Where audience lenses decide
    *altitude*, query lenses decide *what to pull out*: `--blocked`, `--standup` (Phase A)
    and `--debt`, `--risk`, `--deps` (Phase B). Default query lens = the existing
-   portfolio aggregate.
+   cross-ticket digest.
 
 The three knobs compose: **scope × query lens × audience.** `/status --sprint --debt
 --for-exec` = "the debt ledger across my sprint, for a VP." `/status --mine --blocked` =
@@ -41,7 +41,7 @@ aggregation into `status`, don't add a rollup command").
 
 | # | Decision | Rationale |
 |---|----------|-----------|
-| D1 | **Extend `/status`; no new command or alias** | Continues CTX-enrichment D5. A portfolio/triage view only changes the *scope of the target* and the *pivot on its content* — both things `status` can infer/accept. A new command would split a single mental model ("ask Jira where things stand") across two verbs. |
+| D1 | **Extend `/status`; no new command or alias** | Continues CTX-enrichment D5. A cross-ticket digest or triage view only changes the *scope of the target* and the *pivot on its content* — both things `status` can infer/accept. A new command would split a single mental model ("ask Jira where things stand") across two verbs. |
 | D2 | **Two orthogonal lens families** (audience × query), not one merged enum | Audience = altitude (*how to render*); query = content pivot (*what to surface*). Merging them (e.g. a `--blocked-for-exec` lens) would be a combinatorial explosion. Keeping them orthogonal means `5 audience × 6 query` compose for free. |
 | D3 | **Scope resolves to a key list via JQL, then reuses the corpus-read path** | The epic rollup already proved fan-out → strict-read each child → aggregate. A scope selector is just a different *way to name the set*; everything downstream is shared. No new read machinery. |
 | D4 | **Strict `[CTX]`-only reads; honest exclusion + no-context buckets** | Consistent with `next`/`status`/JQL (format skill: "cross-ticket JQL = strict"). Surface excluded (non-`[CTX]`/malformed) counts and a separate **no-context (N)** bucket; never silently drop a ticket from the set. |
@@ -106,7 +106,7 @@ sorts).
 
 ### Layer 3 — Query lens (the pivot)
 
-Default (no query flag) = the **portfolio aggregate**, reusing the epic-rollup renderer
+Default (no query flag) = the **cross-ticket digest**, reusing the epic-rollup renderer
 (health, confidence distribution, risk concentration, dependency graph, cost roll-up) now
 over an arbitrary set instead of an epic's children.
 

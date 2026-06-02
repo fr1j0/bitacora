@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Extend `/bitacora:status` to read across an arbitrary multi-ticket scope (`--mine` / `--sprint` / `--jql` / 2+ keys) and surface it through two query lenses (`--blocked`, `--standup`) plus the default portfolio aggregate — reusing the existing epic-rollup machinery, fully backward-compatible.
+**Goal:** Extend `/bitacora:status` to read across an arbitrary multi-ticket scope (`--mine` / `--sprint` / `--jql` / 2+ keys) and surface it through two query lenses (`--blocked`, `--standup`) plus the default cross-ticket digest — reusing the existing epic-rollup machinery, fully backward-compatible.
 
 **Architecture:** A four-layer pipeline added behind the existing command — scope resolution (JQL → key list) → corpus read (strict `[CTX]` per key, reusing the §4b child-read discipline) → query lens (default aggregate / `--blocked` / `--standup`) → render (existing `--for-*` altitude). The only new executable code is a pure-arithmetic `since-window.sh` helper for the `--standup` window; everything else is skill prose + rendered-output fixtures. Multi-ticket mode activates only on a scope flag or 2+ keys, so `/status KEY` and `/status EPIC` are untouched.
 
@@ -229,7 +229,7 @@ Insert immediately after it (before `## 2. Resolve the target ticket`):
   single-ticket / epic-rollup behavior verbatim. `--board <id|name>` is **reserved for a
   later phase**: if passed, say it is not yet supported and stop (do not silently fall back).
 - **Query lens (multi-ticket only).** `--blocked` or `--standup` selects *what to surface*
-  across the scope; with neither, the default is the portfolio aggregate (§7). Query lenses
+  across the scope; with neither, the default is the cross-ticket digest (§7). Query lenses
   compose with the `--for-*` audience lens, which still selects altitude. A query lens in
   single-ticket mode is an error — name the multi-ticket scopes and stop. Two query lenses
   at once is an error.
@@ -365,7 +365,7 @@ description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored s
 
 New:
 ```
-description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses (--for-self/eng/ops/pm/exec), roll up an epic across its children, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default portfolio aggregate. Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
+description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses (--for-self/eng/ops/pm/exec), roll up an epic across its children, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default cross-ticket digest. Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
 ```
 
 - [ ] **Step 8: Re-read the edited sections for consistency**
@@ -381,7 +381,7 @@ git commit -m "feat(status): multi-ticket scope resolution + corpus read (#83)"
 
 ---
 
-## Task 3: Default portfolio aggregate over a scope
+## Task 3: Default cross-ticket digest over a scope
 
 Reuses the epic Aggregate signals + Aggregate render, retargeted from "an epic's children" to "the resolved set." Adds §7 (the multi-ticket render section) with the default branch + its fixture.
 
@@ -417,7 +417,7 @@ rule as §5. Every render carries a **coverage** line —
 `N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms —
 plus any `showing N of M — narrow with --jql` truncation note from §2a.
 
-### Default (no query flag) — portfolio aggregate
+### Default (no query flag) — cross-ticket digest
 
 Compute the **Aggregate signals** exactly as the epic path does (health, confidence
 distribution, risk concentration, dependency graph, cost rollup, coverage), but over the
@@ -438,7 +438,7 @@ Read `examples/multi-aggregate.txt` and the self Aggregate render rule (§5 "**s
 
 ```bash
 git add plugins/bitacora/skills/session-status/SKILL.md plugins/bitacora/skills/session-status/examples/multi-aggregate.txt
-git commit -m "feat(status): default portfolio aggregate over a multi-ticket scope (#83)"
+git commit -m "feat(status): default cross-ticket digest over a multi-ticket scope (#83)"
 ```
 
 ---
@@ -610,7 +610,7 @@ Insert after it (before `Arguments: $ARGUMENTS`):
 For a **multi-ticket** read, pass a scope instead of one key — `--mine`, `--sprint`,
 `--jql "<JQL>"`, or two or more keys — and optionally a query lens: `--blocked` (what's
 stuck) or `--standup [--since 1d|2d|last-working-day]` (what moved). With no query lens, a
-multi-ticket scope renders a portfolio aggregate. The `--for-*` audience lens still applies.
+multi-ticket scope renders a cross-ticket digest. The `--for-*` audience lens still applies.
 ```
 
 - [ ] **Step 2: Update the command frontmatter description**
@@ -638,7 +638,7 @@ Old:
 
 New:
 ```
-| `/bitacora:status` | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary (`--for-self`/`-eng`/`-ops`/`-pm`/`-exec`), or roll up an epic. Point it at a **multi-ticket scope** (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a portfolio aggregate or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only: prints and offers a clipboard copy. |
+| `/bitacora:status` | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary (`--for-self`/`-eng`/`-ops`/`-pm`/`-exec`), or roll up an epic. Point it at a **multi-ticket scope** (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only: prints and offers a clipboard copy. |
 ```
 
 - [ ] **Step 4: Commit**
@@ -664,7 +664,7 @@ At the end of `docs/superpowers/checklists/MANUAL-ACCEPTANCE.md`, append:
 ## Multi-ticket `/status` (Phase A)
 
 - [ ] **M1 — `--mine` aggregate:** `/bitacora:status --mine` with ≥2 assigned tickets. →
-      Portfolio aggregate in the `self` lens; coverage line `N tickets (M reporting, …)`;
+      Cross-ticket digest in the `self` lens; coverage line `N tickets (M reporting, …)`;
       no-`[CTX]` tickets land in `Not yet reporting`, never dropped.
 - [ ] **M2 — explicit keys:** `/bitacora:status PROJ-1 PROJ-2`. → Multi-ticket mode (2+ keys),
       not single-ticket. `/bitacora:status PROJ-1` alone still renders one ticket.
