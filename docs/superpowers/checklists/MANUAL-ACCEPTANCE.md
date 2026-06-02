@@ -55,3 +55,8 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       content rendered at exec altitude (PR/commit hashes stripped, asks framed).
 - [ ] **M8 — backward compat:** `/bitacora:status EPIC-1` still rolls up the epic; a bare
       single key is unchanged from pre-Phase-A behavior.
+- [ ] **M9 — ticket-key links:** run a multi-ticket digest (or `--blocked` / `--standup` /
+      epic rollup). → Each `By ticket:` / `By child:` / entry key is a **clickable link** to the
+      right ticket; inline keys (`Health`, `Top risks`, `Dependencies`, `No movement:`,
+      `Not yet reporting:`) stay bare. With `--copy-as-slack`, the copied text uses
+      `<url|KEY>` form.
