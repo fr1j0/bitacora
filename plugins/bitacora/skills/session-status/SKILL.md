@@ -1,6 +1,6 @@
 ---
 name: session-status
-description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses (--for-self/eng/ops/pm/exec), roll up an epic across its children, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default portfolio aggregate. Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
+description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses (--for-self/eng/ops/pm/exec), roll up an epic across its children, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default cross-ticket digest. Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
 ---
 
 Read a ticket's latest `[CTX]` state and synthesize an **audience-tailored summary**, then
@@ -30,11 +30,11 @@ so there is no confirmation gate. Follow the **READ** rules in
 - **Scope (multi-ticket).** A scope selector switches `status` from a single ticket to a
   multi-ticket read: `--mine`, `--sprint`, `--jql "<JQL>"`, or **two or more**
   `project_key_pattern` keys in the arguments. Multi-ticket mode activates **iff** a scope
-  flag is present or 2+ keys are passed — a single key, or an epic key, keeps the existing
-  single-ticket / epic-rollup behavior verbatim. `--board <id|name>` is **reserved for a
+  flag is present or 2+ keys are passed — a single key (including an epic key) keeps the
+  existing single-ticket / epic-rollup behavior verbatim. `--board <id|name>` is **reserved for a
   later phase**: if passed, say it is not yet supported and stop (do not silently fall back).
 - **Query lens (multi-ticket only).** `--blocked` or `--standup` selects *what to surface*
-  across the scope; with neither, the default is the portfolio aggregate (§7). Query lenses
+  across the scope; with neither, the default is the cross-ticket digest (§7). Query lenses
   compose with the `--for-*` audience lens, which still selects altitude. A query lens in
   single-ticket mode is an error — name the multi-ticket scopes and stop. Two query lenses
   at once is an error.
@@ -75,7 +75,7 @@ first N in `updated DESC` order and **surface the truncation** in the render
 (`showing N of M — narrow with --jql`); never silently drop. Edge cases:
 
 - **Zero matches** → say so plainly and stop (e.g. `--mine matched no open tickets`).
-- **Exactly one match** → read it as a single ticket (§4); a one-ticket set needs no aggregate.
+- **Exactly one match** → treat it as a single target and proceed from §4 (if it is an epic, §4a still rolls it up); a one-ticket set needs no digest.
 - **JQL error** (bad `--jql`, unknown field) → surface the error verbatim and stop; no retry loop.
 
 ## 3. Resolve the Atlassian site
