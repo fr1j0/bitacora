@@ -358,6 +358,26 @@ Clipboard is best-effort: pipe the rendered text to the first available of `pbco
 none is found in the default path, skip the offer silently. With `--copy-as-slack`,
 surface the absence as a one-line note (see above) so the user knows to copy manually.
 
+## 7. Multi-ticket render (query lenses)
+
+Runs only on the multi-ticket path (§2a + §4c). The **query lens** (§1) selects the pivot;
+the `--for-*` **audience lens** still selects altitude. Facts only — the same no-invention
+rule as §5. Every render carries a **coverage** line —
+`N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms —
+plus any `showing N of M — narrow with --jql` truncation note from §2a.
+
+### Default (no query flag) — cross-ticket digest
+
+Compute the **Aggregate signals** exactly as the epic path does (health, confidence
+distribution, risk concentration, dependency graph, cost rollup, coverage), but over the
+resolved set instead of an epic's children, and render them with the **Aggregate render**
+template for the chosen lens (default `self`). Only two things differ from the epic path:
+the header names the **scope** rather than an epic, and there is no parent-epic link.
+
+Header form by scope: `Scope: --mine`, `Scope: --sprint`, `Scope: <N> keys`, or
+`Scope: custom JQL` — followed by ` — <coverage>`. See `examples/multi-aggregate.txt`
+(the `--for-self` digest over a 4-ticket `--mine` scope).
+
 ## Error / edge behavior
 
 - **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
