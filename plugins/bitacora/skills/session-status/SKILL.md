@@ -379,6 +379,27 @@ Header form by scope: `Scope: --mine`, `Scope: --sprint`, `Scope: <N> keys`, or
 `Scope: custom JQL` — followed by ` — <coverage>`. See `examples/multi-aggregate.txt`
 (the `--for-self` digest over a 4-ticket `--mine` scope).
 
+### --blocked — what's stuck
+
+Filter the set to tickets whose latest `[CTX]` carries a `Blockers:` **or** `Dependencies:`
+section. Sort **most-stale first** (oldest latest-`[CTX]` `created`). Omit every ticket with
+neither section. `stale <Nd>` = whole days between that ticket's latest-`[CTX]` `created` and
+now. Render in the chosen lens (default `self`):
+
+```
+Blocked — <coverage>
+
+- <KEY> "<title>" — <Jira status> · stale <Nd>
+    Blocked on: <Blockers bullets>
+    Waiting on: <Dependencies bullets — who/what>          (omit this line if no Dependencies)
+- …
+Clear: <count> of <M reporting> have no blockers/deps.
+```
+
+If **no** ticket in the set is blocked, print `Nothing blocked across <coverage>.` and stop.
+`--for-pm`/`--for-exec` strip PR/commit hashes and frame `Waiting on:` as an ask; the other
+lenses keep references. See `examples/multi-blocked.txt`.
+
 ## Error / edge behavior
 
 - **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
