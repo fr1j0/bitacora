@@ -27,7 +27,7 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
 - **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, morning ticket picking, and corpus-grounded ticket sharpening.
-- **Today** — Phase 1 complete, plus **v0.4.0**: `handoff`, `resume`, `status` (single-ticket, epic rollup, and **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses, keys rendered as links), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
+- **Today** — Phase 1 complete, plus **v0.4.1**: `handoff`, `resume`, `status` (single-ticket, epic rollup, and **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
 ## What it does

@@ -2,6 +2,17 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.4.1] — 2026-06-03 · Ticket-key links are Slack-only
+
+### Changed
+
+- **Ticket-key links now appear only in `--copy-as-slack` output.** Printed `/bitacora:status`
+  renders (digest, `--blocked`, `--standup`, epic rollup, every `--for-*` lens) show **bare**
+  ticket keys again — the inline markdown links added in v0.4.0 were visual noise in a dense
+  terminal glance. When you copy for Slack, each per-ticket index entry's key still renders as a
+  `<https://<site>/browse/KEY|KEY>` link; inline / tail keys stay bare in both.
+  ([#90](https://github.com/fr1j0/bitacora/issues/90))
+
 ## [v0.4.0] — 2026-06-02 · Multi-ticket `/status` — cross-ticket reads
 
 Cashes in the read side of the shared-memory thesis: `/bitacora:status` now reads across an

@@ -55,8 +55,7 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       content rendered at exec altitude (PR/commit hashes stripped, asks framed).
 - [ ] **M8 — backward compat:** `/bitacora:status EPIC-1` still rolls up the epic; a bare
       single key is unchanged from pre-Phase-A behavior.
-- [ ] **M9 — ticket-key links:** run a multi-ticket digest (or `--blocked` / `--standup` /
-      epic rollup). → Each per-ticket index entry's leading key (`By ticket:` / `By child:` /
-      `--blocked` / `--standup` `Moved:`) is a **clickable link** to the right ticket; inline keys (`Health`, `Top risks`, `Dependencies`, `No movement:`,
-      `Not yet reporting:`) stay bare. With `--copy-as-slack`, the copied text uses
-      `<url|KEY>` form.
+- [ ] **M9 — ticket-key links (Slack-only):** run a multi-ticket digest (or `--blocked` /
+      `--standup` / epic rollup). → The **printed** render shows **bare** keys (no inline links).
+      Re-run with `--copy-as-slack`. → The copied Slack text renders each per-ticket index entry's
+      key as `<url|KEY>`; inline / tail keys stay bare.
