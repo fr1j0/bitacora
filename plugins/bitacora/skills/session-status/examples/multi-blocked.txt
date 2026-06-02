@@ -1,6 +1,6 @@
 Blocked — 4 tickets (3 reporting, 1 no [CTX])
 
-- AUTH-12 "OAuth token refresh" — In Progress · stale 2d
+- [AUTH-12](https://example.atlassian.net/browse/AUTH-12) "OAuth token refresh" — In Progress · stale 2d
     Blocked on: API contract for `/token/refresh` not finalized
     Waiting on: PLATFORM-4 (contract sign-off)
 Clear: 2 of 3 reporting have no blockers/deps.

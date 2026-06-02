@@ -21,6 +21,8 @@ SW="$DIR/since-window.sh"
 AGG="$EX/multi-aggregate.txt"
 BLK="$EX/multi-blocked.txt"
 STD="$EX/multi-standup.txt"
+EPE="$EX/epic-exec.txt"
+EPG="$EX/epic-eng.txt"
 COVERAGE="4 tickets (3 reporting, 1 no [CTX])"
 ALLOWED="AUTH-12 DATA-77 UI-30 PERF-9 PLATFORM-4"
 
@@ -91,5 +93,27 @@ if "$SW" 1d 1704801600 >/dev/null 2>&1 && "$SW" last-working-day 1704801600 >/de
 else
   bad "since-window.sh smoke failed"
 fi
+
+# 8. ticket-key links — each per-ticket INDEX entry leads with a [KEY](…/browse/KEY) link
+check_linked() {  # file, key, label
+  if grep -Fq -- "[$2](" "$1" && grep -Fq -- "/browse/$2)" "$1"; then pass "$3"
+  else bad "$3 (key $2 not linked in $(basename "$1"))"; fi
+}
+check_linked "$AGG" "AUTH-12" "aggregate links AUTH-12 index entry"
+check_linked "$AGG" "DATA-77" "aggregate links DATA-77 index entry"
+check_linked "$AGG" "UI-30"   "aggregate links UI-30 index entry"
+check_linked "$BLK" "AUTH-12" "blocked links AUTH-12 entry"
+check_linked "$STD" "DATA-77" "standup links DATA-77 Moved entry"
+check_linked "$EPE" "CHECKOUT-101" "epic-exec links CHECKOUT-101"
+check_linked "$EPE" "CHECKOUT-102" "epic-exec links CHECKOUT-102"
+check_linked "$EPE" "CHECKOUT-103" "epic-exec links CHECKOUT-103"
+check_linked "$EPG" "CHECKOUT-101" "epic-eng links CHECKOUT-101"
+check_linked "$EPG" "CHECKOUT-102" "epic-eng links CHECKOUT-102"
+check_linked "$EPG" "CHECKOUT-103" "epic-eng links CHECKOUT-103"
+
+# 9. index-only — tail / inline keys stay bare (guards the design decision)
+check_hasnot "$AGG" "[PERF-9](" "aggregate leaves Not-yet-reporting PERF-9 bare"
+check_hasnot "$STD" "[AUTH-12](" "standup leaves No-movement AUTH-12 bare"
+check_hasnot "$STD" "[UI-30](" "standup leaves No-movement UI-30 bare"
 
 exit $fail
