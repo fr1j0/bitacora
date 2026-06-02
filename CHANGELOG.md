@@ -2,6 +2,38 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.4.0] — 2026-06-02 · Multi-ticket `/status` — cross-ticket reads
+
+Cashes in the read side of the shared-memory thesis: `/bitacora:status` now reads across an
+**arbitrary multi-ticket scope**, not just one ticket or an epic's children. No new command or
+alias — fully backward-compatible: `/status KEY` and `/status EPIC` are unchanged, and
+multi-ticket mode activates only on a scope flag or 2+ keys.
+
+### Added
+
+- **Multi-ticket scope selectors for `/bitacora:status`** — `--mine`, `--sprint`,
+  `--jql "<JQL>"`, or two-or-more ticket keys resolve (via JQL) to a set that is strict-read
+  for each ticket's latest `[CTX]`, with honest coverage buckets (reporting / no-`[CTX]` /
+  malformed / unreadable) and a capped fan-out (`status.multi_fanout_cap`, default 25) that
+  discloses `showing N of M`. ([#83](https://github.com/fr1j0/bitacora/issues/83), [#84](https://github.com/fr1j0/bitacora/pull/84))
+- **Two query lenses**, composing with the existing `--for-*` audience lenses:
+  - `--blocked` — only tickets carrying `Blockers:`/`Dependencies:`, most-stale-first, with a
+    `Clear: X of Y` tail.
+  - `--standup [--since 1d|2d|last-working-day]` — what moved inside the window vs. a
+    `No movement:` tail, backed by a deterministic, pure-arithmetic `since-window.sh` helper
+    (UTC, no GNU/BSD `date` divergence).
+
+  With no query lens, a multi-ticket scope renders the default **cross-ticket digest** — the
+  epic-rollup renderer (health · confidence · risk concentration · dependency graph · cost)
+  over an arbitrary set. The epic path keeps the term "portfolio"; the multi-ticket default is
+  the "cross-ticket digest" (a deliberate split).
+- **Tests.** `since-window.sh` has a 13-case suite; a new CI-wired fixture-contract lint
+  (`scripts/test-multi-status-fixtures.sh`) locks the multi-ticket example renders to the
+  documented rules. The live-render layer stays under `MANUAL-ACCEPTANCE.md` (M1–M8).
+
+Read-only throughout; strict `[CTX]` only. Phase B (`--debt`/`--risk`/`--deps`, `--board`,
+saved-scope config) is tracked in [#85](https://github.com/fr1j0/bitacora/issues/85).
+
 ## [v0.3.3] — 2026-06-01 · Archive snapshot preserved verbatim
 
 ### Fixed
