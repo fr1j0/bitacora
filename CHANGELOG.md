@@ -27,6 +27,10 @@ multi-ticket mode activates only on a scope flag or 2+ keys.
   epic-rollup renderer (health · confidence · risk concentration · dependency graph · cost)
   over an arbitrary set. The epic path keeps the term "portfolio"; the multi-ticket default is
   the "cross-ticket digest" (a deliberate split).
+- **Ticket keys render as links.** In the multi-ticket / aggregate renders, each per-ticket
+  index entry (`By ticket:` / `By child:` / `--blocked` / `--standup` `Moved:`) leads with a
+  clickable `[KEY](https://<site>/browse/KEY)` link (Slack: `<url|KEY>`); inline mentions stay
+  bare. ([#88](https://github.com/fr1j0/bitacora/pull/88))
 - **Tests.** `since-window.sh` has a 13-case suite; a new CI-wired fixture-contract lint
   (`scripts/test-multi-status-fixtures.sh`) locks the multi-ticket example renders to the
   documented rules. The live-render layer stays under `MANUAL-ACCEPTANCE.md` (M1–M8).
