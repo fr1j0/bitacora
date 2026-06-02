@@ -1,7 +1,7 @@
 Standup — since 1d · 4 tickets (3 reporting, 1 no [CTX])
 
 Moved:
-- DATA-77 "Feature store migration" — In Progress
+- [DATA-77](https://example.atlassian.net/browse/DATA-77) "Feature store migration" — In Progress
     Did: cut over the read path to the new store; backfill verified
     Next: enable dual-write, monitor lag
     ⚠ drift PSI could exceed threshold under May traffic

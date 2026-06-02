@@ -10,6 +10,6 @@ Dependencies:
 - CHECKOUT-103 → CHECKOUT-102: the checkout UI waits on the new ranking model
 Cost:         ~+0.4¢ per prediction, plus extra serving nodes (approximate, from 2 children)
 By child:
-- CHECKOUT-101 "Serving cluster migration" — on track (high)
-- CHECKOUT-102 "Ranking model v3" — in progress (medium)
-- CHECKOUT-103 "Checkout summary panel" — at risk (low)
+- [CHECKOUT-101](https://acme.atlassian.net/browse/CHECKOUT-101) "Serving cluster migration" — on track (high)
+- [CHECKOUT-102](https://acme.atlassian.net/browse/CHECKOUT-102) "Ranking model v3" — in progress (medium)
+- [CHECKOUT-103](https://acme.atlassian.net/browse/CHECKOUT-103) "Checkout summary panel" — at risk (low)
