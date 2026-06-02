@@ -385,6 +385,16 @@ git commit -m "feat(status): multi-ticket scope resolution + corpus read (#83)"
 
 Reuses the epic Aggregate signals + Aggregate render, retargeted from "an epic's children" to "the resolved set." Adds §7 (the multi-ticket render section) with the default branch + its fixture.
 
+> **Decision point — terminology split (deliberate, do not unify).** This task adds the
+> multi-ticket render *beside* the existing epic-rollup prose in the same file. The epic path
+> keeps the word **"portfolio"** ("portfolio view," "a portfolio's natural audience is
+> leadership"); the new multi-ticket default is the **"cross-ticket digest."** Keep them
+> distinct on purpose: an epic is a real parent→children hierarchy (a portfolio), whereas a
+> scope is an arbitrary set (a digest). **Do not** rename the epic prose to match, and **do
+> not** call the multi-ticket default a "portfolio." If a future change makes the split feel
+> like noise, unifying on "cross-ticket digest" everywhere is the fallback — but that is out
+> of scope here.
+
 **Files:**
 - Modify: `plugins/bitacora/skills/session-status/SKILL.md`
 - Create: `plugins/bitacora/skills/session-status/examples/multi-aggregate.txt`
