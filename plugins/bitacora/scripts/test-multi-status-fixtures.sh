@@ -23,6 +23,7 @@ BLK="$EX/multi-blocked.txt"
 STD="$EX/multi-standup.txt"
 EPE="$EX/epic-exec.txt"
 EPG="$EX/epic-eng.txt"
+SLK="$EX/multi-aggregate-slack.txt"
 COVERAGE="4 tickets (3 reporting, 1 no [CTX])"
 ALLOWED="AUTH-12 DATA-77 UI-30 PERF-9 PLATFORM-4"
 
@@ -94,26 +95,19 @@ else
   bad "since-window.sh smoke failed"
 fi
 
-# 8. ticket-key links — each per-ticket INDEX entry leads with a [KEY](…/browse/KEY) link
-check_linked() {  # file, key, label
-  if grep -Fq -- "[$2](" "$1" && grep -Fq -- "/browse/$2)" "$1"; then pass "$3"
-  else bad "$3 (key $2 not linked in $(basename "$1"))"; fi
-}
-check_linked "$AGG" "AUTH-12" "aggregate links AUTH-12 index entry"
-check_linked "$AGG" "DATA-77" "aggregate links DATA-77 index entry"
-check_linked "$AGG" "UI-30"   "aggregate links UI-30 index entry"
-check_linked "$BLK" "AUTH-12" "blocked links AUTH-12 entry"
-check_linked "$STD" "DATA-77" "standup links DATA-77 Moved entry"
-check_linked "$EPE" "CHECKOUT-101" "epic-exec links CHECKOUT-101"
-check_linked "$EPE" "CHECKOUT-102" "epic-exec links CHECKOUT-102"
-check_linked "$EPE" "CHECKOUT-103" "epic-exec links CHECKOUT-103"
-check_linked "$EPG" "CHECKOUT-101" "epic-eng links CHECKOUT-101"
-check_linked "$EPG" "CHECKOUT-102" "epic-eng links CHECKOUT-102"
-check_linked "$EPG" "CHECKOUT-103" "epic-eng links CHECKOUT-103"
+# 8. printed renders are BARE — links live only in the --copy-as-slack output (D1)
+for f in "$AGG" "$BLK" "$STD" "$EPE" "$EPG"; do
+  check_hasnot "$f" "](http" "printed render keeps bare keys ($(basename "$f"))"
+done
 
-# 9. index-only — tail / inline keys stay bare (guards the design decision)
-check_hasnot "$AGG" "[PERF-9](" "aggregate leaves Not-yet-reporting PERF-9 bare"
-check_hasnot "$STD" "[AUTH-12](" "standup leaves No-movement AUTH-12 bare"
-check_hasnot "$STD" "[UI-30](" "standup leaves No-movement UI-30 bare"
+# 9. --copy-as-slack output Slack-links the index keys as <…/browse/KEY|KEY> (D2); inline/tail bare (D3)
+check_slack() {  # file, key, label
+  if grep -Fq -- "/browse/$2|$2>" "$1"; then pass "$3"
+  else bad "$3 (key $2 not Slack-linked in $(basename "$1"))"; fi
+}
+check_slack "$SLK" "AUTH-12" "slack digest Slack-links AUTH-12"
+check_slack "$SLK" "DATA-77" "slack digest Slack-links DATA-77"
+check_slack "$SLK" "UI-30"   "slack digest Slack-links UI-30"
+check_hasnot "$SLK" "/browse/PERF-9|" "slack digest leaves Not-yet-reporting PERF-9 bare"
 
 exit $fail
