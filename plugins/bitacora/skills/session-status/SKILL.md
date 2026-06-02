@@ -296,8 +296,8 @@ epic and no `--for-*` flag was given, use `status.epic_default_mode` (default `e
 single-ticket default `self` — a portfolio's natural audience is leadership. An explicit flag always
 wins. Lenses degrade gracefully: omit any signal that is empty (no risks → no `Top risks:` block).
 
-**Ticket-key links:** render each `By child:` entry's leading key as a link per §7's
-*Ticket-key links* rule (the digest reuses these templates, so the rule is defined there).
+**Ticket-key links:** render each `By child:` / `By ticket:` entry's leading key as a link per
+§7's *Ticket-key links* rule (the digest reuses these templates, so the rule is defined there).
 Keys named inline in `Top risks:` / `Dependencies:` stay bare.
 
 **--for-exec** (default for epics):
