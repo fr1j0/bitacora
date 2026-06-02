@@ -400,6 +400,37 @@ If **no** ticket in the set is blocked, print `Nothing blocked across <coverage>
 `--for-pm`/`--for-exec` strip PR/commit hashes and frame `Waiting on:` as an ask; the other
 lenses keep references. See `examples/multi-blocked.txt`.
 
+### --standup — what moved in the window
+
+Resolve the window cutoff with the helper (deterministic, pure-arithmetic UTC):
+
+```bash
+cutoff=$("${CLAUDE_PLUGIN_ROOT}/scripts/since-window.sh" "<token>")
+# <token> defaults to last-working-day; also accepts <N>d (1d, 2d, …).
+# Prints a UTC epoch; a [CTX] whose `created` epoch is >= cutoff is "in the window".
+```
+
+(From the repo root the helper is `plugins/bitacora/scripts/since-window.sh`.) A reporting
+ticket **moved** if its latest compliant `[CTX]` has `created >= cutoff`. Render in the
+chosen lens (default `self`):
+
+```
+Standup — since <token> · <coverage>
+
+Moved:
+- <KEY> "<title>" — <Jira status>
+    Did: <one line from that [CTX]'s Done / Status change>
+    Next: <first Next bullet>
+    ⚠ <Risk or Blockers one-liner>                         (only if present)
+- …
+No movement: <KEY, KEY, …>   (reporting tickets whose latest [CTX] predates the cutoff; omit if none)
+```
+
+If nothing moved, print `No [CTX] activity since <token> across <coverage>.` The window is
+UTC-day-aligned for `last-working-day` (a deliberate v1 simplification — a Monday run picks
+up Friday + weekend); `--since 2d` widens it when a teammate's day boundary differs. See
+`examples/multi-standup.txt`.
+
 ## Error / edge behavior
 
 - **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
