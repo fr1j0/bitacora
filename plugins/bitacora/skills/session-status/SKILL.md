@@ -263,8 +263,9 @@ Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--
 - Surface the ticket key + URL prominently as the leading line, e.g.:
   `*PROJ-1234* — <https://site/browse/PROJ-1234|OAuth callback handling>`
 - **Ticket-key links in index entries** (the multi-ticket / aggregate `By ticket:` / `By child:`
-  / `--blocked` / `--standup` `Moved:` lists): `<https://<site>/browse/KEY|KEY>` instead of
-  `[KEY](url)`.
+  / `--blocked` / `--standup` `Moved:` lists): render the leading key as
+  `<https://<site>/browse/KEY|KEY>`. This is the **only** place keys are linked — printed
+  renders leave them bare. Inline / tail keys stay bare even here.
 
 All read semantics (strict `[CTX]` extraction, ticket resolution, error handling) are
 unchanged from the default render path.
@@ -296,9 +297,8 @@ epic and no `--for-*` flag was given, use `status.epic_default_mode` (default `e
 single-ticket default `self` — a portfolio's natural audience is leadership. An explicit flag always
 wins. Lenses degrade gracefully: omit any signal that is empty (no risks → no `Top risks:` block).
 
-**Ticket-key links:** render each `By child:` / `By ticket:` entry's leading key as a link per
-§7's *Ticket-key links* rule (the digest reuses these templates, so the rule is defined there).
-Keys named inline in `Top risks:` / `Dependencies:` stay bare.
+**Ticket-key links:** `By child:` / `By ticket:` entry keys print **bare**; they become Slack
+links only under `--copy-as-slack`, per §7's *Ticket-key links (Slack only)* rule.
 
 **--for-exec** (default for epics):
 
@@ -314,7 +314,7 @@ Dependencies:                                (omit if none)
 - <CHILD-A → CHILD-B: what blocks what>
 Cost:         <summed infra + inference $ — approximate, from K children>   (omit if none)
 By child:
-- [<CHILD-KEY>](https://<site>/browse/<CHILD-KEY>) "<title>" — plain status (confidence)
+- <CHILD-KEY "<title>" — plain status (confidence)>
 Not yet reporting: <CHILD-KEY, …>            (omit if none)
 ```
 
@@ -327,7 +327,7 @@ https://<site>/browse/EPIC-1
 Dependency graph:                            (omit if none)
 - <CHILD-A → CHILD-B (what blocks what)>
 By child:
-- [<CHILD-KEY>](https://<site>/browse/<CHILD-KEY>) "<title>" — Status; next: <first Next bullet>; risk: <Risk if any, else —>
+- <CHILD-KEY "<title>" — Status; next: <first Next bullet>; risk: <Risk if any, else —>>
 Open risks / blockers:                       (omit if none)
 - <CHILD-KEY: risk/blocker>
 Excluded: <K no [CTX] (J malformed)>         (omit if zero)
@@ -373,14 +373,13 @@ rule as §5. Every render carries a **coverage** line —
 `N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms —
 plus any `showing N of M — narrow with --jql` truncation note from §2a.
 
-**Ticket-key links.** In every per-ticket **index entry** — the `By ticket:` / `By child:`
-lists (rendered via §5's *Aggregate render*), the `--blocked` entries, and the `--standup`
-`Moved:` entries — render the entry's **leading key** as a link:
-`[KEY](https://<site>/browse/KEY)`, where `<site>` is the Atlassian site resolved in §3.
-Inline mentions of a key elsewhere — in `Health:`, `Top risks:`, `Dependencies:` edges, and
-the `Not yet reporting:` / `No movement:` tails — stay **bare** (one clean link per ticket,
-not 3–4). Under `--copy-as-slack`, use the Slack form `<https://<site>/browse/KEY|KEY>`
-(see step 5's *Slack mrkdwn rendering*).
+**Ticket-key links (Slack only).** Printed renders show **bare** keys. Only under
+`--copy-as-slack` does each per-ticket **index entry** — the `By ticket:` / `By child:` lists
+(rendered via §5's *Aggregate render*), the `--blocked` entries, and the `--standup` `Moved:`
+entries — render its **leading key** as a Slack link `<https://<site>/browse/KEY|KEY>`, where
+`<site>` is the Atlassian site resolved in §3. Even in Slack, inline mentions (`Health:`,
+`Top risks:`, `Dependencies:` edges) and the `Not yet reporting:` / `No movement:` tails stay
+bare. See step 5's *Slack mrkdwn rendering*.
 
 ### Default (no query flag) — cross-ticket digest
 
@@ -405,7 +404,7 @@ now. Render in the chosen lens (default `self`):
 ```
 Blocked — <coverage>
 
-- [<KEY>](https://<site>/browse/<KEY>) "<title>" — <Jira status> · stale <Nd>
+- <KEY> "<title>" — <Jira status> · stale <Nd>
     Blocked on: <Blockers bullets>
     Waiting on: <Dependencies bullets — who/what>          (omit this line if no Dependencies)
 - …
@@ -434,7 +433,7 @@ chosen lens (default `self`):
 Standup — since <token> · <coverage>
 
 Moved:
-- [<KEY>](https://<site>/browse/<KEY>) "<title>" — <Jira status>
+- <KEY> "<title>" — <Jira status>
     Did: <one line from that [CTX]'s Done / Status change>
     Next: <first Next bullet>
     ⚠ <Risk or Blockers one-liner>                         (only if present)
