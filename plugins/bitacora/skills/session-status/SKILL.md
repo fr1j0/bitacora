@@ -1,6 +1,6 @@
 ---
 name: session-status
-description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses — --for-self (terse recall), --for-eng (technical handoff), --for-ops (deploy/operational), --for-pm (plain-language stakeholder status), --for-exec (business/risk/cost). Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
+description: Synthesize a Jira ticket's latest [CTX] into an audience-tailored summary across five lenses (--for-self/eng/ops/pm/exec), roll up an epic across its children, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default cross-ticket digest. Read-only; prints the summary and offers a clipboard copy. Use when the user runs /bitacora:status or /bit:status.
 ---
 
 Read a ticket's latest `[CTX]` state and synthesize an **audience-tailored summary**, then
@@ -27,6 +27,24 @@ so there is no confirmation gate. Follow the **READ** rules in
   clipboard automatically (skipping the prompt in step 6). Compatible with all five
   mode flags. See step 5's *Slack mrkdwn rendering* sub-section for the rendering
   rules.
+- **Scope (multi-ticket).** A scope selector switches `status` from a single ticket to a
+  multi-ticket read: `--mine`, `--sprint`, `--jql "<JQL>"`, or **two or more**
+  `project_key_pattern` keys in the arguments. Multi-ticket mode activates **iff** a scope
+  flag is present or 2+ keys are passed — a single key (including an epic key) keeps the
+  existing single-ticket / epic-rollup behavior verbatim. `--board <id|name>` is **reserved for a
+  later phase**: if passed, say it is not yet supported and stop (do not silently fall back).
+- **Query lens (multi-ticket only).** `--blocked` or `--standup` selects *what to surface*
+  across the scope; with neither, the default is the cross-ticket digest (§7). Query lenses
+  compose with the `--for-*` audience lens, which still selects altitude. A query lens in
+  single-ticket mode is an error — name the multi-ticket scopes and stop. Two query lenses
+  at once is an error.
+- **`--since <token>` (only with `--standup`).** `<token>` ∈ `<N>d` (e.g. `1d`, `2d`) or
+  `last-working-day` (the default). If passed without `--standup`, ignore it with a one-line
+  note.
+
+The multi-ticket default audience is `self`, like the single-ticket default. `--blocked`,
+`--standup`, and the aggregate all honor an explicit `--for-*`; `--debt`/`--risk` will read
+naturally at `--for-eng`/`exec` when they land in Phase B.
 
 ## 2. Resolve the target ticket (single, focused)
 
@@ -39,6 +57,27 @@ Resolve exactly one ticket, in priority order (identical to resume):
   surface, **list them and let the user pick**. Never guess between them.
 - **Nothing resolves:** ask for a key once (no nag); stop.
 
+### 2a. Resolve a multi-ticket scope (when scope mode is active)
+
+When §1 detected a scope selector or 2+ keys, **skip §2's single-target resolution** and
+resolve a *set* of keys. Resolve the Atlassian site first (§3 — needed to run JQL), then
+build the list via `searchJiraIssuesUsingJql`, requesting `summary,issuetype,status`:
+
+| Scope | JQL |
+|-------|-----|
+| explicit keys (2+) | `key IN (KEY-1, KEY-2, …) ORDER BY updated DESC` |
+| `--mine` | `assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC` |
+| `--sprint` | `assignee = currentUser() AND sprint IN openSprints() ORDER BY updated DESC` |
+| `--jql "<q>"` | the user's `<q>` verbatim; append `ORDER BY updated DESC` only if `<q>` has no `ORDER BY` |
+
+**Cap the set** at `status.multi_fanout_cap` (default 25). If the JQL matched more, take the
+first N in `updated DESC` order and **surface the truncation** in the render
+(`showing N of M — narrow with --jql`); never silently drop. Edge cases:
+
+- **Zero matches** → say so plainly and stop (e.g. `--mine matched no open tickets`).
+- **Exactly one match** → treat it as a single target and proceed from §4 (if it is an epic, §4a still rolls it up); a one-ticket set needs no digest.
+- **JQL error** (bad `--jql`, unknown field) → surface the error verbatim and stop; no retry loop.
+
 ## 3. Resolve the Atlassian site
 
 `getAccessibleAtlassianResources` → `cloudId`. If multiple sites, use the `jira_cloud_id`
@@ -47,6 +86,9 @@ resolved, this is a hard stop** (see Error behavior) — status cannot do its jo
 Jira read access.
 
 ## 4. Read the ticket (strict [CTX])
+
+**Multi-ticket mode (§2a) bypasses this section.** §4/§4a/§4b below are the single-ticket
+and epic paths; when a scope set was resolved, skip straight to §4c.
 
 `getJiraIssue` for the resolved key, **requesting comments**. Extract `[CTX]` comments per
 the **strict** READ rules in `bitacora:jira-comment-format`:
@@ -95,6 +137,17 @@ Runs only when §4a found an Epic. Read-only throughout.
 
 Child reads are independent; one child's 404 / permission error is isolated — count it as
 unreadable and continue with the rest.
+
+### 4c. Read the scope set (multi-ticket path)
+
+Runs when §2a resolved a set. For each key, `getJiraIssue` **requesting comments** and
+extract its latest compliant `[CTX]` per the strict READ rules in `bitacora:jira-comment-format`
+— identical classification to §4b: **reporting** (has a compliant `[CTX]`, its latest is
+authoritative), **no-`[CTX]`**, or **malformed**. For each reporting ticket also capture its
+latest-`[CTX]` `created` timestamp from comment metadata (needed by `--blocked` staleness and
+`--standup` windowing). Reads are independent — one key's 404 / permission error is isolated;
+count it **unreadable** and continue. Carry the no-`[CTX]` / malformed / unreadable tallies
+into every §7 render as the coverage line, exactly like §4b's excluded-count discipline.
 
 ## 5. Render for the selected mode
 
@@ -280,7 +333,7 @@ single-ticket emphasis:
   Status + Next only.
 - **pm** — plain-language portfolio: `Health` and `Confidence` first, `By child` as one plain
   sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
-- **self** — terse: `Health` line + the `By child` list only.
+- **self** — terse: `Health` line + the `By child` list (plus the `Not yet reporting:` / coverage tail — never drop no-`[CTX]` tickets).
 
 All five keep the coverage figure in the header line (`Epic · <coverage>`) so the reader knows how complete the rollup is.
 
@@ -305,6 +358,79 @@ Clipboard is best-effort: pipe the rendered text to the first available of `pbco
 none is found in the default path, skip the offer silently. With `--copy-as-slack`,
 surface the absence as a one-line note (see above) so the user knows to copy manually.
 
+## 7. Multi-ticket render (query lenses)
+
+Runs only on the multi-ticket path (§2a + §4c). The **query lens** (§1) selects the pivot;
+the `--for-*` **audience lens** still selects altitude. Facts only — the same no-invention
+rule as §5. Every render carries a **coverage** line —
+`N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms —
+plus any `showing N of M — narrow with --jql` truncation note from §2a.
+
+### Default (no query flag) — cross-ticket digest
+
+Compute the **Aggregate signals** exactly as the epic path does (health, confidence
+distribution, risk concentration, dependency graph, cost rollup, coverage), but over the
+resolved set instead of an epic's children, and render them with the **Aggregate render**
+template for the chosen lens (default `self`). Three things differ from the epic path:
+the header names the **scope** rather than an epic, there is no parent-epic link, and
+`By child:` becomes **`By ticket:`** throughout (a scope has no parent–child relationship).
+
+Header form by scope: `Scope: --mine`, `Scope: --sprint`, `Scope: <N> keys`, or
+`Scope: custom JQL` — followed by ` — <coverage>`. See `examples/multi-aggregate.txt`
+(the `--for-self` digest over a 4-ticket `--mine` scope).
+
+### --blocked — what's stuck
+
+Filter the set to tickets whose latest `[CTX]` carries a `Blockers:` **or** `Dependencies:`
+section. Sort **most-stale first** (oldest latest-`[CTX]` `created`). Omit every ticket with
+neither section. `stale <Nd>` = whole days between that ticket's latest-`[CTX]` `created` and
+now. Render in the chosen lens (default `self`):
+
+```
+Blocked — <coverage>
+
+- <KEY> "<title>" — <Jira status> · stale <Nd>
+    Blocked on: <Blockers bullets>
+    Waiting on: <Dependencies bullets — who/what>          (omit this line if no Dependencies)
+- …
+Clear: <count> of <M reporting> have no blockers/deps.
+```
+
+If **no** ticket in the set is blocked, print `Nothing blocked across <coverage>.` and stop.
+`--for-pm`/`--for-exec` strip PR/commit hashes and frame `Waiting on:` as an ask; the other
+lenses keep references. See `examples/multi-blocked.txt`.
+
+### --standup — what moved in the window
+
+Resolve the window cutoff with the helper (deterministic, pure-arithmetic UTC):
+
+```bash
+cutoff=$("${CLAUDE_PLUGIN_ROOT}/scripts/since-window.sh" "<token>")
+# <token> defaults to last-working-day; also accepts <N>d (1d, 2d, …).
+# Prints a UTC epoch; a [CTX] whose `created` epoch is >= cutoff is "in the window".
+```
+
+(From the repo root the helper is `plugins/bitacora/scripts/since-window.sh`.) A reporting
+ticket **moved** if its latest compliant `[CTX]` has `created >= cutoff`. Render in the
+chosen lens (default `self`):
+
+```
+Standup — since <token> · <coverage>
+
+Moved:
+- <KEY> "<title>" — <Jira status>
+    Did: <one line from that [CTX]'s Done / Status change>
+    Next: <first Next bullet>
+    ⚠ <Risk or Blockers one-liner>                         (only if present)
+- …
+No movement: <KEY, KEY, …>   (reporting tickets whose latest [CTX] predates the cutoff; omit if none)
+```
+
+If nothing moved, print `No [CTX] activity since <token> across <coverage>.` The window is
+UTC-day-aligned for `last-working-day` (a deliberate v1 simplification — a Monday run picks
+up Friday + weekend); `--since 2d` widens it when a teammate's day boundary differs. See
+`examples/multi-standup.txt`.
+
 ## Error / edge behavior
 
 - **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
@@ -322,6 +448,13 @@ surface the absence as a one-line note (see above) so the user knows to copy man
 - **Ticket 404 / no read permission:** surface the reason for that key; offer to retry with
   a different key. No retry loop.
 - **No ticket resolved:** say so; suggest passing a key.
+- **Scope matched zero tickets (multi-ticket):** say which scope and that it matched nothing;
+  suggest narrowing or a different scope. No retry loop.
+- **All reporting tickets have no `[CTX]` (multi-ticket):** render the coverage line and the
+  per-ticket Status/title list for orientation; suggest `/bitacora:handoff` on them. Nothing
+  to aggregate or filter.
+- **`--board` passed:** not yet supported (Phase B); say so and stop.
+- **Bad `--jql` / unknown field:** surface the JQL error verbatim; stop. No retry loop.
 - **Invalid / conflicting mode flag:** error listing the valid modes; do not guess.
 
 ## Configuration
@@ -338,4 +471,5 @@ status:
   epic_type: Epic            # issue type name that triggers aggregation (override for renamed epic types)
   epic_children_cap: 50      # max children read per epic; truncation is surfaced, never silent
   epic_default_mode: exec    # lens for an epic target when no --for-* flag is given
+  multi_fanout_cap: 25       # max tickets read per multi-ticket scope; truncation is surfaced, never silent
 ```
