@@ -32,17 +32,17 @@ case "$token" in
     while :; do
       d=$(( today_mid / day - off ))
       wd=$(( ( (d + 3) % 7 ) + 1 ))   # 1=Mon .. 7=Sun
-      if (( wd >= 1 && wd <= 5 )); then break; fi
+      if (( wd <= 5 )); then break; fi
       off=$(( off + 1 ))
     done
     echo $(( today_mid - off * day ))
     ;;
   *d)
     n="${token%d}"
-    if [[ "$n" =~ ^[0-9]+$ ]] && (( n >= 1 )); then
+    if [[ "$n" =~ ^[0-9]+$ ]] && (( n >= 1 && n <= 36500 )); then
       echo $(( now - n * day ))
     else
-      echo "since-window: bad day count in '$token' (expected <N>d, N>=1)" >&2
+      echo "since-window: bad day count in '$token' (expected <N>d, 1<=N<=36500)" >&2
       exit 2
     fi
     ;;
