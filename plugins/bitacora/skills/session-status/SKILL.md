@@ -371,8 +371,9 @@ plus any `showing N of M — narrow with --jql` truncation note from §2a.
 Compute the **Aggregate signals** exactly as the epic path does (health, confidence
 distribution, risk concentration, dependency graph, cost rollup, coverage), but over the
 resolved set instead of an epic's children, and render them with the **Aggregate render**
-template for the chosen lens (default `self`). Only two things differ from the epic path:
-the header names the **scope** rather than an epic, and there is no parent-epic link.
+template for the chosen lens (default `self`). Three things differ from the epic path:
+the header names the **scope** rather than an epic, there is no parent-epic link, and
+`By child:` becomes **`By ticket:`** throughout (a scope has no parent–child relationship).
 
 Header form by scope: `Scope: --mine`, `Scope: --sprint`, `Scope: <N> keys`, or
 `Scope: custom JQL` — followed by ` — <coverage>`. See `examples/multi-aggregate.txt`
