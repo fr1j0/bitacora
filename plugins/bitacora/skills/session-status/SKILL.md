@@ -333,7 +333,7 @@ single-ticket emphasis:
   Status + Next only.
 - **pm** — plain-language portfolio: `Health` and `Confidence` first, `By child` as one plain
   sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
-- **self** — terse: `Health` line + the `By child` list only.
+- **self** — terse: `Health` line + the `By child` list (plus the `Not yet reporting:` / coverage tail — never drop no-`[CTX]` tickets).
 
 All five keep the coverage figure in the header line (`Epic · <coverage>`) so the reader knows how complete the rollup is.
 
