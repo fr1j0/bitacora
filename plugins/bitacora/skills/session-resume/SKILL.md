@@ -33,7 +33,8 @@ resume cannot do its job without Jira read access.
 
 ## 3. Read the ticket
 
-`getJiraIssue` for the resolved key, **requesting comments**. Extract `[CTX]` comments
+`getJiraIssue` for the resolved key, **requesting comments** and the ticket's `updated`
+field (top-level; needed by the staleness banner in §4). Extract `[CTX]` comments
 using **strict** compliance per the READ rules in `bitacora:jira-comment-format`
 (compliant `[CTX]` only — comments missing `Status:`/`Next:` are tallied as malformed,
 non-`[CTX]` comments as not-in-format; never silently dropped):
@@ -75,6 +76,30 @@ Suggested next step: <derived from the first Next item>
 The `Last touched:` line is computed from the latest compliant `[CTX]`'s own `created`
 timestamp (from the Jira API; never hand-typed). If the ticket has zero `[CTX]`
 comments, the line reads `Last touched: never (no [CTX] yet)` instead of a date.
+
+**Staleness banner (drift check).** Using the latest compliant `[CTX]`'s `created` epoch
+(already computed for `Last touched:`) and the ticket's `updated` epoch from §3, call the
+decision helper with the shared `staleness_grace` (default `2d`, from the
+`bitacora:jira-comment-format` Configuration):
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/staleness-check.sh" \
+  --ctx-epoch "<latest-ctx-created-epoch>" \
+  --updated-epoch "<ticket-updated-epoch>" \
+  --grace "<staleness_grace>"
+# stdout: "fresh" or "stale <N>d"
+```
+
+If it returns `stale Nd`, prepend a one-line banner to the briefing, directly under the
+header line (before `Last touched:`):
+
+```
+⚠ This context may be behind — the ticket was updated <N>d after this [CTX];
+  re-check the ticket before relying on it.
+```
+
+Advisory only — never blocks the briefing. Skip the check entirely when the ticket has
+zero `[CTX]` (the `Last touched: never` path) or the `updated` field is missing.
 
 ### Vagueness hint (footer suggestion, after the briefing)
 
