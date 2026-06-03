@@ -59,3 +59,27 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       `--standup` / epic rollup). → The **printed** render shows **bare** keys (no inline links).
       Re-run with `--copy-as-slack`. → The copied Slack text renders each per-ticket index entry's
       key as `<url|KEY>`; inline / tail keys stay bare.
+
+## Collision detection on `/handoff` (v1)
+
+> Needs a second Atlassian account (or a teammate) to post a `[CTX]` so the latest
+> context on a ticket is authored by someone other than you. The fire/no-fire math is
+> unit-tested in `plugins/bitacora/scripts/test-collision-check.sh`; the cases below are
+> the live-render half (LLM extracting authors/timestamps + driving the gate).
+
+- [ ] **C1 — fires (takeover):** Have the other account post a `[CTX]` on a ticket you
+      have never `[CTX]`-ed, within 48h. Work the ticket, run `/bitacora:handoff`. → That
+      ticket shows `⚠ collision` at the gate with the other author, age, and Status/Next
+      excerpt; the three actions are offered.
+- [ ] **C2 — merge:** On a C1 collision, choose **merge**. → Your `[CTX]` is re-drafted
+      carrying the teammate's Status/Next forward; the merged draft is re-shown before
+      writing; on write it does not erase their context.
+- [ ] **C3 — proceed / skip:** On a C1 collision, choose **proceed** → your draft writes
+      as-is; on a second run choose **skip** → that ticket is not written; other tickets in
+      the same handoff are unaffected either way.
+- [ ] **C4 — no fire (solo / stale / mine-newest):** (a) All `[CTX]` on the ticket are
+      yours → no flag. (b) The teammate's `[CTX]` is older than 48h → no flag. (c) You
+      posted a `[CTX]` after the teammate's → no flag.
+- [ ] **C5 — lenient skip:** Disconnect/deny the Atlassian MCP (or use a ticket whose read
+      fails), run handoff. → No collision flag, no error about the check; handoff proceeds
+      exactly as the no-check path.
