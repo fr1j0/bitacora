@@ -62,21 +62,38 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 
 ## Collision detection on `/handoff` (v1)
 
-> Needs a second Atlassian account (or a teammate) to post a `[CTX]` so the latest
-> context on a ticket is authored by someone other than you. The fire/no-fire math is
-> unit-tested in `plugins/bitacora/scripts/test-collision-check.sh`; the cases below are
-> the live-render half (LLM extracting authors/timestamps + driving the gate).
+> **What's already hard-verified (no manual step needed):** the fire/no-fire *decision* is
+> unit-tested in `plugins/bitacora/scripts/test-collision-check.sh`, and the *comment
+> plumbing* (each `getJiraIssue` comment exposes `author.accountId` + `created`, in the same
+> accountId format `atlassianUserInfo` returns) was confirmed live by **identity inversion** —
+> feeding a real `[CTX]`'s author/timestamp to the helper with a mismatched `--me` fires
+> `collision`, with the real `--me` returns `clear`. accountIds are opaque strings to the
+> helper, so "someone else" is just "an id that isn't mine."
+>
+> The cases below are the **live-render half** (the LLM extracting authors/timestamps and
+> driving the gate), which can't be unit-tested.
 
-- [ ] **C1 — fires (takeover):** Have the other account post a `[CTX]` on a ticket you
-      have never `[CTX]`-ed, within 48h. Work the ticket, run `/bitacora:handoff`. → That
-      ticket shows `⚠ collision` at the gate with the other author, age, and Status/Next
-      excerpt; the three actions are offered.
-- [ ] **C2 — merge:** On a C1 collision, choose **merge**. → Your `[CTX]` is re-drafted
-      carrying the teammate's Status/Next forward; the merged draft is re-shown before
-      writing; on write it does not erase their context.
-- [ ] **C3 — proceed / skip:** On a C1 collision, choose **proceed** → your draft writes
-      as-is; on a second run choose **skip** → that ticket is not written; other tickets in
-      the same handoff are unaffected either way.
+**Solo testing without a second Atlassian account — the dry-run convention.** A real
+`/handoff` will never fire the gate for a single user (step 2 resolves `--me` from
+`atlassianUserInfo` = you = the author of your own `[CTX]`, so it always returns `clear`).
+To exercise C1–C3 alone, **ask the agent to dry-run / simulate a collision** — e.g.
+*"simulate a teammate collision on TESTING-22 and show the handoff gate."* The agent treats
+an existing (or hypothetical) `[CTX]` as authored by a named hypothetical teammate, runs the
+real decision helper, renders the actual `⚠ collision` gate and the **merge** re-draft, and
+**writes nothing**. This eyeballs the render/merge UX; the decision + plumbing it sits on top
+of are already hard-verified above. (A true two-author end-to-end run still needs a second
+account or teammate; do it opportunistically when one is available.)
+
+- [ ] **C1 — fires (takeover):** Dry-run a teammate `[CTX]` (within 48h) on a ticket you have
+      never `[CTX]`-ed. → The gate shows `⚠ collision` with the teammate author, age, and
+      Status/Next excerpt; the three actions are offered. (Live two-author equivalent: have a
+      second account post the `[CTX]`, then run `/bitacora:handoff`.)
+- [ ] **C2 — merge:** On a C1 dry-run, choose **merge**. → Your `[CTX]` is re-drafted carrying
+      the teammate's Status/Next forward; the merged draft is re-shown before writing; on a
+      live write it does not erase their context.
+- [ ] **C3 — proceed / skip:** On a C1 dry-run, choose **proceed** → draft writes as-is (live);
+      choose **skip** → that ticket is not written; other tickets in the same handoff are
+      unaffected either way.
 - [ ] **C4 — no fire (solo / stale / mine-newest):** (a) All `[CTX]` on the ticket are
       yours → no flag. (b) The teammate's `[CTX]` is older than 48h → no flag. (c) You
       posted a `[CTX]` after the teammate's → no flag.
