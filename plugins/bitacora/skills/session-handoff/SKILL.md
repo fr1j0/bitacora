@@ -67,10 +67,32 @@ auto-detected from file signals; add it at the confirm gate when a latent risk i
 from the session. Separately, add the `Status:` confidence cue and the `[precedent]` /
 `[debt]` / `[blast-radius]` decision tags when warranted.
 
-**Optional continuity-read (lenient):** before drafting, you may read the latest `[CTX]`
-on the ticket via `getJiraIssue` (request the comments) to thread `Status`/`Next` and
-avoid restating `Done`. Fall back gracefully if there is no prior `[CTX]` or the read
-fails.
+**Continuity-read + collision check (lenient).** Before drafting, read the ticket's
+comments via `getJiraIssue` to (a) thread `Status`/`Next` and avoid restating `Done`,
+and (b) detect a **collision** — a teammate's recent `[CTX]` this handoff would bury.
+Resolve the current user once via `atlassianUserInfo` → `accountId`. From the comments,
+identify, using the `bitacora:jira-comment-format` read rules:
+
+- the **most-recent `[CTX]`** — its author `accountId` and `created` timestamp;
+- the current user's **own most-recent `[CTX]`** on the ticket, if any — its `created`.
+
+Convert both timestamps to epoch seconds and call the decision helper:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/collision-check.sh" \
+  --me "<my-accountId>" \
+  --latest-author "<latest-ctx-author-accountId>" \
+  --latest-epoch "<latest-ctx-epoch>" \
+  [--mine-epoch "<my-last-ctx-epoch>"] \
+  --window "<collision_window>"     # default 48h; see Configuration
+# stdout: "collision" or "clear"; omit --mine-epoch when you have no prior [CTX] here.
+```
+
+If it prints `collision`, flag the ticket for the gate (step 4) and keep the colliding
+`[CTX]`'s author, age, and a `Status`/`Next` excerpt to show there. **Lenient
+throughout:** if the MCP is absent, the read fails, the user can't be resolved, or there
+is no prior `[CTX]`, skip the check silently and draft as normal — collision detection
+never blocks a handoff.
 
 ## 3. Prepare ONE consolidated local scratch
 
@@ -86,7 +108,11 @@ Show all drafts and the scratch summary, then offer the choices:
 /bitacora:handoff — N tickets touched this session
 
 [1] PROJ-1234  (branch feature/PROJ-1234-oauth)        → [CTX] drafted
-[2] PROJ-5678  (branch fix/PROJ-5678-flaky-test)       → [CTX] drafted
+[2] PROJ-5678  (branch fix/PROJ-5678-flaky-test)       → [CTX] drafted   ⚠ collision
+      Latest [CTX] is by Alice Méndez, 3h ago (after your last update):
+        Status: Auth flow blocked on token refresh — see PR #214
+        Next:   Rotate the staging secret, then re-run e2e
+      [merge] re-draft threading Alice's context · [proceed] write mine as-is · [skip]
 [3] PROJ-9999  (mentioned while on feature/PROJ-1234)  → [CTX] drafted
 + 1 consolidated local scratch capture (via Remember)
 
@@ -97,6 +123,20 @@ Approve all · Review individually · Skip specific ("skip 3") · Cancel
 - **Review individually** → step through each draft; edit / approve / skip per ticket.
 - **Skip specific** → drop those, write the rest.
 - **Cancel** → write nothing; offer to keep editing.
+
+**Collision-flagged tickets (`⚠ collision`).** When the step-2 check fired, show the
+colliding `[CTX]`'s author, age, and a `Status`/`Next` excerpt, and offer three
+per-ticket actions (warn-only — a collision never blocks the gate or the other tickets):
+
+- **merge** → re-read the colliding `[CTX]` in full and re-draft this ticket's `[CTX]`
+  threading its `Status`/`Next` so the teammate's context is carried forward, not buried;
+  re-show the merged draft before writing. If several teammates posted `[CTX]` after your
+  last one, merge the **single most-recent** (highest-signal; full-set merge is a follow-on).
+- **proceed** → write the drafted `[CTX]` as-is (you've judged the overlap benign).
+- **skip** → do not write this ticket's `[CTX]`.
+
+`Approve all` writes every non-collision ticket as-is and pauses on each `⚠ collision`
+ticket for one of the three actions above before writing it.
 
 Never write to Jira before this gate.
 
@@ -182,5 +222,6 @@ session_ticket_tracking:
   source: reconstruct           # reconstruct | recorder  (recorder = Phase 1.5 hook)
   attribution: branch_name      # touched-ticket → branch mapping strategy
   # activity_threshold: <n>     # Phase 1.5 — substantive-vs-incidental auto-filter; v1 shows all
+collision_window: 48h           # collision detection lookback (<N>h | <N>d); a teammate's [CTX] newer than this is flagged at the gate
 jira_cloud_id: ""               # optional; if set, skips the multi-site select prompt
 ```
