@@ -1,7 +1,7 @@
 {
   "name": "bitacora",
   "description": "Jira-aware workflow layer for Claude Code: clean session handoffs, session resume, audience-tailored status summaries, and the [CTX] comment-format discipline.",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": {
     "name": "Bitácora contributors"
   },

@@ -2,6 +2,34 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.5.1] — 2026-06-03 · Staleness signal
+
+Read-side companion to v0.5.0's write-side guard: `/resume` and `/status` now flag when a
+ticket's latest `[CTX]` has fallen **behind the ticket's own activity**, so you don't trust
+a status the ticket has already moved past.
+
+### Added
+
+- **Staleness signal.** A ticket's latest `[CTX]` is **behind** when
+  `ticket.updated − latest_[CTX].created > staleness_grace` (default **2d**) — i.e. the ticket
+  got a status change / comment / activity *after* your last recorded context. Reported as
+  `behind Nd`. This is **drift**, distinct from `/next`'s inactivity-`stale` (untouched for
+  `next.stale_days`); it never fires when there is no `[CTX]` or when `updated ≤ created`.
+  ([#96](https://github.com/fr1j0/bitacora/issues/96), [#97](https://github.com/fr1j0/bitacora/pull/97))
+  - **`/bitacora:resume`** prepends a `⚠ This context may be behind …` banner under the
+    header before rehydrating.
+  - **`/bitacora:status`** adds a `Freshness: behind Nd` line (single-ticket) and a
+    `· ⚠ behind Nd` marker on each stale per-ticket index entry (multi-ticket), composing with
+    every `--for-*` / `--blocked` / `--standup` lens without changing their selection.
+- **`staleness_grace` config key** (default `2d`; accepts `<N>h` / `<N>d`), top-level in the
+  `[CTX]` format Configuration block since it is shared by `/resume` and `/status`.
+- **Tests.** A pure-arithmetic `staleness-check.sh` helper (UTC epoch seconds) with an 11-case
+  fixture suite wired into CI on Linux and macOS.
+
+Read-only and advisory throughout — the signal never blocks a briefing or a summary.
+Deferred by design: `/next` (it already carries an opposite inactivity-`stale`) and the
+statusLine (it makes no synchronous network call).
+
 ## [v0.5.0] — 2026-06-03 · Collision detection on `/handoff`
 
 Cashes in the write side of the shared-memory thesis: `/bitacora:handoff` now warns before
