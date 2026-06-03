@@ -27,7 +27,7 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
 - **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, morning ticket picking, and corpus-grounded ticket sharpening.
-- **Today** — Phase 1 complete, plus **v0.4.1**: `handoff`, `resume`, `status` (single-ticket, epic rollup, and **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
+- **Today** — Phase 1 complete, plus **v0.5.0**: `handoff` (now with **collision detection** — warns before burying a teammate's recent `[CTX]`), `resume`, `status` (single-ticket, epic rollup, and **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
 ## What it does
@@ -146,7 +146,7 @@ The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional
 - Atlassian Rovo MCP configured with read/write access to your team's Jira instance *(optional — handoff runs local-only without it, drafting comments to screen instead of writing them)*.
 - The [Remember](https://github.com/anthropics/claude-code/tree/main/plugins/remember) plugin or another local memory tool *(optional — for the between-sessions scratch Bitácora delegates rather than manages)*.
 
-**Pinning to a specific revision.** The marketplace points at `main`. To pin to an audited revision, check out a tagged release — the latest is [`v0.4.1`](https://github.com/fr1j0/bitacora/releases/tag/v0.4.1) — or fork the repo and `marketplace add <your-fork>`, or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
+**Pinning to a specific revision.** The marketplace points at `main`. To pin to an audited revision, check out a tagged release — the latest is [`v0.5.0`](https://github.com/fr1j0/bitacora/releases/tag/v0.5.0) — or fork the repo and `marketplace add <your-fork>`, or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
 
 **Troubleshooting — `/bitacora:help` says "Not logged in" after `/login`.** The in-session `/login` writes the auth token to disk but doesn't always refresh the running Claude Code process's in-memory auth state — most likely on a freshly bootstrapped profile where Claude Code prompted for login *during* the session. Restart the session: Ctrl+C, re-run `claude` (or `HOME=/whatever claude` if you're testing in an isolated profile), then `/bitacora:help` should work. Sessions that were already logged-in before the install are unaffected.
 
