@@ -100,3 +100,25 @@ account or teammate; do it opportunistically when one is available.)
 - [ ] **C5 — lenient skip:** Disconnect/deny the Atlassian MCP (or use a ticket whose read
       fails), run handoff. → No collision flag, no error about the check; handoff proceeds
       exactly as the no-check path.
+
+## Staleness signal (v1)
+
+> Trivially solo-testable — it's your own `[CTX]` vs the ticket's `updated`. The drift math
+> is unit-tested in `plugins/bitacora/scripts/test-staleness-check.sh`; the cases below are
+> the live-render half.
+
+- [ ] **S1 — /resume banner fires:** On a ticket with a compliant `[CTX]`, edit the ticket
+      (change status / add a comment) so its `updated` is ≥ 2d after that `[CTX]`'s `created`
+      (or use a ticket where that's already true). Run `/bitacora:resume <KEY>`. → A
+      `⚠ This context may be behind …` banner appears under the header, before `Last touched:`.
+- [ ] **S2 — /resume fresh, no banner:** On a ticket whose latest `[CTX]` is its most recent
+      activity (or drift < 2d), run `/bitacora:resume <KEY>`. → No banner; briefing unchanged.
+- [ ] **S3 — /status single-ticket line:** `/bitacora:status <KEY>` on an S1-style ticket. →
+      A `Freshness: behind <N>d` line under the summary. On an S2-style ticket → no such line.
+- [ ] **S4 — /status multi-ticket marker:** `/bitacora:status --mine` (or 2+ keys) including at
+      least one stale ticket. → That ticket's `By ticket:` entry is suffixed ` · ⚠ behind <N>d`;
+      fresh tickets in the same digest carry no marker. Confirms it composes with `--blocked` /
+      `--standup` / `--for-*` without changing their selection.
+- [ ] **S5 — no [CTX] / grace override:** A ticket with no `[CTX]` shows neither banner nor
+      marker (it's "no context", not stale). Set `staleness_grace: 12h` in `.bitacora.yml` and
+      re-run S1/S3 → tickets with ≥12h drift now flag.

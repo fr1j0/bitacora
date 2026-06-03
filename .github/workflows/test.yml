@@ -33,6 +33,8 @@ jobs:
         run: bash plugins/bitacora/scripts/test-since-window.sh
       - name: Run collision-check tests
         run: bash plugins/bitacora/scripts/test-collision-check.sh
+      - name: Run staleness-check tests
+        run: bash plugins/bitacora/scripts/test-staleness-check.sh
       - name: Run multi-ticket status fixture tests
         run: bash plugins/bitacora/scripts/test-multi-status-fixtures.sh
       - name: "Run /bit: alias sync tests"

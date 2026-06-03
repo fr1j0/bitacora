@@ -215,6 +215,7 @@ comment_compliance:
   show_excluded_count: true
   partial_match: false               # strict prefix only
 project_key_pattern: "[A-Z][A-Z0-9]+-\\d+"   # top-level; shared by detection + JQL. DEFAULT only.
+staleness_grace: 2d                          # top-level; drift tolerance (<N>h | <N>d) before a ticket's latest [CTX] is "behind" its `updated`. Used by /resume + /status.
 ```
 
 `project_key_pattern` is user-overridable; common alternates: lowercase keys
