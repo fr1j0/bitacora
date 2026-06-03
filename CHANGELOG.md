@@ -2,6 +2,40 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.5.0] — 2026-06-03 · Collision detection on `/handoff`
+
+Cashes in the write side of the shared-memory thesis: `/bitacora:handoff` now warns before
+it buries a teammate's recent `[CTX]`, instead of writing blind. Stateless and author-based —
+no new local state, and it never fires when you're the only one writing `[CTX]`.
+
+### Added
+
+- **Collision detection on `/bitacora:handoff`.** Before drafting, the (previously optional)
+  continuity-read is now performed and also checks for a **collision**: when a ticket's
+  most-recent `[CTX]` is authored by **someone other than you** (`accountId` resolved via
+  `atlassianUserInfo`), is **newer than your own last `[CTX]`** there (or you have none — a
+  takeover), and falls within **`collision_window`** (default **48h**), the confirm gate flags
+  the ticket `⚠ collision` with the teammate's author, age, and a `Status`/`Next` excerpt, and
+  offers three per-ticket actions:
+  - **merge** — re-draft your `[CTX]` threading their `Status`/`Next` forward so their context
+    is carried, not buried (re-shown before writing);
+  - **proceed** — write your draft as-is;
+  - **skip** — don't write that ticket.
+
+  Warn-only — a collision never blocks the gate or the other tickets. Lenient throughout: MCP
+  absent, read failure, unresolved identity, or no prior `[CTX]` → the check is skipped
+  silently and the handoff proceeds. ([#93](https://github.com/fr1j0/bitacora/issues/93),
+  [#94](https://github.com/fr1j0/bitacora/pull/94))
+- **`collision_window` config key** (default `48h`; accepts `<N>h` / `<N>d`) in the handoff
+  Configuration block — same override files as the other handoff keys.
+- **Tests.** A pure-arithmetic `collision-check.sh` decision helper (UTC epoch seconds, no
+  GNU/BSD `date` divergence) with a 12-case fixture suite wired into CI on Linux and macOS.
+  The comment-extraction plumbing was verified live against real Jira data; the gate render is
+  covered by a documented **dry-run** convention in `MANUAL-ACCEPTANCE.md` (ask the agent to
+  simulate a teammate collision — it renders the gate and writes nothing).
+
+Read paths and the single-user experience are unchanged.
+
 ## [v0.4.1] — 2026-06-03 · Ticket-key links are Slack-only
 
 ### Changed
