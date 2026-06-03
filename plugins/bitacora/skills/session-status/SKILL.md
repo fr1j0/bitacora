@@ -98,6 +98,8 @@ the **strict** READ rules in `bitacora:jira-comment-format`:
 - Stitch up to `status.ctx_lookback` prior `[CTX]` comments (default 2) to build a short
   Done/progress trajectory.
 - Use each comment's own `created` timestamp from the API — **never a hand-typed date**.
+- Also capture the ticket's `updated` timestamp (top-level field; request it alongside
+  comments) — needed by the staleness `Freshness:` line in §5.
 - Surface excluded counts separately (non-`[CTX]`, malformed); never silently drop. With
   `--include-all`, print the excluded comments too.
 
@@ -145,7 +147,8 @@ extract its latest compliant `[CTX]` per the strict READ rules in `bitacora:jira
 — identical classification to §4b: **reporting** (has a compliant `[CTX]`, its latest is
 authoritative), **no-`[CTX]`**, or **malformed**. For each reporting ticket also capture its
 latest-`[CTX]` `created` timestamp from comment metadata (needed by `--blocked` staleness and
-`--standup` windowing). Reads are independent — one key's 404 / permission error is isolated;
+`--standup` windowing) and the ticket's `updated` timestamp (needed by the staleness marker
+in §7). Reads are independent — one key's 404 / permission error is isolated;
 count it **unreadable** and continue. Carry the no-`[CTX]` / malformed / unreadable tallies
 into every §7 render as the coverage line, exactly like §4b's excluded-count discipline.
 
@@ -166,6 +169,28 @@ value into plain language for `pm`/`exec` is allowed; inventing facts is not.
 | exec | `--for-exec` | CTO, CRAIO | business/risk/cost + confidence; strips implementation detail, keeps ticket link |
 
 A lens **degrades gracefully**: if the `[CTX]` lacks a section the lens would lead with, omit it silently (a UI ticket under `--for-ops` simply has no `Deploy/Ops:` to show).
+
+### Freshness (all single-ticket lenses)
+
+Independent of the audience lens, run the drift check on the resolved ticket using the
+latest compliant `[CTX]`'s `created` epoch and the ticket's `updated` epoch (from §4), with
+the shared `staleness_grace` (default `2d`):
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/staleness-check.sh" \
+  --ctx-epoch "<latest-ctx-created-epoch>" \
+  --updated-epoch "<ticket-updated-epoch>" \
+  --grace "<staleness_grace>"
+```
+
+If it returns `stale Nd`, append one line to the render (after the lens's body):
+
+```
+Freshness: behind <N>d (ticket updated after the latest [CTX])
+```
+
+Omit the line entirely when `fresh` (no positive-state noise), when the ticket has no
+compliant `[CTX]`, or when `updated` is missing. This is read-only and advisory.
 
 ### --for-self (default) — terse personal recall: latest Status, no Done trajectory (use --for-eng for that). Jargon + PR links fine.
 
@@ -380,6 +405,14 @@ entries — render its **leading key** as a Slack link `<https://<site>/browse/K
 `<site>` is the Atlassian site resolved in §3. Even in Slack, inline mentions (`Health:`,
 `Top risks:`, `Dependencies:` edges) and the `Not yet reporting:` / `No movement:` tails stay
 bare. See step 5's *Slack mrkdwn rendering*.
+
+**Staleness marker.** For each **reporting** ticket, run the drift check (§5's *Freshness*
+helper call) using its latest-`[CTX]` `created` and its `updated` (both captured in §4c). When
+it returns `stale Nd`, suffix that ticket's per-index entry — `By ticket:` / `By child:`,
+`--blocked` entries, `--standup` `Moved:` entries — with ` · ⚠ behind <N>d`, after any status
+and after the Slack key-link. Fresh / no-`[CTX]` tickets get no marker. The marker is
+orthogonal to the query lens: it never changes `--blocked` / `--standup` selection, only
+annotates the entries a lens already shows.
 
 ### Default (no query flag) — cross-ticket digest
 
