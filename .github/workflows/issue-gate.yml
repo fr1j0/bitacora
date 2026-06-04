@@ -62,6 +62,7 @@ jobs:
                 pullRequest(number: $number) {
                   labels(first: 30) { nodes { name } }
                   timelineItems(first: 100, itemTypes: [LABELED_EVENT]) {
+                    pageInfo { hasNextPage }
                     nodes { ... on LabeledEvent { label { name } actor { login } createdAt } }
                   }
                   closingIssuesReferences(first: 20) {
@@ -69,6 +70,7 @@ jobs:
                       number
                       labels(first: 30) { nodes { name } }
                       timelineItems(first: 100, itemTypes: [LABELED_EVENT]) {
+                        pageInfo { hasNextPage }
                         nodes { ... on LabeledEvent { label { name } actor { login } createdAt } }
                       }
                     }
@@ -76,6 +78,16 @@ jobs:
                 }
               }
             }' -F owner="$OWNER" -F name="$NAME" -F number="$PR")
+
+          # Loud-fail the silent truncation cliff: if any timeline exceeded the
+          # 100-event page, the latest-actor check may be reading a stale page.
+          if jq -e '
+            [ .data.repository.pullRequest.timelineItems.pageInfo.hasNextPage ]
+            + [ .data.repository.pullRequest.closingIssuesReferences.nodes[].timelineItems.pageInfo.hasNextPage ]
+            | any
+          ' <<<"$response" >/dev/null; then
+            echo "::warning::A PR or linked-issue timeline exceeds 100 LABELED_EVENTs; the owner-applied label check reads only the latest page and may be inaccurate."
+          fi
 
           # pr_has_label <name>: true if the PR currently carries <name>.
           pr_has_label() {
@@ -90,7 +102,7 @@ jobs:
             jq -r --arg L "$1" '
               .data.repository.pullRequest.timelineItems.nodes
               | map(select(.label.name==$L))
-              | sort_by(.createdAt) | last | .actor.login // empty
+              | sort_by(.createdAt) | last | .actor.login // ""
             ' <<<"$response"
           }
 
