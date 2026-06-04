@@ -152,19 +152,26 @@ maintainer knows the bound exists (no silent truncation).
 | `docs/TRIAGE.md` | Rewrite "Label ownership" — the gate now **enforces** owner-applied approval; drop the "we don't hard-enforce this / social contract" caveat. Note the owner-only limitation. |
 
 No new scripts, no test-fixture harness (consistent with the existing gate, which has no
-unit tests and is validated by running on real PRs). Validation is by shellcheck + the
-gate dogfooding on its own PR (#92's `ready-for-dev` is owner-applied, confirmed).
+unit tests). Validation is by shellcheck plus running the new GraphQL query + classification
+against the **live API** for the change's own PR (see below).
 
 ## Testing / validation
 
 - `shellcheck` passes on the workflow's shell (run locally; the gate's run-block is bash).
-- **Dogfood:** this change's own PR is `Closes #92`; #92 carries `ready-for-dev` applied by
-  @fr1j0, so the hardened gate must report **pass** on this PR. That is the live positive
-  test.
-- **Negative path** is asserted by inspection: a label whose latest `LABELED_EVENT` actor
-  is not `$OWNER` takes the fail branch. (A fully automated negative test would require
-  mocking `gh api` / GraphQL responses — out of proportion for a gate that has never had a
-  unit harness; logged here as a deliberate scope choice.)
+- **Live-API validation (the real positive test):** because the gate runs on
+  `pull_request_target`, the workflow file that *executes* on any PR is the one on the **base
+  branch (`main`)**, not the PR head — so the new gate logic does **not** run on its own PR's
+  `gate` check (that check exercises `main`'s current/old gate). Instead, validate by running
+  the new query + jq classification directly against the live API for the change's PR:
+  `closingIssuesReferences` resolves to #92, whose latest `ready-for-dev` `LABELED_EVENT`
+  actor is `@fr1j0` → classified `approved`, `pageInfo.hasNextPage` false. This confirms
+  field availability, the `LabeledEvent` fragment, and the partition against real data. The
+  new gate first governs real `gate` checks only **after** this PR merges to `main`; confirm
+  on the next contributor PR.
+- **Negative path** is asserted by inspection plus canned-JSON checks: a label whose latest
+  `LABELED_EVENT` actor is not `$OWNER` takes the fail branch. (A fully automated negative
+  test against the live API would require a real non-owner-applied label; out of proportion
+  for a gate that has never had a unit harness — logged here as a deliberate scope choice.)
 
 ## Risks
 

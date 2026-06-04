@@ -379,14 +379,37 @@ BODY
 ```
 Expected: PR URL printed. Do **not** self-apply any label.
 
-- [ ] **Step 3: Confirm the gate dogfoods green**
+- [ ] **Step 3: Validate the new gate logic against the live API**
 
-Wait for the `gate` check to run on the new PR, then:
+IMPORTANT: `issue-gate.yml` runs on `pull_request_target`, so the `gate` check on this PR
+executes the workflow from the **base branch (`main`)** — i.e. the *old* gate, not the code
+in this PR. The green `gate` check on this PR therefore does **not** validate the new logic
+(its sticky will read the old *"approved"* wording, not *"owner-approved"*). The new gate
+only governs real checks after this PR merges.
+
+To validate the new logic now, run its query + classification directly against the live API
+for this PR (substitute the PR number for `$PR`):
 ```bash
 cd /Users/fernandocastillo/Projects/bitacora
-gh pr checks --watch
+OWNER=fr1j0; NAME=bitacora; PR=<this-PR-number>
+response=$(gh api graphql -f query='
+  query($owner: String!, $name: String!, $number: Int!) {
+    repository(owner: $owner, name: $name) { pullRequest(number: $number) {
+      closingIssuesReferences(first: 20) { nodes {
+        number labels(first: 30) { nodes { name } }
+        timelineItems(first: 100, itemTypes: [LABELED_EVENT]) {
+          pageInfo { hasNextPage }
+          nodes { ... on LabeledEvent { label { name } actor { login } createdAt } } } } } } } }' \
+  -F owner="$OWNER" -F name="$NAME" -F number="$PR")
+jq -r '.data.repository.pullRequest.closingIssuesReferences.nodes[] | . as $n
+  | ($n.labels.nodes | any(.name=="ready-for-dev")) as $present
+  | ($n.timelineItems.nodes | map(select(.label.name=="ready-for-dev")) | sort_by(.createdAt) | last | .actor.login // "") as $actor
+  | "\($n.number)\t\(if $present then "y" else "n" end)\t\($actor)"' <<<"$response"
 ```
-Expected: `gate` passes — #92's `ready-for-dev` was applied by `fr1j0` (the owner), so the hardened gate must report *"Gate passed — linked to owner-approved issue(s) #92."* If it fails, the gate logic is wrong; stop and debug before handing off for review.
+Expected: `92	y	fr1j0` — present, latest applier is the owner → would classify approved.
+If the query errors or the actor is wrong, the gate logic is wrong; stop and debug before
+handing off. Also confirm CI is otherwise green (`gh pr checks` — `gate`/`lint`/`shell-tests`
+all pass; the `gate` pass here is the old gate, which is fine).
 
 - [ ] **Step 4: Hand off for owner review**
 
