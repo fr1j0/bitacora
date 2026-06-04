@@ -42,9 +42,16 @@ volunteers.
 
 ## Label ownership
 
-Only maintainers apply `ready-for-dev` and `skip-issue-check`. Contributors should not
-self-apply these (the gate workflow only trusts maintainer labels in practice; we don't
-hard-enforce this, but it's the social contract).
+Only the repo owner (@fr1j0) approves work. The `ready-for-dev` (on an issue) and
+`skip-issue-check` (on a PR) labels **only count when the owner applied them** — the
+issue-gate reads each label's `LABELED_EVENT` actor and fails the gate if anyone else
+applied it. A non-owner `skip-issue-check` is ignored (the PR falls through to the normal
+linked-issue check) rather than blocking. Self-applying these labels as a contributor will
+not pass the gate.
+
+This is intentionally owner-only. If a co-maintainer is added later, extend the owner
+comparison (`actor == $OWNER`) in `.github/workflows/issue-gate.yml` to accept their login
+as well.
 
 ## Branch protection (one-time admin)
 
