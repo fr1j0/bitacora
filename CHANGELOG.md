@@ -2,6 +2,34 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.6.0] — 2026-06-05 · Day-bucketed standup + clickable cross-ticket keys
+
+Two refinements to `/status` and `/handoff`: the `--standup` lens now reads like a real
+standup (grouped by day, past-first), and `/handoff` writes cross-ticket references as
+clickable links instead of bare keys.
+
+### Added
+
+- **Day-bucketed `--standup`.** `/bitacora:status --standup` groups what moved into a past
+  bucket then `Today`, **past-first**. The past header is data-driven and weekend-aware:
+  `Yesterday` (the immediate prior day), a weekday name (e.g. `Friday`) when the prior worked
+  day isn't yesterday, or `Earlier` for a wide `--since Nd` window. The lens now reads
+  **every** in-window `[CTX]` per ticket (not just the latest), so a ticket touched on both
+  the past day and today appears in both buckets with each day's `Did`/`Next`. Scoped to
+  `--standup`; every other lens stays latest-`[CTX]`-authoritative.
+  ([#102](https://github.com/fr1j0/bitacora/pull/102))
+  - New pure-arithmetic `standup-buckets.sh` helper (UTC epoch → day index + weekday name),
+    unit-tested on Linux and macOS; the committed `--standup` example and the multi-ticket
+    fixture lint were updated to the two-bucket render.
+- **Clickable cross-ticket keys in `[CTX]`.** When `/bitacora:handoff` drafts a `[CTX]`, any
+  *other* ticket key it writes — in `Dependencies:`, a `Related:` line (siblings / parent
+  initiative / epic), or inline — is now emitted as a compact reference link
+  `[KEY](https://<site>/browse/KEY)` instead of a bare key, so the references click through in
+  the rendered comment (applying the `jira-comment-format` compact-references convention).
+  **Rendering only** — it creates no native Jira issue link and never touches the
+  `parent`/epic field, staying inside the status-not-authoring scope.
+  ([#103](https://github.com/fr1j0/bitacora/pull/103))
+
 ## [v0.5.1] — 2026-06-03 · Staleness signal
 
 Read-side companion to v0.5.0's write-side guard: `/resume` and `/status` now flag when a
