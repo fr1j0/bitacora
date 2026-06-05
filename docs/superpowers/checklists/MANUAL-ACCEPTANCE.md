@@ -43,7 +43,7 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 - [ ] **M3 — `--blocked`:** `/bitacora:status --mine --blocked`. → Only tickets with
       `Blockers:`/`Dependencies:`, most-stale first, `stale Nd` correct; `Nothing blocked …`
       when none qualify.
-- [ ] **M4 — `--standup` (day buckets):** `/bitacora:status --mine --standup --since 1d`. →
+- [x] **M4 — `--standup` (day buckets):** `/bitacora:status --mine --standup --since 1d`. →
       In-window `[CTX]` grouped into a past bucket then `Today`, past-first; the past header
       reads `Yesterday` (midweek), a weekday name when the prior worked day isn't yesterday
       (e.g. a weekend gap), or `Earlier`
