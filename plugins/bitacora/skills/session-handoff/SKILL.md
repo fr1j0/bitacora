@@ -67,6 +67,15 @@ auto-detected from file signals; add it at the confirm gate when a latent risk i
 from the session. Separately, add the `Status:` confidence cue and the `[precedent]` /
 `[debt]` / `[blast-radius]` decision tags when warranted.
 
+**Linkify cross-ticket keys.** Any *other* ticket key written into the `[CTX]` — in
+`Dependencies:`, in a `Related:` line (siblings / parent initiative / epic), or mentioned
+inline — must be a compact reference link `[KEY](https://<site>/browse/KEY)` using the
+Atlassian site host (the continuity-read below already resolves it via
+`getAccessibleAtlassianResources`; see step 5), **never a bare key**. This is the `bitacora:jira-comment-format`
+*compact references over bare URLs* convention; the handoff writer applies it so the
+references click through in the rendered comment. This is purely a rendering choice — it
+creates **no** native Jira issue link and never touches the `parent` / epic field.
+
 **Continuity-read + collision check (lenient).** Before drafting, read the ticket's
 comments via `getJiraIssue` to (a) thread `Status`/`Next` and avoid restating `Done`,
 and (b) detect a **collision** — a teammate's recent `[CTX]` this handoff would bury.
