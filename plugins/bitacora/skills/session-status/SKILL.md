@@ -147,7 +147,8 @@ extract its latest compliant `[CTX]` per the strict READ rules in `bitacora:jira
 — identical classification to §4b: **reporting** (has a compliant `[CTX]`, its latest is
 authoritative), **no-`[CTX]`**, or **malformed**. For each reporting ticket also capture its
 latest-`[CTX]` `created` timestamp from comment metadata (needed by `--blocked` staleness and
-`--standup` windowing) and the ticket's `updated` timestamp (needed by the staleness marker
+`--standup` windowing — note `--standup` additionally consumes **every** in-window `[CTX]` per
+ticket, not just the latest; see §7's `--standup`) and the ticket's `updated` timestamp (needed by the staleness marker
 in §7). Reads are independent — one key's 404 / permission error is isolated;
 count it **unreadable** and continue. Carry the no-`[CTX]` / malformed / unreadable tallies
 into every §7 render as the coverage line, exactly like §4b's excluded-count discipline.
@@ -288,7 +289,7 @@ Render the **same content** as the chosen mode (`--for-self` / `--for-eng` / `--
 - Surface the ticket key + URL prominently as the leading line, e.g.:
   `*PROJ-1234* — <https://site/browse/PROJ-1234|OAuth callback handling>`
 - **Ticket-key links in index entries** (the multi-ticket / aggregate `By ticket:` / `By child:`
-  / `--blocked` / `--standup` `Moved:` lists): render the leading key as
+  / `--blocked` entries / `--standup` bucket entries under the day headers): render the leading key as
   `<https://<site>/browse/KEY|KEY>`. This is the **only** place keys are linked — printed
   renders leave them bare. Inline / tail keys stay bare even here.
 
@@ -400,8 +401,8 @@ plus any `showing N of M — narrow with --jql` truncation note from §2a.
 
 **Ticket-key links (Slack only).** Printed renders show **bare** keys. Only under
 `--copy-as-slack` does each per-ticket **index entry** — the `By ticket:` / `By child:` lists
-(rendered via §5's *Aggregate render*), the `--blocked` entries, and the `--standup` `Moved:`
-entries — render its **leading key** as a Slack link `<https://<site>/browse/KEY|KEY>`, where
+(rendered via §5's *Aggregate render*), the `--blocked` entries, and the `--standup` bucket
+entries (under the day headers) — render its **leading key** as a Slack link `<https://<site>/browse/KEY|KEY>`, where
 `<site>` is the Atlassian site resolved in §3. Even in Slack, inline mentions (`Health:`,
 `Top risks:`, `Dependencies:` edges) and the `Not yet reporting:` / `No movement:` tails stay
 bare. See step 5's *Slack mrkdwn rendering*.
@@ -409,7 +410,7 @@ bare. See step 5's *Slack mrkdwn rendering*.
 **Staleness marker.** For each **reporting** ticket, run the drift check (§5's *Freshness*
 helper call) using its latest-`[CTX]` `created` and its `updated` (both captured in §4c). When
 it returns `stale Nd`, suffix that ticket's per-index entry — `By ticket:` / `By child:`,
-`--blocked` entries, `--standup` `Moved:` entries — with ` · ⚠ behind <N>d`, after any status
+`--blocked` entries, the `--standup` bucket entry in the ticket's latest bucket — with ` · ⚠ behind <N>d`, after any status
 and after the Slack key-link. Fresh / no-`[CTX]` tickets get no marker. The marker is
 orthogonal to the query lens: it never changes `--blocked` / `--standup` selection, only
 annotates the entries a lens already shows.
@@ -448,7 +449,7 @@ If **no** ticket in the set is blocked, print `Nothing blocked across <coverage>
 `--for-pm`/`--for-exec` strip PR/commit hashes and frame `Waiting on:` as an ask; the other
 lenses keep references. See `examples/multi-blocked.txt`.
 
-### --standup — what moved in the window
+### --standup — what moved, by day
 
 Resolve the window cutoff with the helper (deterministic, pure-arithmetic UTC):
 
@@ -458,25 +459,65 @@ cutoff=$("${CLAUDE_PLUGIN_ROOT}/scripts/since-window.sh" "<token>")
 # Prints a UTC epoch; a [CTX] whose `created` epoch is >= cutoff is "in the window".
 ```
 
-(From the repo root the helper is `plugins/bitacora/scripts/since-window.sh`.) A reporting
-ticket **moved** if its latest compliant `[CTX]` has `created >= cutoff`. Render in the
-chosen lens (default `self`):
+(From the repo root the helper is `plugins/bitacora/scripts/since-window.sh`.)
+
+**Read model — all in-window `[CTX]` (standup only).** Unlike every other lens, `--standup`
+does **not** stop at the latest `[CTX]`. For each reporting ticket, take **every** compliant
+`[CTX]` whose `created >= cutoff` (the comments are already in hand from §4c — just stop
+discarding the earlier in-window ones; this is **no** extra API calls). A ticket with no
+in-window `[CTX]` has **not moved**. This per-`[CTX]` read is scoped to `--standup`;
+`--blocked`, the digest, and all single-ticket / epic paths keep
+latest-`[CTX]`-authoritative.
+
+**Bucket each in-window `[CTX]` by its UTC day.** Get today's day index once, and each
+`[CTX]`'s day index + weekday name, from the helper:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/standup-buckets.sh" "<epoch>"   # prints "<day_index> <Weekday>"
+```
+
+- **Today** — `[CTX]` whose day index equals today's.
+- **Past** — `[CTX]` whose day index is *less than* today's (still ≥ cutoff).
+
+Render the **past bucket first, then Today** (chronological). **Omit an empty bucket.** Within
+a bucket, order entries by `[CTX]` `created` descending. A ticket with in-window `[CTX]` on
+**both** the past day and today appears in **both** buckets, each line carrying that day's own
+`Did` / `Next` (within a bucket, the ticket's latest `[CTX]` in that bucket drives the line).
+
+**Past-bucket header** — derived from the distinct day indices present in the past bucket
+(call that set D; let `T` = today's day index):
+
+- `|D| == 1` and that day is `T − 1` → **`Yesterday`**
+- `|D| == 1` and that day is `< T − 1` (a weekend / non-working gap sits between) → that
+  **weekday name** (e.g. `Friday`)
+- `|D| > 1` (only possible with a wide `--since Nd`) → **`Earlier`**
+
+`Today` is always literally `Today`. Render in the chosen lens (default `self`):
 
 ```
 Standup — since <token> · <coverage>
 
-Moved:
+<Yesterday | Friday | Earlier>:
 - <KEY> "<title>" — <Jira status>
-    Did: <one line from that [CTX]'s Done / Status change>
+    Did: <Done / Status change from that day's [CTX]>
     Next: <first Next bullet>
-    ⚠ <Risk or Blockers one-liner>                         (only if present)
+    ⚠ <Risk or Blockers one-liner>            (only if present)
 - …
-No movement: <KEY, KEY, …>   (reporting tickets whose latest [CTX] predates the cutoff; omit if none)
+
+Today:
+- <KEY> "<title>" — <Jira status>
+    Did: …
+    Next: …
+- …
+
+No movement: <KEY, KEY, …>   (reporting tickets with no in-window [CTX]; omit if none)
 ```
 
 If nothing moved, print `No [CTX] activity since <token> across <coverage>.` The window is
-UTC-day-aligned for `last-working-day` (a deliberate v1 simplification — a Monday run picks
-up Friday + weekend); `--since 2d` widens it when a teammate's day boundary differs. See
+UTC-day-aligned (a deliberate v1 simplification — a Monday `last-working-day` run picks up
+Friday + weekend, all under the `Friday` header); `--since 2d` widens it. The per-ticket
+**staleness marker** (below) is printed **once per ticket**, on its entry in the **latest**
+bucket it appears in (Today if present, else the past bucket). See
 `examples/multi-standup.txt`.
 
 ## Error / edge behavior
