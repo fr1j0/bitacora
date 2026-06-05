@@ -45,7 +45,8 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       when none qualify.
 - [ ] **M4 — `--standup` (day buckets):** `/bitacora:status --mine --standup --since 1d`. →
       In-window `[CTX]` grouped into a past bucket then `Today`, past-first; the past header
-      reads `Yesterday` (midweek), a weekday name when a weekend gap intervenes, or `Earlier`
+      reads `Yesterday` (midweek), a weekday name when the prior worked day isn't yesterday
+      (e.g. a weekend gap), or `Earlier`
       for a wide multi-day window. A ticket touched on both days appears in both buckets with
       each day's `Did`/`Next`. Non-movers fall under `No movement:`. A Monday
       `last-working-day` run files Friday's work under the `Friday` header.

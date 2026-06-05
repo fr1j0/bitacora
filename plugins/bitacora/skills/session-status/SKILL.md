@@ -410,8 +410,8 @@ bare. See step 5's *Slack mrkdwn rendering*.
 **Staleness marker.** For each **reporting** ticket, run the drift check (§5's *Freshness*
 helper call) using its latest-`[CTX]` `created` and its `updated` (both captured in §4c). When
 it returns `stale Nd`, suffix that ticket's per-index entry — `By ticket:` / `By child:`,
-`--blocked` entries, the `--standup` bucket entry in the ticket's latest bucket — with ` · ⚠ behind <N>d`, after any status
-and after the Slack key-link. Fresh / no-`[CTX]` tickets get no marker. The marker is
+`--blocked` entries, the `--standup` bucket entry in the ticket's latest bucket — with ` · ⚠ behind <N>d`, after the Jira status
+(and, in Slack, after the key-link). Fresh / no-`[CTX]` tickets get no marker. The marker is
 orthogonal to the query lens: it never changes `--blocked` / `--standup` selection, only
 annotates the entries a lens already shows.
 
@@ -488,8 +488,8 @@ a bucket, order entries by `[CTX]` `created` descending. A ticket with in-window
 (call that set D; let `T` = today's day index):
 
 - `|D| == 1` and that day is `T − 1` → **`Yesterday`**
-- `|D| == 1` and that day is `< T − 1` (a weekend / non-working gap sits between) → that
-  **weekday name** (e.g. `Friday`)
+- `|D| == 1` and that day is `< T − 1` (the past day is not the immediate prior calendar
+  day — e.g. a weekend or non-working gap) → that **weekday name** (e.g. `Friday`)
 - `|D| > 1` (only possible with a wide `--since Nd`) → **`Earlier`**
 
 `Today` is always literally `Today`. Render in the chosen lens (default `self`):
