@@ -43,9 +43,12 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 - [ ] **M3 — `--blocked`:** `/bitacora:status --mine --blocked`. → Only tickets with
       `Blockers:`/`Dependencies:`, most-stale first, `stale Nd` correct; `Nothing blocked …`
       when none qualify.
-- [ ] **M4 — `--standup`:** `/bitacora:status --mine --standup --since 1d`. → Only tickets
-      whose latest `[CTX]` is within 1 day under `Moved:`; the rest under `No movement:`;
-      `last-working-day` default picks up Friday on a Monday run.
+- [ ] **M4 — `--standup` (day buckets):** `/bitacora:status --mine --standup --since 1d`. →
+      In-window `[CTX]` grouped into a past bucket then `Today`, past-first; the past header
+      reads `Yesterday` (midweek), a weekday name when a weekend gap intervenes, or `Earlier`
+      for a wide multi-day window. A ticket touched on both days appears in both buckets with
+      each day's `Did`/`Next`. Non-movers fall under `No movement:`. A Monday
+      `last-working-day` run files Friday's work under the `Friday` header.
 - [ ] **M5 — cap disclosure:** A scope matching more than `multi_fanout_cap` (default 25). →
       `showing N of M — narrow with --jql`; no silent truncation.
 - [ ] **M6 — empty + single + board:** `--mine` matching zero → plain "matched nothing";
