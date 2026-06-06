@@ -22,7 +22,8 @@ enriches the handoff, and the workflow degrades gracefully when it's missing.
 |---------|--------------|
 | `/bitacora:handoff [KEYS...]` | Reconstruct the Jira tickets touched this session, draft a `[CTX]` status comment for each (confirm before writing), and save one consolidated local scratch via Remember. Pass ticket keys to force the set. |
 | `/bitacora:resume [KEY]` | Rehydrate a fresh session from a ticket's latest `[CTX]`: read its `Status` / `Decisions` / `Next` back into context after a `/clear` and print a compact, read-only briefing. Pass a key to target a ticket; otherwise resolved from the branch. |
-| `/bitacora:status [KEY] [--for-self\|--for-eng\|--for-ops\|--for-pm\|--for-exec]` | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary (5 lenses; default `--for-self`), or roll up an **epic**. Point it at a **multi-ticket scope** (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only — prints the summary and offers a clipboard copy. |
+| `/bitacora:status [KEY] [--for-self\|--for-eng\|--for-ops\|--for-pm\|--for-exec]` | Synthesize ONE ticket's latest `[CTX]` into an audience-tailored summary (5 lenses; default `--for-self`). Epics render as a single node (their own `[CTX]`, not a rollup). Read-only — prints the summary and offers a clipboard copy. |
+| `/bitacora:digest [KEY\|SCOPE] [--for-self\|--for-eng\|--for-ops\|--for-pm\|--for-exec]` | Aggregate `[CTX]` read — roll up an epic across its children, or read a multi-ticket scope (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only — prints the summary and offers a clipboard copy. |
 | `/bitacora:next` | Morning ticket picker: query the tickets assigned to you, categorize into Continue / Ready / Quick wins + a Needs-attention tail, annotate each with a `[CTX]`-grounded reason-to-pick, recommend one, and chain into `/bitacora:resume <KEY>`. Read-only. |
 | `/bitacora:improve` | Sharpen a ticket — read the ticket plus its `[CTX]` trail, free-form comments, local Remember scratch, and git/PR history; produce a type-aware structured rewrite (Story / Bug / Epic / Subtask) with confident engineering choices labeled as `Assumptions`; snapshot the pre-state to an `[ARCHIVE]` comment, then edit the description (and optionally the title) in place. |
 | `/bitacora:help` | Print the Bitácora command reference. |
@@ -46,7 +47,7 @@ fi
 ```
 
 This copies every bundled alias (the `bit-` prefix is stripped to form the
-command name). Then `/bit:handoff`, `/bit:resume`, `/bit:status`, `/bit:next`,
+command name). Then `/bit:handoff`, `/bit:resume`, `/bit:status`, `/bit:digest`, `/bit:next`,
 `/bit:improve`, and `/bit:help` run the same workflows as their `/bitacora:…` forms.
 
 You only run this **once**. After `~/.claude/commands/bit/` exists, the plugin keeps
