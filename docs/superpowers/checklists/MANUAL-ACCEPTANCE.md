@@ -31,7 +31,7 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 
 > **Two test layers.** The deterministic *mechanical* contract — coverage math, blocked-only
 > selection, `--standup` window membership, and the `portfolio`→`digest` terminology — is
-> auto-checked in CI by `plugins/bitacora/scripts/test-multi-status-fixtures.sh` against the
+> auto-checked in CI by `plugins/bitacora/scripts/test-digest-fixtures.sh` against the
 > committed `examples/multi-*.txt`. The items below are the **render** half: live LLM output
 > across lenses against a real Jira, which can't be unit-tested.
 

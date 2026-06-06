@@ -16,7 +16,8 @@ so there is no confirmation gate. Follow the **READ** rules in
 - **Mode flag:** one of `--for-self`, `--for-eng`, `--for-ops`, `--for-pm`, `--for-exec`.
   An explicit flag always wins; with no flag, fall back to `status.default_mode` (built-in
   default `self`). An unknown flag or more than one mode flag is an error — name the five
-  valid modes and stop; never guess. See §5 for which lens a given role should pass.
+  valid modes and stop; never guess. See the *Audience lenses* table in
+  `bitacora:jira-comment-format` for which lens a given role should pass.
 - **Ticket key:** any `project_key_pattern` match in the arguments forces the target.
 - **`--include-all`:** optional; reveal the excluded (non-`[CTX]` / malformed) comments
   instead of only counting them.
