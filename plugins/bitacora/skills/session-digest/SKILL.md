@@ -134,10 +134,16 @@ same **no-invention** rule applies; never synthesize a number or claim a ticket 
   listed as plain bullets. Empty if none.
 - **Cost rollup** — sum the numeric infra + inference `$` values across tickets that report them;
   label it **approximate** and note how many tickets contributed. Omit if no ticket reports cost.
-- **Coverage** — `N tickets (M reporting, K no [CTX], J malformed)`, plus any truncation note from
+- **Coverage** — `N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms — plus any truncation note from
   §4. Always shown so the reader knows the rollup's basis.
 
 ## 6. Render
+
+The **query lens** (§1) selects the pivot (`--blocked` / `--standup` / the default digest);
+the `--for-*` **audience lens** still selects altitude. Facts only — the same no-invention rule
+as the single-ticket renders. Every render carries a **coverage** line —
+`N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms —
+plus any `showing N of M — narrow with --jql` truncation note from §2.
 
 ### Aggregate render
 
@@ -311,7 +317,8 @@ of Markdown:
   Slack renders Markdown lists inconsistently
 - **No Markdown tables.** If a mode would have used a table (none currently do, but
   defensive), fall back to one bullet per row
-- Surface the scope / epic key + URL prominently as the leading line
+- Surface the scope / epic key + URL prominently as the leading line, e.g.:
+  `*EPIC-1* — <https://site/browse/EPIC-1|Checkout revamp>` (for a scope: `*Scope: --mine*`).
 
 **Ticket-key links (Slack only).** Printed renders show **bare** keys. Only under
 `--copy-as-slack` does each per-ticket **index entry** — the `By ticket:` / `By child:` lists
@@ -319,7 +326,8 @@ of Markdown:
 entries (under the day headers) — render its **leading key** as a Slack link
 `<https://<site>/browse/KEY|KEY>`, where `<site>` is the Atlassian site resolved in §3.
 Even in Slack, inline mentions (`Health:`, `Top risks:`, `Dependencies:` edges) and the
-`Not yet reporting:` / `No movement:` tails stay bare.
+`Not yet reporting:` / `No movement:` tails stay bare. This is the **only** place keys are
+linked — printed renders leave them bare. Inline / tail keys stay bare even here.
 
 All read semantics (strict `[CTX]` extraction, error handling) are unchanged from the default
 render path. See `examples/multi-aggregate-slack.txt`.
