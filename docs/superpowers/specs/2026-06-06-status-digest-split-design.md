@@ -85,13 +85,17 @@ Two skills; shared read, no duplicated render logic.
 |------|----------------|
 | `skills/session-status/SKILL.md` | Single-ticket resolution + strict `[CTX]` read + the five audience-lens render templates + freshness. Epic key → single-node read. Multi-ticket flags → error+pointer. |
 | `skills/session-digest/SKILL.md` (new) | Aggregate target resolution (epic key **or** scope) + the epic/scope aggregate signals + the aggregate render templates + the query lenses (`--blocked`, `--standup`) + cross-ticket digest. Single non-epic key → error+pointer. |
-| `skills/jira-comment-format/SKILL.md` | Unchanged shared dependency: strict `[CTX]` extraction (READ rules) used by both. |
+| `skills/jira-comment-format/SKILL.md` | Shared dependency: strict `[CTX]` extraction (READ rules) **and** the canonical audience-lens altitude table (hoisted here). Used by both commands. |
 
-**Audience-lens altitude** (what each of self/eng/ops/pm/exec leads with and strips) is the
-one piece both skills need. To avoid duplication, the canonical five-lens table lives in
-**`session-status`** (where the single-ticket renders are richest), and `session-digest`
-references it by name ("render the aggregate signals in the chosen lens, per the audience-lens
-table in `bitacora:session-status`"), supplying only the aggregate-specific shaping per lens.
+**Audience-lens altitude** (which roles each of self/eng/ops/pm/exec serves, and what each
+lens leads with / strips) is the one piece both skills need. The canonical five-lens table is
+**hoisted into `jira-comment-format`** so neither command owns it — `jira-comment-format` is
+already the shared dependency both skills load. `session-status` and `session-digest` each
+reference the table by name ("apply the audience lens per the *Audience lenses* table in
+`bitacora:jira-comment-format`") and supply only their own render templates: single-ticket
+layouts in `session-status`, aggregate shaping in `session-digest`. The per-lens *render
+templates* are NOT hoisted (they differ by command); only the lens **definitions** (lens →
+flag → roles → leads-with/strips) move.
 
 **Shared scripts** stay in `scripts/` and are now called by `/digest`:
 `since-window.sh`, `standup-buckets.sh`, `staleness-check.sh` (staleness markers on digest
@@ -115,7 +119,17 @@ index entries).
 
 §4 single-ticket read, §4a removed (no epic branch), §5 single-ticket render templates (five
 lenses) + freshness, `examples/self.txt`/`eng.txt`/`ops.txt`/`pm.txt`/`exec.txt`,
-`--copy-as-slack` single-ticket rendering.
+`--copy-as-slack` single-ticket rendering. The §5 *role → lens* altitude table is **removed**
+from `session-status` and replaced by a one-line reference to the hoisted table in
+`jira-comment-format`.
+
+### What moves into `jira-comment-format`
+
+The canonical **Audience lenses** table — the `lens | flag | roles it serves |
+leads-with / strips` rows for `self`/`eng`/`ops`/`pm`/`exec` — lifted verbatim from
+`session-status` §5 into a new *Audience lenses* section in `jira-comment-format`, alongside
+the existing READ rules. Both command skills reference it. This is documentation only (no
+behavior change to the lenses themselves).
 
 ## Configuration
 
