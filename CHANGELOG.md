@@ -2,6 +2,35 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.0] — 2026-06-07 · /status ÷ /digest split
+
+Splits the overloaded `/bitacora:status` along a **singular-vs-aggregate** seam — giving the
+aggregate reads room to grow and keeping each command focused on one job.
+
+### Added
+
+- **`/bitacora:digest`** (alias `/bit:digest`) — the new home for every aggregate `[CTX]`
+  read: roll up an epic across its children, or read a multi-ticket scope (`--mine`,
+  `--sprint`, `--jql`, or 2+ keys) through a query lens (`--blocked`, `--standup`) or the
+  default cross-ticket digest, in any of the five audience lenses. A single non-epic key
+  passed to `/digest` points back to `/status`.
+  ([#105](https://github.com/fr1j0/bitacora/pull/105))
+
+### Changed
+
+- **`/bitacora:status` is now single-ticket only.** It synthesizes one ticket's latest
+  `[CTX]` across the five audience lenses, and an **epic renders as a single node** (its own
+  `[CTX]`, not a rollup). Multi-ticket invocations (`--mine`/`--sprint`/`--jql`/2+ keys,
+  `--blocked`, `--standup`) now return a clean pointer to `/bitacora:digest`.
+  **Breaking:** epic rollup and multi-ticket reads moved from `/status` to `/digest`.
+- The canonical **audience-lens table** and the `digest.*` config keys (read with a
+  `status.*` fallback so existing configs keep working) were hoisted into the shared
+  `jira-comment-format` skill, so neither command owns them.
+
+Internal: new `session-digest` skill; `session-status` slimmed to single-ticket; the
+multi-ticket fixture lint renamed to `test-digest-fixtures.sh` and wired into CI alongside
+the standup-buckets tests.
+
 ## [v0.6.0] — 2026-06-05 · Day-bucketed standup + clickable cross-ticket keys
 
 Two refinements to `/status` and `/handoff`: the `--standup` lens now reads like a real
