@@ -200,9 +200,7 @@ Bitácora is the *glue* — the opinionated workflow layer that ties these tools
 
 ## Contributing
 
-Currently in alpha. Issues and design discussion are welcome via GitHub Issues — every change starts as an issue. See [CONTRIBUTING.md](CONTRIBUTING.md) for the issue-first flow, branch naming, and maintainer guardrails.
-
-If you want to use Bitácora during alpha, fork it and pin to whatever commit you've audited. That's the safest path while the API is still settling.
+Alpha, single-maintainer. Issues and design discussion are welcome — every change starts as a GitHub issue; see [CONTRIBUTING.md](CONTRIBUTING.md) for the issue-first flow and maintainer guardrails. To use Bitácora during alpha, fork and pin to a commit you've audited.
 
 ## License
 
