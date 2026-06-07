@@ -2,6 +2,15 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.1] — 2026-06-07 · Docs polish
+
+### Changed
+
+- Trimmed the README **Contributing** section to a short single-maintainer note (keeps the
+  `CONTRIBUTING.md` pointer and the fork-and-pin guidance) — pre-listing polish ahead of a
+  possible community-marketplace submission. No code or command changes.
+  ([#107](https://github.com/fr1j0/bitacora/pull/107))
+
 ## [v0.7.0] — 2026-06-07 · /status ÷ /digest split
 
 Splits the overloaded `/bitacora:status` along a **singular-vs-aggregate** seam — giving the
