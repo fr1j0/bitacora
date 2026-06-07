@@ -16,7 +16,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status` (single-ticket) and `digest` (epic rollup + multi-ticket reads), a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
@@ -27,7 +27,7 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
 - **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, morning ticket picking, and corpus-grounded ticket sharpening.
-- **Today** — Phase 1 complete, plus **v0.5.1**: `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`), `resume` and `status` (now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), `status` for single-ticket reads, `digest` for epic rollup and **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
+- **Today** — Phase 1 complete, plus **v0.5.1**: `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`), `resume`, `status` (single-ticket reads, now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), and **`digest`** (epic rollup + **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; ticket keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
 ## What it does
