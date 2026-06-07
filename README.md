@@ -16,7 +16,7 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status`, a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
+Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status` (single-ticket) and `digest` (epic rollup + multi-ticket reads), a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
 
 > [!WARNING]
 > **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
@@ -27,7 +27,7 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 
 - **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
 - **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, morning ticket picking, and corpus-grounded ticket sharpening.
-- **Today** — Phase 1 complete, plus **v0.5.1**: `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`), `resume` and `status` (now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), `status` across single-ticket, epic rollup, and **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
+- **Today** — Phase 1 complete, plus **v0.5.1**: `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`), `resume`, `status` (single-ticket reads, now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), and **`digest`** (epic rollup + **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; ticket keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
 ## What it does
@@ -68,7 +68,8 @@ All commands below are **Phase 1 — shipped.**
 | `/bitacora:handoff` | Wrap up a session cleanly. Writes a structured `[CTX]` comment to each touched Jira ticket plus a local handoff for next-session continuity. |
 | `/bitacora:help` | Print the Bitácora command reference. |
 | `/bitacora:resume` | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
-| `/bitacora:status` | Synthesize a ticket's latest `[CTX]` into an audience-tailored summary (`--for-self`/`-eng`/`-ops`/`-pm`/`-exec`), or roll up an epic. Point it at a **multi-ticket scope** (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only: prints and offers a clipboard copy. |
+| `/bitacora:status` | Synthesize ONE ticket's latest `[CTX]` into an audience-tailored summary (`--for-self`/`-eng`/`-ops`/`-pm`/`-exec`). Epics render as a single node (their own `[CTX]`, not a rollup). Read-only: prints and offers a clipboard copy. |
+| `/bitacora:digest` | Aggregate `[CTX]` read — roll up an epic across its children, or read a multi-ticket scope (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only: prints and offers a clipboard copy. |
 | `/bitacora:next` | Morning ticket picker. Reads the tickets assigned to you, categorizes by pickup cost (Continue / Ready / Quick wins + a Needs-attention tail), annotates each with a `[CTX]`-grounded reason-to-pick, recommends one, and chains into `/bitacora:resume <KEY>`. Read-only. |
 | `/bitacora:improve` | Sharpen a ticket — corpus-grounded structured rewrite (Story / Bug / Epic / Subtask aware) with a snapshot to an `[ARCHIVE]` Jira comment before any field edit. Read + write; description by default, title opt-in per invocation. |
 
@@ -173,7 +174,7 @@ Next:
 - Token refresh implementation
 ```
 
-Agents reading the ticket for `/bitacora:resume`, `/bitacora:status`, `/bitacora:next`, or cross-ticket queries use only `[CTX]`-prefixed comments — free-form human discussion is ignored for state extraction. (`/bitacora:improve` and `/bitacora:handoff`'s continuity-read are the lenient exceptions: they read everything, because requirements and prior-handoff context often live in human discussion.)
+Agents reading the ticket for `/bitacora:resume`, `/bitacora:status`, `/bitacora:digest`, `/bitacora:next`, or cross-ticket queries use only `[CTX]`-prefixed comments — free-form human discussion is ignored for state extraction. (`/bitacora:improve` and `/bitacora:handoff`'s continuity-read are the lenient exceptions: they read everything, because requirements and prior-handoff context often live in human discussion.)
 
 This creates a virtuous loop: the more team members adopt the format, the more useful the shared memory layer becomes. See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](docs/JIRA_AGENT_COMMENT_FORMAT.md) for the full spec.
 

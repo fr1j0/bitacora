@@ -16,8 +16,11 @@ Bitácora — commands
                                 local handoff for next session.
   /bitacora:resume [KEY]        Rehydrate a cleared session from a
                                 ticket's latest [CTX] (read-only).
-  /bitacora:status [KEY]        Summarize a ticket's latest [CTX] for an
+  /bitacora:status [KEY]        Summarize ONE ticket's latest [CTX] for an
                                 audience — 5 lenses (self/eng/ops/pm/exec).
+  /bitacora:digest [KEY|SCOPE]  Aggregate read — epic rollup or a multi-ticket
+                                scope (--mine/--sprint/--jql) via --blocked /
+                                --standup / the default cross-ticket digest.
   /bitacora:next                Morning ticket picker — categorized
                                 shortlist of your assigned tickets
                                 grounded in [CTX] (read-only).
@@ -26,5 +29,5 @@ Bitácora — commands
                                 snapshot to [ARCHIVE] before the edit.
   /bitacora:help                Show this command reference.
 
-  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:next, /bit:improve, /bit:help (opt-in — see plugin README)
+  Alias: /bit:handoff, /bit:resume, /bit:status, /bit:digest, /bit:next, /bit:improve, /bit:help (opt-in — see plugin README)
 ```

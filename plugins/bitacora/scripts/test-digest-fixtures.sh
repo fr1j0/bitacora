@@ -16,7 +16,7 @@
 #   coverage:  "4 tickets (3 reporting, 1 no [CTX])"
 set -uo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
-EX="$DIR/../skills/session-status/examples"
+EX="$DIR/../skills/session-digest/examples"
 SW="$DIR/since-window.sh"
 AGG="$EX/multi-aggregate.txt"
 BLK="$EX/multi-blocked.txt"

@@ -140,6 +140,24 @@ For guaranteed fidelity (no converter in the loop), build the body as ADF direct
 pass `contentFormat: adf`; markdown-with-blank-lines is the lighter default and renders
 correctly.
 
+## Audience lenses
+
+`/bitacora:status` and `/bitacora:digest` both render `[CTX]` through five audience lenses;
+pass the flag for the reader's role. This table is the single source of truth for lens
+**altitude** (what each lens leads with and strips); each command supplies its own render
+templates (single-ticket in `bitacora:session-status`, aggregate in `bitacora:session-digest`).
+
+| Lens | Flag | Roles it serves | Leads with / strips |
+|------|------|-----------------|---------------------|
+| self | `--for-self` | you | terse recall — latest Status + Next |
+| eng  | `--for-eng`  | frontend, backend, full-stack, staff, AI staff, tech lead | contract, `Artifacts:`, `Model/Eval:`, `Decisions:`+tags; keeps PR/commit links |
+| ops  | `--for-ops`  | devops, infra, MLOps | `Deploy/Ops:`, rollback, watch-list, `Impact:`; keeps links |
+| pm   | `--for-pm`   | product, technical managers | plain language; confidence; `Risk:`/`Dependencies:` as asks; strips PR/commit hashes, keeps ticket link |
+| exec | `--for-exec` | CTO, CRAIO | business/risk/cost + confidence; strips implementation detail, keeps ticket link |
+
+A lens **degrades gracefully**: if the `[CTX]` lacks a section the lens would lead with, omit
+it silently (a UI ticket under `--for-ops` simply has no `Deploy/Ops:` to show).
+
 ## Read-side compliance
 
 - **Prefix match, with optional preamble.** A comment is treated as `[CTX]` if its
@@ -223,3 +241,18 @@ staleness_grace: 2d                          # top-level; drift tolerance (<N>h 
 
 **Overrides:** if present, read `${CLAUDE_PROJECT_DIR}/.bitacora.yml`, else
 `~/.claude/bitacora.yml`. Absence is normal — fall back to the defaults above silently.
+
+`/bitacora:digest` reads its own `digest.*` keys, each **falling back to the legacy
+`status.*` key** of the same name (then the built-in default) so existing configs keep working:
+
+```yaml
+digest:
+  epic_type: Epic            # issue type that triggers epic rollup (was status.epic_type)
+  epic_children_cap: 50      # max children read per epic (was status.epic_children_cap)
+  epic_default_mode: exec    # lens for an epic target with no --for-* (was status.epic_default_mode)
+  multi_fanout_cap: 25       # max tickets read per scope (was status.multi_fanout_cap)
+  default_mode: self         # lens for a scope read with no --for-* (was the multi default)
+```
+
+Resolution per key: `digest.<key>` → legacy `status.<key>` → built-in default.
+`status.ctx_lookback` and `status.default_mode` remain single-ticket-only.

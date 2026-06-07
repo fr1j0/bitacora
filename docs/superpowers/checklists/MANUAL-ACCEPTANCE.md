@@ -27,23 +27,23 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       writes ✓, [2] reports ✗ with retry offer, [3] dropped; scratch writes ✓ regardless.
 - [ ] **`/bit:` alias:** After copying the alias file, `/bit:handoff` runs the same flow.
 
-## Multi-ticket `/status` (Phase A)
+## Multi-ticket `/digest` (Phase A)
 
 > **Two test layers.** The deterministic *mechanical* contract — coverage math, blocked-only
 > selection, `--standup` window membership, and the `portfolio`→`digest` terminology — is
-> auto-checked in CI by `plugins/bitacora/scripts/test-multi-status-fixtures.sh` against the
+> auto-checked in CI by `plugins/bitacora/scripts/test-digest-fixtures.sh` against the
 > committed `examples/multi-*.txt`. The items below are the **render** half: live LLM output
 > across lenses against a real Jira, which can't be unit-tested.
 
-- [ ] **M1 — `--mine` digest:** `/bitacora:status --mine` with ≥2 assigned tickets. →
+- [ ] **M1 — `--mine` digest:** `/bitacora:digest --mine` with ≥2 assigned tickets. →
       Cross-ticket digest in the `self` lens; coverage line `N tickets (M reporting, …)`;
       no-`[CTX]` tickets land in `Not yet reporting`, never dropped.
-- [ ] **M2 — explicit keys:** `/bitacora:status PROJ-1 PROJ-2`. → Multi-ticket mode (2+ keys),
+- [ ] **M2 — explicit keys:** `/bitacora:digest PROJ-1 PROJ-2`. → Multi-ticket mode (2+ keys),
       not single-ticket. `/bitacora:status PROJ-1` alone still renders one ticket.
-- [ ] **M3 — `--blocked`:** `/bitacora:status --mine --blocked`. → Only tickets with
+- [ ] **M3 — `--blocked`:** `/bitacora:digest --mine --blocked`. → Only tickets with
       `Blockers:`/`Dependencies:`, most-stale first, `stale Nd` correct; `Nothing blocked …`
       when none qualify.
-- [x] **M4 — `--standup` (day buckets):** `/bitacora:status --mine --standup --since 1d`. →
+- [x] **M4 — `--standup` (day buckets):** `/bitacora:digest --mine --standup --since 1d`. →
       In-window `[CTX]` grouped into a past bucket then `Today`, past-first; the past header
       reads `Yesterday` (midweek), a weekday name when the prior worked day isn't yesterday
       (e.g. a weekend gap), or `Earlier`
@@ -52,17 +52,18 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       `last-working-day` run files Friday's work under the `Friday` header.
 - [ ] **M5 — cap disclosure:** A scope matching more than `multi_fanout_cap` (default 25). →
       `showing N of M — narrow with --jql`; no silent truncation.
-- [ ] **M6 — empty + single + board:** `--mine` matching zero → plain "matched nothing";
+- [ ] **M6 — empty + single + board:** `/bitacora:digest --mine` matching zero → plain "matched nothing";
       a scope resolving to exactly one → single-ticket render; `--board X` → "not yet
       supported" and stop.
-- [ ] **M7 — audience compose:** `/bitacora:status --mine --blocked --for-exec`. → `--blocked`
+- [ ] **M7 — audience compose:** `/bitacora:digest --mine --blocked --for-exec`. → `--blocked`
       content rendered at exec altitude (PR/commit hashes stripped, asks framed).
-- [ ] **M8 — backward compat:** `/bitacora:status EPIC-1` still rolls up the epic; a bare
-      single key is unchanged from pre-Phase-A behavior.
-- [ ] **M9 — ticket-key links (Slack-only):** run a multi-ticket digest (or `--blocked` /
-      `--standup` / epic rollup). → The **printed** render shows **bare** keys (no inline links).
-      Re-run with `--copy-as-slack`. → The copied Slack text renders each per-ticket index entry's
-      key as `<url|KEY>`; inline / tail keys stay bare.
+- [ ] **M8 — routing:** `/bitacora:digest EPIC-1` rolls up the epic across its children;
+      `/bitacora:status EPIC-1` renders the epic's own `[CTX]` as a single node (no rollup).
+      A bare single non-epic key: `/bitacora:status PROJ-1` renders one ticket unchanged.
+- [ ] **M9 — ticket-key links (Slack-only):** run `/bitacora:digest --mine` (or `--blocked` /
+      `--standup` / epic rollup via `/bitacora:digest EPIC-1`). → The **printed** render shows
+      **bare** keys (no inline links). Re-run with `--copy-as-slack`. → The copied Slack text
+      renders each per-ticket index entry's key as `<url|KEY>`; inline / tail keys stay bare.
 
 ## Collision detection on `/handoff` (v1)
 
@@ -119,10 +120,19 @@ account or teammate; do it opportunistically when one is available.)
       activity (or drift < 2d), run `/bitacora:resume <KEY>`. → No banner; briefing unchanged.
 - [ ] **S3 — /status single-ticket line:** `/bitacora:status <KEY>` on an S1-style ticket. →
       A `Freshness: behind <N>d` line under the summary. On an S2-style ticket → no such line.
-- [ ] **S4 — /status multi-ticket marker:** `/bitacora:status --mine` (or 2+ keys) including at
+- [ ] **S4 — /digest multi-ticket marker:** `/bitacora:digest --mine` (or 2+ keys) including at
       least one stale ticket. → That ticket's `By ticket:` entry is suffixed ` · ⚠ behind <N>d`;
       fresh tickets in the same digest carry no marker. Confirms it composes with `--blocked` /
       `--standup` / `--for-*` without changing their selection.
 - [ ] **S5 — no [CTX] / grace override:** A ticket with no `[CTX]` shows neither banner nor
       marker (it's "no context", not stale). Set `staleness_grace: 12h` in `.bitacora.yml` and
       re-run S1/S3 → tickets with ≥12h drift now flag.
+
+## Command routing guards
+
+- [ ] **G1 — status rejects multi:** `/bitacora:status --mine --standup` → prints
+      "Multi-ticket reads now live in /bitacora:digest" with the flags echoed; no render.
+- [ ] **G2 — digest rejects a single key / status epic-as-node:** `/bitacora:digest AT-1234`
+      (a non-epic key) → "That's a single ticket — use /bitacora:status AT-1234"; no render.
+      `/bitacora:status AT-EPIC` (an epic) → renders the epic's own [CTX] as one node (or the
+      no-[CTX] line + a /bitacora:digest pointer).
