@@ -2,6 +2,21 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.2] — 2026-06-08 · Stability note + [CTX] format version
+
+### Added
+
+- **Stability & compatibility** section (root + plugin README) — the alpha posture stated by
+  layer: the `[CTX]` format is the versioned contract; commands/flags are still settling in
+  `0.x`; config keys are additive with `status.*`→`digest.*` fallback.
+- **`[CTX]` format version `v1`** declared in `jira-comment-format` and
+  `docs/JIRA_AGENT_COMMENT_FORMAT.md` — implicit (bare `[CTX]` = v1, no per-comment token),
+  the additive-sections rule, and a reserved `[CTX v2]` prefix for any future breaking bump
+  (a v1 reader skips `[CTX v2]` rather than mis-parsing it).
+  ([#109](https://github.com/fr1j0/bitacora/pull/109))
+
+Docs/policy only — no code change.
+
 ## [v0.7.1] — 2026-06-07 · Docs polish
 
 ### Changed
