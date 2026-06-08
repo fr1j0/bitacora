@@ -105,6 +105,10 @@ account or teammate; do it opportunistically when one is available.)
 - [ ] **C5 — lenient skip:** Disconnect/deny the Atlassian MCP (or use a ticket whose read
       fails), run handoff. → No collision flag, no error about the check; handoff proceeds
       exactly as the no-check path.
+- [ ] **C6 — self-collision:** Run `/bitacora:handoff` on a ticket whose newest `[CTX]` is your own
+      and < 2h old → the gate shows `⚠ recent self-handoff` with `[append]` / `[skip]`;
+      `append` writes the new `[CTX]`, `skip` does not. A handoff hours later (outside
+      `self_handoff_window`) shows no marker. Teammate `⚠ collision` is unaffected.
 
 ## Staleness signal (v1)
 

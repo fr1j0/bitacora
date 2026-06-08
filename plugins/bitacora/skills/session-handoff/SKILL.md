@@ -103,6 +103,26 @@ throughout:** if the MCP is absent, the read fails, the user can't be resolved, 
 is no prior `[CTX]`, skip the check silently and draft as normal — collision detection
 never blocks a handoff.
 
+**Self-collision (your own recent `[CTX]`).** The teammate check above fires only when the
+newest `[CTX]` is someone else's. When the newest `[CTX]` is **your own**, run the same helper
+in `--self` mode to catch a duplicate re-handoff:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/collision-check.sh" --self \
+  --me "<my-accountId>" \
+  --latest-author "<latest-ctx-author-accountId>" \
+  --latest-epoch "<latest-ctx-epoch>" \
+  --window "<self_handoff_window>"   # default 2h; see Configuration
+# stdout: "collision" or "clear". --self reports "collision" iff the newest [CTX] is yours
+# AND within the window.
+```
+
+The teammate and self checks are **mutually exclusive** (decided by whose `[CTX]` is newest),
+so it stays one decision per ticket: run the teammate check when the newest `[CTX]` is a
+teammate's, and the `--self` check when it is your own. If `--self` prints `collision`, flag the
+ticket **`⚠ recent self-handoff`** for the gate (step 4). Same lenient rule — skip silently if
+the MCP is absent, the user can't be resolved, or there is no prior `[CTX]`.
+
 ## 3. Prepare ONE consolidated local scratch
 
 Across all tickets, collect the session-level scratch: dead ends, fragile-code warnings,
@@ -146,6 +166,23 @@ per-ticket actions (warn-only — a collision never blocks the gate or the other
 
 `Approve all` writes every non-collision ticket as-is and pauses on each `⚠ collision`
 ticket for one of the three actions above before writing it.
+
+**Self-handoff-flagged tickets (`⚠ recent self-handoff`).** When the `--self` check fired,
+show the age of your own last `[CTX]` and the window, and offer two per-ticket actions
+(warn-only — never blocks the gate or the other tickets):
+
+- **append** → write the drafted `[CTX]` as normal (the second handoff is legitimate).
+- **skip** → do not write this ticket's `[CTX]`.
+
+Example gate line:
+
+```
+[2] PROJ-5678  (branch fix/PROJ-5678-flaky-test)       → [CTX] drafted   ⚠ recent self-handoff
+      Your own [CTX] here is 18m ago (within the 2h self-handoff window).
+      [append] write this [CTX] anyway · [skip] don't write this ticket
+```
+
+`Approve all` also pauses on each `⚠ recent self-handoff` ticket for append/skip before writing it.
 
 Never write to Jira before this gate.
 
@@ -232,5 +269,6 @@ session_ticket_tracking:
   attribution: branch_name      # touched-ticket → branch mapping strategy
   # activity_threshold: <n>     # Phase 1.5 — substantive-vs-incidental auto-filter; v1 shows all
 collision_window: 48h           # collision detection lookback (<N>h | <N>d); a teammate's [CTX] newer than this is flagged at the gate
+self_handoff_window: 2h         # self-collision lookback (<N>h | <N>d); a re-handoff within this of your own last [CTX] is flagged at the gate
 jira_cloud_id: ""               # optional; if set, skips the multi-site select prompt
 ```

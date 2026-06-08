@@ -29,6 +29,7 @@ check_err() {  # desc, args...
 NOW=1704801600              # 2024-01-09 12:00 UTC
 H3=$((NOW - 10800))         # 3h ago  (within 48h)
 H2=$((NOW - 7200))          # 2h ago
+H1=$((NOW - 3600))          # 1h ago
 CUTOFF=1704628800           # NOW - 48h (exact boundary)
 JUST_OUT=$((CUTOFF - 1))    # 1s before the 48h boundary
 TWO_DAYS=$((NOW - 172800))  # exactly 48h ago (== CUTOFF)
@@ -41,6 +42,13 @@ check "other at 48h boundary → collision"    collision --me u1 --latest-author
 check "other 1s past window → clear"         clear     --me u1 --latest-author u2 --latest-epoch "$JUST_OUT" --now "$NOW"
 check "1d window, 2d-old other → clear"      clear     --me u1 --latest-author u2 --latest-epoch "$TWO_DAYS" --window 1d --now "$NOW"
 check "7d window, 2d-old other → collision"  collision --me u1 --latest-author u2 --latest-epoch "$TWO_DAYS" --window 7d --now "$NOW"
+
+# --self mode: self-collision — collision iff the newest [CTX] is MINE and recent.
+check "self: mine + recent (default 48h) → collision" collision --self --me u1 --latest-author u1 --latest-epoch "$H3" --now "$NOW"
+check "self: mine + within 2h → collision"            collision --self --window 2h --me u1 --latest-author u1 --latest-epoch "$H1" --now "$NOW"
+check "self: mine + older than 2h → clear"            clear     --self --window 2h --me u1 --latest-author u1 --latest-epoch "$H3" --now "$NOW"
+check "self: mine at 2h boundary → collision"         collision --self --window 2h --me u1 --latest-author u1 --latest-epoch "$H2" --now "$NOW"
+check "self: newest is a teammate's → clear"          clear     --self --window 2h --me u1 --latest-author u2 --latest-epoch "$H1" --now "$NOW"
 
 check_err "missing --me"             --latest-author u2 --latest-epoch "$H3" --now "$NOW"
 check_err "missing --latest-author"  --me u1 --latest-epoch "$H3" --now "$NOW"
