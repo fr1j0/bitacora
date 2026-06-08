@@ -2,6 +2,19 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.5] — 2026-06-08 · Self-collision guard on /handoff
+
+### Added
+
+- **Self-collision guard** — `/handoff` now warns when you're about to stack a near-duplicate
+  `[CTX]` on a ticket whose newest `[CTX]` is **your own** and recent (≤ `self_handoff_window`,
+  default **2h**). The confirm gate flags it `⚠ recent self-handoff` with **append** / **skip**
+  (warn-only — never blocks), symmetric to the teammate-collision path (#94). Implemented as a
+  `--self` mode in `collision-check.sh` (the mirror rule; teammate mode unchanged) and a new
+  `self_handoff_window` config key. Time-window only for this cut (content-diff detection and
+  in-place `[CTX]` edit deferred).
+  ([#100](https://github.com/fr1j0/bitacora/issues/100), [#115](https://github.com/fr1j0/bitacora/pull/115))
+
 ## [v0.7.4] — 2026-06-08 · Fix: handoff-pending false positive on a dirty tree
 
 ### Fixed
