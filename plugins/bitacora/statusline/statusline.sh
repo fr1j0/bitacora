@@ -122,7 +122,8 @@ if [ "$SHOW_HANDOFF" = "true" ]; then
     marker_ts="$(tr -dc '0-9' < "$marker_path" 2>/dev/null)"
     [ -z "$marker_ts" ] && marker_ts=0
   fi
-  if handoff_pending "$is_ticket" "$tree_dirty" "$last_commit_ts" "$marker_ts"; then
+  now_ts="$(date +%s)"
+  if handoff_pending "$is_ticket" "$tree_dirty" "$last_commit_ts" "$marker_ts" "$now_ts"; then
     handoff_body="✎ handoff pending"
     if [ -n "$pct" ] && [ "$pct" -ge "$THRESHOLD" ]; then segments+=("$(escalate "$handoff_body")"); else segments+=("$handoff_body"); fi
   fi

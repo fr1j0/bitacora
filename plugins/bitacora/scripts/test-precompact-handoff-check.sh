@@ -84,12 +84,13 @@ out="$(run_hook '{"prompt":"tell me a joke"}')"
 # Case 2: /clear on a clean ticket repo with marker in the future → silent.
 now_ts="$(date +%s)"
 future_ts=$(( now_ts + 3600 ))
+stale_ts=$(( now_ts - 3600 ))   # a handoff older than the grace window → a dirty tree counts as new work (#101)
 repo="$(setup_repo "AT-1234" "false" "0" "$future_ts")"
 out="$(cd_run "$repo" '{"prompt":"/clear"}')"
 [ -z "$out" ] && pass "clean ticket repo + /clear → silent" || bad "clean ticket repo → got: $out"
 
-# Case 3: /clear on ticket branch with dirty tree → block + names ticket.
-repo="$(setup_repo "AT-1234-feat" "true" "0" "$future_ts")"
+# Case 3: /clear on ticket branch with dirty tree (handoff older than grace) → block + names ticket.
+repo="$(setup_repo "AT-1234-feat" "true" "0" "$stale_ts")"
 out="$(cd_run "$repo" '{"prompt":"/clear"}')"
 if printf '%s' "$out" | grep -q '"decision":"block"' && printf '%s' "$out" | grep -q "AT-1234"; then
   pass "dirty tree on ticket + /clear → block + names ticket"
@@ -116,7 +117,7 @@ out="$(cd_run "$work" '{"prompt":"/clear"}')"
 [ -z "$out" ] && pass "outside git repo + /clear → silent" || bad "no-repo → got: $out"
 
 # Case 7: Marker file present consumes one /clear and is removed.
-repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+repo="$(setup_repo "AT-1234" "true" "0" "$stale_ts")"
 mkdir -p "$repo/.bitacora"
 touch "$repo/.bitacora/skip-handoff-once"
 out="$(cd_run "$repo" '{"prompt":"/clear"}')"
@@ -127,7 +128,7 @@ else
 fi
 
 # Case 8: /compact triggers the same logic.
-repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+repo="$(setup_repo "AT-1234" "true" "0" "$stale_ts")"
 out="$(cd_run "$repo" '{"prompt":"/compact"}')"
 if printf '%s' "$out" | grep -q '"decision":"block"'; then
   pass "/compact + dirty ticket → block"
@@ -141,7 +142,7 @@ out="$(cd_run "$repo" '{"prompt":"/clear-foo"}')"
 [ -z "$out" ] && pass "/clear-foo (not /clear) → silent" || bad "/clear-foo → got: $out"
 
 # Case 10: Leading whitespace before /clear still matches.
-repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+repo="$(setup_repo "AT-1234" "true" "0" "$stale_ts")"
 out="$(cd_run "$repo" '{"prompt":"   /clear"}')"
 if printf '%s' "$out" | grep -q '"decision":"block"'; then
   pass "leading whitespace + /clear → block"
@@ -187,7 +188,7 @@ out="$(cd_run "$repo" '{"prompt":"/clear"}')"
 # Case 7 only proves the marker is removed on first /clear; this case
 # verifies the bypass is truly one-shot (second invocation re-engages the
 # guardrail) rather than seeding a persistent silence.
-repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+repo="$(setup_repo "AT-1234" "true" "0" "$stale_ts")"
 mkdir -p "$repo/.bitacora"
 touch "$repo/.bitacora/skip-handoff-once"
 first="$(cd_run "$repo" '{"prompt":"/clear"}')"        # consumes marker, silent
@@ -218,12 +219,20 @@ fi
 # Claude Code allows `/compact <focus instructions>`; the `'/compact '*`
 # arm of the case statement covers this. Regression guard against future
 # changes that tighten the match to bare `/compact` only.
-repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+repo="$(setup_repo "AT-1234" "true" "0" "$stale_ts")"
 out="$(cd_run "$repo" '{"prompt":"/compact focus on the auth flow"}')"
 if printf '%s' "$out" | grep -q '"decision":"block"'; then
   pass "/compact with focus hint → block"
 else
   bad "/compact with args → got: $out"
 fi
+
+# Case 18: dirty tree + a FRESH handoff marker → silent (#101 regression).
+# A handoff leaves the tree dirty; within the grace window that dirt is the work
+# the handoff just captured, so the guard must NOT re-fire. Pre-#101 (dirty ⇒
+# always pending) this blocked every /clear right after a handoff.
+repo="$(setup_repo "AT-1234" "true" "0" "$future_ts")"
+out="$(cd_run "$repo" '{"prompt":"/clear"}')"
+[ -z "$out" ] && pass "dirty + fresh handoff marker → silent (#101)" || bad "#101 fresh-marker → got: $out"
 
 exit $fail
