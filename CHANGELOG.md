@@ -2,6 +2,19 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.4] — 2026-06-08 · Fix: handoff-pending false positive on a dirty tree
+
+### Fixed
+
+- **`✎ handoff pending` no longer sticks after a handoff on a dirty working tree**, and the
+  `/clear` guardrail no longer blocks right after a handoff. `handoff_pending` short-circuited
+  on `tree_dirty` before consulting the handoff marker; since `/handoff` writes a `[CTX]`
+  comment but never commits, the tree stays dirty and the nudge fired forever. The dirty clause
+  now respects a **grace window** — a dirty tree counts as pending only once the last handoff is
+  older than `BITACORA_HANDOFF_GRACE` seconds (default `300`). Fixes both the statusLine and the
+  shared `precompact-handoff-check.sh` guardrail.
+  ([#101](https://github.com/fr1j0/bitacora/issues/101), [#113](https://github.com/fr1j0/bitacora/pull/113))
+
 ## [v0.7.3] — 2026-06-08 · Manifest metadata
 
 ### Added
