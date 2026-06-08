@@ -2,6 +2,13 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.3] — 2026-06-08 · Manifest metadata
+
+### Added
+
+- `homepage` and `repository` fields in `plugin.json` (both `https://github.com/fr1j0/bitacora`)
+  so a public marketplace listing links back to the source. Pre-submission polish.
+
 ## [v0.7.2] — 2026-06-08 · Stability note + [CTX] format version
 
 ### Added
