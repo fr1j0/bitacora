@@ -75,7 +75,8 @@ if [ -r "$handoff_marker" ]; then
 fi
 
 # 10. Decide. False ⇒ nothing to do.
-if ! handoff_pending "$is_ticket" "$tree_dirty" "$last_commit_ts" "$marker_ts"; then
+now_ts="$(date +%s)"
+if ! handoff_pending "$is_ticket" "$tree_dirty" "$last_commit_ts" "$marker_ts" "$now_ts"; then
   exit 0
 fi
 
