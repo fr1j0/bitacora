@@ -212,6 +212,12 @@ See [`docs/JIRA_AGENT_COMMENT_FORMAT.md`](../../docs/JIRA_AGENT_COMMENT_FORMAT.m
 operational source of truth is the `jira-comment-format` skill; `scripts/validate-ctx.sh`
 classifies any comment as `compliant` / `malformed` / `not-in-format`.
 
+## Stability
+
+Alpha (`0.x`): commands/flags may change between minor releases — pin a tag if you need
+stability. The `[CTX]` format is the versioned contract (current **v1**); see *Stability &
+compatibility* in the root README and `docs/JIRA_AGENT_COMMENT_FORMAT.md`.
+
 ## Safety
 
 Draft → show → confirm → write, always. No auto-update, no telemetry. Local scratch is

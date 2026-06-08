@@ -78,6 +78,14 @@ Excluded comments are always counted, never silently dropped:
 Requirements-understanding operations (sharpening a ticket, onboarding, decision
 archaeology) read **leniently** — human discussion is exactly what's wanted there.
 
+## Format version
+
+The format is versioned; the current version is **v1** (implicit — a bare `[CTX]` prefix means
+v1, and no per-comment version token is written). Within v1 the required shape (`[CTX]` +
+`Status:` / `Next:`) stays stable and new sections are additive. A breaking change to the
+required shape bumps the format to **v2**, written with an explicit `[CTX v2]` prefix so that a
+v1 reader — which keys on the literal `[CTX]` prefix — skips it instead of mis-parsing it.
+
 ## The adoption incentive
 
 Strict reading is a forcing function, not just efficiency: comments that don't follow the

@@ -30,6 +30,18 @@ Bitácora is a Claude Code plugin that turns Jira into a shared external memory 
 - **Today** — Phase 1 complete, plus **v0.7.1**: `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`), `resume`, `status` (single-ticket reads, now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), and **`digest`** (epic rollup + **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked`/`--standup` lenses; ticket keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
 - **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
 
+## Stability & compatibility
+
+Bitácora is **alpha (`0.x`)** — the command surface is still settling, and commands or flags can change between minor releases (e.g. v0.7.0 moved multi-ticket reads out of `/status` into `/digest`). Pin to a tagged release you've audited if you need stability.
+
+What we're deliberate about, by layer:
+
+- **The `[CTX]` comment format — the real contract.** People and other agents parse these comments, so the format is versioned and treated as the stable surface. Current version **v1**; the required `[CTX]` + `Status:`/`Next:` shape won't break within v1, new sections are additive, and a breaking change bumps to `[CTX v2]`. See the [format spec](docs/JIRA_AGENT_COMMENT_FORMAT.md).
+- **Commands & flags — still settling.** Names/options may change in `0.x`; breaking moves are noted in the CHANGELOG and, where possible, self-redirect (`/status --mine` points you to `/digest`).
+- **Config keys — additive with fallback.** New keys ship with defaults; renamed keys keep reading the old name (`digest.*` falls back to `status.*`).
+
+No telemetry, no auto-update — nothing on your machine changes unless you re-install or move your pin.
+
 ## What it does
 
 Bitácora is a small plugin that builds on the Claude Code ecosystem:

@@ -222,6 +222,25 @@ required.
 
 See `examples/archive.txt` for a rendered `[ARCHIVE]` body.
 
+## Format version & compatibility
+
+**Current version: `v1`** (implicit). A compliant comment's trimmed body starts with the
+literal `[CTX]` prefix and carries the required `Status:` and `Next:` fields. Bare `[CTX]`
+always means v1 — no per-comment version token is written.
+
+**What readers can rely on within v1:**
+
+- The **required shape** (`[CTX]` prefix + `Status:` / `Next:`) will not change incompatibly.
+- **Optional sections are additive** — new ones (e.g. `Model/Eval:`, `Related:`) may land in
+  minor releases; strict readers ignore sections they don't recognize, so adding one never
+  breaks an older reader.
+
+**Breaking the required shape is a format major bump to `v2`**, which will (1) be called out
+under a "Format" heading in the CHANGELOG, and (2) be written with an explicit **`[CTX v2]`**
+prefix. Readers detect version by prefix: `[CTX]` → v1, `[CTX vN]` → vN. Because `[CTX v2]`
+does not match the literal `[CTX]` prefix (the character after `CTX` is a space, not `]`), a
+v1 reader safely skips a v2 comment rather than mis-parsing it.
+
 ## Configuration
 
 Defaults (used inline unless overridden):
