@@ -36,10 +36,10 @@ the `~/.claude/bitacora.yml` one, per slug — see Configuration).
 
 - **Exit 0** — stdout is the Jira project key; inject `AND project = <KEY>` into the
   default JQL (step 3).
-- **Exit 3** (remote found but slug not mapped) or **exit 4** (not a git repo / no
-  remote) — **hard stop.** Relay the script's stderr message verbatim — it names the
-  detected slug and shows the exact YAML to add. Do **not** fall back to an unscoped
-  query.
+- **Any non-zero exit** — **hard stop.** Relay the script's stderr message verbatim:
+  for an unmapped slug (exit 3) it names the detected slug and shows the exact YAML
+  to add; for a missing repo/remote (exit 4) it states the reason. Do **not** fall
+  back to an unscoped query.
 
 ## 3. Query the tickets
 
@@ -137,10 +137,11 @@ Print, then stop. Read-only — no gate, no write.
   reason and point to MCP setup. Do not pretend a local-only fallback — without Jira read,
   there is nothing to pick from.
 - **No project scope** (repo's remote slug not in `next.remote_project_map`, repo has
-  no remote, or CWD is not a git repo) and no `next.jql` override: **hard stop.**
-  Relay `resolve-project-scope.sh`'s stderr verbatim (it names the detected slug and
-  the exact YAML to add). Never degrade to the unscoped site-wide query — that
-  surfaces another project's backlog with full confidence (#118).
+  no remote, or the project dir is not a git repo) and no `next.jql` override:
+  **hard stop.** Relay `resolve-project-scope.sh`'s stderr verbatim (for an unmapped
+  slug it names the detected slug and the exact YAML to add). Never degrade to the
+  unscoped site-wide query — that surfaces another project's backlog with full
+  confidence (#118).
 - **Empty result:** say "nothing open assigned to you — inbox zero"; not an error.
 - **Bad override JQL** (`next.jql` set, server returns a parse / field error): surface the
   offending query and Jira's error message; stop. Do **not** silently fall back to the
