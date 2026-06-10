@@ -2,6 +2,32 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.6] — 2026-06-10 · Parked-debt rollup in /digest
+
+### Added
+
+- **Parked debt** section in the `/digest` aggregate — every `[debt]`-tagged `Decisions:`
+  bullet across the scope rolls into one ledger, grouped by ticket
+  (`KEY · decision · follow-up KEY`, follow-up segment omitted when none is named). Computed
+  in the shared aggregate signals, so the epic rollup and the multi-ticket scope both get it.
+  Renders in `--for-exec` (`Debt:`, business framing), `--for-eng` (`Parked debt:`, with the
+  follow-up key), and `--for-self` (terse tail); `--for-pm`/`--for-ops` omit it; an empty
+  ledger omits the section entirely. **Zero new flags.** Slack renders keep ledger keys bare.
+  ([#85](https://github.com/fr1j0/bitacora/issues/85), [#119](https://github.com/fr1j0/bitacora/pull/119))
+- **Risk-concentration recurrence flag** — when the same surface or dependency recurs across
+  2+ tickets, the risk section appends `Concentrated: <surface> recurs across KEY-A + KEY-B`.
+  Evidence-based only: never an inferred theme.
+- Fixture contract: 13 new lint assertions (debt ledger across the aggregate/Slack/epic
+  renders, recurrence flag, bare Slack ledger keys, a no-debt negative fixture) and a new
+  manual-acceptance item (M10).
+
+### Changed
+
+- **#85's remaining Phase-B surface closed as won't-do**: the `--debt`/`--risk`/`--deps`
+  query lenses (covered by the aggregate's sections), `--board` (a board is a saved JQL —
+  `--jql` covers it; the rejection now reads "not supported — use `--jql`"), and the
+  saved-scope config keys. The skill's Phase-B forward references are retired.
+
 ## [v0.7.5] — 2026-06-08 · Self-collision guard on /handoff
 
 ### Added
