@@ -177,6 +177,8 @@ Top risks:                                   (omit if none)
 - <CHILD-KEY: risk one-liner, business framing; risk-bearing children first>
 Dependencies:                                (omit if none)
 - <CHILD-A → CHILD-B: what blocks what>
+Debt:                                        (omit if none)
+- <CHILD-KEY: parked tradeoff carried forward, business framing (+ follow-up KEY if named)>
 Cost:         <summed infra + inference $ — approximate, from K children>   (omit if none)
 By child:
 - <CHILD-KEY "<title>" — plain status (confidence)>
@@ -195,6 +197,8 @@ By child:
 - <CHILD-KEY "<title>" — Status; next: <first Next bullet>; risk: <Risk if any, else —>>
 Open risks / blockers:                       (omit if none)
 - <CHILD-KEY: risk/blocker>
+Parked debt:                                 (omit if none)
+- <CHILD-KEY · deferred decision · follow-up KEY (omit if not named)>
 Excluded: <K no [CTX] (J malformed)>         (omit if zero)
 ```
 
@@ -205,7 +209,17 @@ single-ticket emphasis:
   Status + Next only.
 - **pm** — plain-language portfolio: `Health` and `Confidence` first, `By child` as one plain
   sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
-- **self** — terse: `Health` line + the `By child` list (plus the `Not yet reporting:` / coverage tail — never drop no-`[CTX]` tickets).
+- **self** — terse: `Health` line + the `By child` list, then a terse `Parked debt:` tail
+  (one ledger line per `[debt]` item, same `KEY · decision · follow-up KEY` shape — your
+  own parked debt; omit when empty), plus the
+  `Not yet reporting:` / coverage tail — never drop no-`[CTX]` tickets.
+
+**Parked debt is an oversight signal** — it renders only in `--for-exec` (`Debt:`, business
+framing), `--for-eng` (`Parked debt:`, technical, with the follow-up key), and `--for-self`
+(terse `Parked debt:` tail). `--for-pm` / `--for-ops` omit it (not their altitude). An empty ledger omits
+the section entirely, like `Top risks:`. The recurrence-flagged risk lines render wherever
+the lens's existing risk section already renders (`Top risks:` in exec, `Open risks /
+blockers:` in eng) — the flag is a phrasing addition, not a new slot.
 
 All five keep the coverage figure in the header line (`Epic · <coverage>`) so the reader knows how complete the rollup is.
 
@@ -335,8 +349,9 @@ of Markdown:
 (rendered via *Aggregate render*), the `--blocked` entries, and the `--standup` bucket
 entries (under the day headers) — render its **leading key** as a Slack link
 `<https://<site>/browse/KEY|KEY>`, where `<site>` is the Atlassian site resolved in §3.
-Even in Slack, inline mentions (`Health:`, `Top risks:`, `Dependencies:` edges) and the
-`Not yet reporting:` / `No movement:` tails stay bare. This is the **only** place keys are
+Even in Slack, inline mentions (`Health:`, `Top risks:`, `Dependencies:` edges, the
+`Debt:` / `Parked debt:` ledger lines) and the `Not yet reporting:` / `No movement:` tails
+stay bare. This is the **only** place keys are
 linked — printed renders leave them bare. Inline / tail keys stay bare even here.
 
 All read semantics (strict `[CTX]` extraction, error handling) are unchanged from the default
