@@ -17,20 +17,45 @@ extracting `[CTX]` state.
 fails, or the site can't be resolved, this is a hard stop** (see Error behavior) — `next`
 cannot do its job without Jira read access.
 
-## 2. Query the tickets
+## 2. Resolve the project scope (git / local)
 
-`searchJiraIssuesUsingJql`. Default JQL:
+The default query is always scoped to the current repo's Jira project — never a
+site-wide dump of everything assigned to you. **Skip this step entirely when
+`next.jql` is set** — the override is the user's verbatim query and owns its own
+scoping.
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-project-scope.sh"
+```
+
+(From the repo root: `plugins/bitacora/scripts/resolve-project-scope.sh`.) The script
+reads the repo's git remote (`origin`, else the first remote), normalizes it to a
+lowercase `host/owner/repo` slug, and resolves it through the
+`next.remote_project_map` config table (repo-level `.bitacora.yml` entry overrides
+the `~/.claude/bitacora.yml` one, per slug — see Configuration).
+
+- **Exit 0** — stdout is the Jira project key; inject `AND project = <KEY>` into the
+  default JQL (step 3).
+- **Any non-zero exit** — **hard stop.** Relay the script's stderr message verbatim:
+  for an unmapped slug (exit 3) it names the detected slug and shows the exact YAML
+  to add; for a missing repo/remote (exit 4) it states the reason. Do **not** fall
+  back to an unscoped query.
+
+## 3. Query the tickets
+
+`searchJiraIssuesUsingJql`. Default JQL (`<KEY>` is the project key from step 2):
 
 ```
-assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC
+assignee = currentUser() AND project = <KEY> AND statusCategory != Done ORDER BY updated DESC
 ```
 
 Capped at ~50 results. `.bitacora.yml` → `next.jql` overrides the default verbatim
-(no merging, no silent fallback). Request the fields needed for ranking: `summary`,
+(no merging, no silent fallback, no scope injection — the override owns its scoping
+and step 2 is skipped entirely). Request the fields needed for ranking: `summary`,
 `status` (with `statusCategory`), `priority`, `issuetype`, `updated`, time-tracking and
 story-points fields, and `issuelinks`. Empty result is **not** an error — see Edge behavior.
 
-## 3. Gather signals (bounded [CTX] read)
+## 4. Gather signals (bounded [CTX] read)
 
 From the search result, extract per ticket: status + `statusCategory`, priority, issue
 type, `updated`, effort estimate (story points or time-tracking, whichever the project
@@ -46,7 +71,7 @@ cutoff governs morning latency cost, not what counts as "stale".)
 
 For each Continue candidate, pull the latest compliant `[CTX]`'s `Status` and `Next` lines.
 
-## 4. Categorize
+## 5. Categorize
 
 Degrade gracefully when a signal is missing — never invent one.
 
@@ -60,7 +85,7 @@ Degrade gracefully when a signal is missing — never invent one.
   `is blocked by` links and silent ≥ a few days) or stale (`updated` older than
   `next.stale_days`, default 30). For cleanup awareness, not selection.
 
-## 5. Reason-to-pick
+## 6. Reason-to-pick
 
 One phrase per ticket, grounded in an **actual signal** and citing it. Examples:
 
@@ -71,13 +96,13 @@ One phrase per ticket, grounded in an **actual signal** and citing it. Examples:
 Never invent a reason not supported by the data. If nothing strong is available, a brief
 status-and-activity phrase is fine (*"in progress, last touched 3d ago"*).
 
-## 6. Recommend
+## 7. Recommend
 
 Exactly one `★` arrow on the single best item: the top **Continue** candidate, else the
 top **Ready to start**. Never mark more than one; never mark a Quick win or a
 Needs-attention item.
 
-## 7. Render the shortlist
+## 8. Render the shortlist
 
 3 buckets + a single-line **Needs attention** tail. Footer offers exactly two actions:
 rehydrate the chosen ticket via the already-shipped `/bitacora:resume`, or re-run for a
@@ -111,6 +136,12 @@ Print, then stop. Read-only — no gate, no write.
 - **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
   reason and point to MCP setup. Do not pretend a local-only fallback — without Jira read,
   there is nothing to pick from.
+- **No project scope** (repo's remote slug not in `next.remote_project_map`, repo has
+  no remote, or the project dir is not a git repo) and no `next.jql` override:
+  **hard stop.** Relay `resolve-project-scope.sh`'s stderr verbatim (for an unmapped
+  slug it names the detected slug and the exact YAML to add). Never degrade to the
+  unscoped site-wide query — that surfaces another project's backlog with full
+  confidence (#118).
 - **Empty result:** say "nothing open assigned to you — inbox zero"; not an error.
 - **Bad override JQL** (`next.jql` set, server returns a parse / field error): surface the
   offending query and Jira's error message; stop. Do **not** silently fall back to the
@@ -134,17 +165,27 @@ Print, then stop. Read-only — no gate, no write.
 
 Reuses `project_key_pattern`, the strict `[CTX]` read modes, and `jira_cloud_id` from the
 `bitacora:jira-comment-format` / handoff config (`${CLAUDE_PROJECT_DIR}/.bitacora.yml`
-then `~/.claude/bitacora.yml`; absence is normal). Two optional additions:
+then `~/.claude/bitacora.yml`; absence is normal). Optional additions:
 
 ```yaml
 next:
   # The default JQL is:
-  #   assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC
-  # Override below for team-scoped pickers. Teammates must be referenced by Jira
-  # accountId — `assignee in (...)` does not accept email addresses or usernames
-  # in Jira Cloud (GDPR-era privacy migration). Use `lookupJiraAccountId` to
-  # resolve a teammate's email → accountId once, then paste the accountId here.
-  jql: ""            # overrides the default query verbatim when set; e.g.:
+  #   assignee = currentUser() AND project = <KEY> AND statusCategory != Done ORDER BY updated DESC
+  # where <KEY> comes from remote_project_map below. Override the whole query for
+  # team-scoped pickers. Teammates must be referenced by Jira accountId —
+  # `assignee in (...)` does not accept email addresses or usernames in Jira Cloud
+  # (GDPR-era privacy migration). Use `lookupJiraAccountId` to resolve a teammate's
+  # email → accountId once, then paste the accountId here.
+  jql: ""            # overrides the default query verbatim when set (owns its own
+                     # scoping; remote_project_map is not consulted); e.g.:
                      #   "assignee in (currentUser(), 5a17b8c2..., 5b22d9e3...) AND statusCategory != Done ORDER BY updated DESC"
   stale_days: 30     # "stale" threshold for the Needs-attention tail
+  # Git-remote → Jira-project table that scopes the default query. The repo's
+  # remote is normalized to a lowercase host/owner/repo slug and resolved here;
+  # no entry → hard stop (never an unscoped dump). Keep the central table in
+  # ~/.claude/bitacora.yml; a repo-level .bitacora.yml entry overrides the home
+  # one for the same slug.
+  remote_project_map:
+    "github.com/org/ai-advisor-portal": "AT"
+    "github.com/org/some-other-repo": "TESTING"
 ```

@@ -47,3 +47,5 @@ jobs:
         run: bash plugins/bitacora/scripts/test-sync-statusline.sh
       - name: Run handoff guardrail hook tests
         run: bash plugins/bitacora/scripts/test-precompact-handoff-check.sh
+      - name: Run resolve-project-scope tests
+        run: bash plugins/bitacora/scripts/test-resolve-project-scope.sh
