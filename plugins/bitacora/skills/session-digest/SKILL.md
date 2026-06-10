@@ -27,8 +27,8 @@ happens to match one ticket (degenerate one-item digest) both proceed normally.
   `--sprint`, `--jql "<JQL>"`, or **two or more** `project_key_pattern` keys in the
   arguments. Multi-ticket mode activates **iff** a scope flag is present or 2+ keys are
   passed — a single epic key keeps the epic-rollup behavior. `--board <id|name>` is
-  **reserved for a later phase**: if passed, say it is not yet supported and stop (do not
-  silently fall back).
+  **not supported** (a board is a saved JQL — use `--jql`): if passed, say exactly that
+  and stop (do not silently fall back).
 - **Query lens (multi-ticket only).** `--blocked` or `--standup` selects *what to surface*
   across the scope; with neither, the default is the cross-ticket digest (§6). Query lenses
   compose with the `--for-*` audience lens, which still selects altitude. A query lens with
@@ -50,8 +50,9 @@ happens to match one ticket (degenerate one-item digest) both proceed normally.
   See §6's *Slack mrkdwn rendering* sub-section for the rendering rules.
 
 The multi-ticket default audience is `self`. `--blocked`, `--standup`, and the aggregate all
-honor an explicit `--for-*`; `--debt`/`--risk` will read naturally at `--for-eng`/`exec` when
-they land in Phase B.
+honor an explicit `--for-*`. There is no `--debt` / `--risk` / `--deps` query lens — parked
+debt is an aggregate **section** (§5), and the risk / dependency views are the aggregate's
+existing Risk-concentration and Dependency-graph signals.
 
 ## 2. Resolve the aggregate target
 
@@ -128,10 +129,20 @@ same **no-invention** rule applies; never synthesize a number or claim a ticket 
 - **Confidence distribution** — tally the `(confidence: …)` cues across reporting tickets
   (`high ×A · medium ×B · low ×C`). Omit tickets that carry no cue from the tally.
 - **Risk concentration** — the tickets carrying `Risk:` or `Blockers:`, listed risk-bearing first,
-  one line each. Empty if none.
+  one line each. When the same surface or dependency recurs across 2+ tickets, flag it as
+  **concentrated** — name the recurring surface once and list the tickets sharing it
+  (`Concentrated: <surface> recurs across KEY-A + KEY-B`, extending with `+ KEY-C` for each
+  additional ticket; append the line after the per-ticket risk lines). Recurrence is evidence-based:
+  only flag a surface the bullets actually share; never infer a theme. Empty if none.
 - **Dependency graph** — parse each ticket's `Dependencies:`; when a dependency names another ticket
   in the same set, render it as an edge `KEY-A → KEY-B (what blocks what)`. Cross-set deps are
   listed as plain bullets. Empty if none.
+- **Parked debt** — every `[debt]`-tagged `Decisions:` bullet across the reporting tickets,
+  grouped by ticket in `By ticket:` / `By child:` order — one ledger line each:
+  `KEY · the deferred decision · follow-up KEY` — omit the follow-up segment when the
+  bullet names none. Empty if none. No new data is read — this is a pivot on the `[debt]` tags the strict read already
+  captures. Same **no-invention** rule: only `[debt]` tags that actually exist; never
+  synthesize a debt item.
 - **Cost rollup** — sum the numeric infra + inference `$` values across tickets that report them;
   label it **approximate** and note how many tickets contributed. Omit if no ticket reports cost.
 - **Coverage** — `N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms — plus any truncation note from
@@ -167,6 +178,8 @@ Top risks:                                   (omit if none)
 - <CHILD-KEY: risk one-liner, business framing; risk-bearing children first>
 Dependencies:                                (omit if none)
 - <CHILD-A → CHILD-B: what blocks what>
+Debt:                                        (omit if none)
+- <CHILD-KEY: parked tradeoff carried forward, business framing (+ follow-up KEY if named)>
 Cost:         <summed infra + inference $ — approximate, from K children>   (omit if none)
 By child:
 - <CHILD-KEY "<title>" — plain status (confidence)>
@@ -185,6 +198,8 @@ By child:
 - <CHILD-KEY "<title>" — Status; next: <first Next bullet>; risk: <Risk if any, else —>>
 Open risks / blockers:                       (omit if none)
 - <CHILD-KEY: risk/blocker>
+Parked debt:                                 (omit if none)
+- <CHILD-KEY · deferred decision · follow-up KEY (omit if not named)>
 Excluded: <K no [CTX] (J malformed)>         (omit if zero)
 ```
 
@@ -195,7 +210,17 @@ single-ticket emphasis:
   Status + Next only.
 - **pm** — plain-language portfolio: `Health` and `Confidence` first, `By child` as one plain
   sentence each, `Risks / needs` framed as asks; strip PR/commit hashes, keep the ticket link.
-- **self** — terse: `Health` line + the `By child` list (plus the `Not yet reporting:` / coverage tail — never drop no-`[CTX]` tickets).
+- **self** — terse: `Health` line + the `By child` list, then a terse `Parked debt:` tail
+  (one ledger line per `[debt]` item, same `KEY · decision · follow-up KEY` shape — your
+  own parked debt; omit when empty), plus the
+  `Not yet reporting:` / coverage tail — never drop no-`[CTX]` tickets.
+
+**Parked debt is an oversight signal** — it renders only in `--for-exec` (`Debt:`, business
+framing), `--for-eng` (`Parked debt:`, technical, with the follow-up key), and `--for-self`
+(terse `Parked debt:` tail). `--for-pm` / `--for-ops` omit it (not their altitude). An empty ledger omits
+the section entirely, like `Top risks:`. The recurrence-flagged risk lines render wherever
+the lens's existing risk section already renders (`Top risks:` in exec, `Open risks /
+blockers:` in eng) — the flag is a phrasing addition, not a new slot.
 
 All five keep the coverage figure in the header line (`Epic · <coverage>`) so the reader knows how complete the rollup is.
 
@@ -325,8 +350,9 @@ of Markdown:
 (rendered via *Aggregate render*), the `--blocked` entries, and the `--standup` bucket
 entries (under the day headers) — render its **leading key** as a Slack link
 `<https://<site>/browse/KEY|KEY>`, where `<site>` is the Atlassian site resolved in §3.
-Even in Slack, inline mentions (`Health:`, `Top risks:`, `Dependencies:` edges) and the
-`Not yet reporting:` / `No movement:` tails stay bare. This is the **only** place keys are
+Even in Slack, inline mentions (`Health:`, `Top risks:`, `Dependencies:` edges, the
+`Debt:` / `Parked debt:` ledger lines) and the `Not yet reporting:` / `No movement:` tails
+stay bare. This is the **only** place keys are
 linked — printed renders leave them bare. Inline / tail keys stay bare even here.
 
 All read semantics (strict `[CTX]` extraction, error handling) are unchanged from the default
@@ -372,7 +398,7 @@ Print the render, then offer/copy to clipboard exactly as `bitacora:session-stat
 - **All reporting tickets have no `[CTX]`:** render the coverage line and the per-ticket
   Status/title list for orientation; suggest `/bitacora:handoff` on them. Nothing to aggregate
   or filter.
-- **`--board` passed:** not yet supported (Phase B); say so and stop.
+- **`--board` passed:** not supported (a board is a saved JQL — use `--jql`); say so and stop.
 - **Bad `--jql` / unknown field:** surface the JQL error verbatim; stop. No retry loop.
 - **Invalid / conflicting mode flag:** error listing the valid modes; do not guess.
 

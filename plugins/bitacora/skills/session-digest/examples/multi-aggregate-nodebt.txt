@@ -1,0 +1,6 @@
+Scope: 2 keys — 2 tickets (1 reporting, 1 no [CTX])
+
+Health: on track — UI-30 in review, no open risks or blockers
+By ticket:
+- UI-30 "Settings page redesign" — In Review
+Not yet reporting: PERF-9
