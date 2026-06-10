@@ -53,8 +53,8 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
 - [ ] **M5 — cap disclosure:** A scope matching more than `multi_fanout_cap` (default 25). →
       `showing N of M — narrow with --jql`; no silent truncation.
 - [ ] **M6 — empty + single + board:** `/bitacora:digest --mine` matching zero → plain "matched nothing";
-      a scope resolving to exactly one → single-ticket render; `--board X` → "not yet
-      supported" and stop.
+      a scope resolving to exactly one → single-ticket render; `--board X` → "not
+      supported — use `--jql`" and stop.
 - [ ] **M7 — audience compose:** `/bitacora:digest --mine --blocked --for-exec`. → `--blocked`
       content rendered at exec altitude (PR/commit hashes stripped, asks framed).
 - [ ] **M8 — routing:** `/bitacora:digest EPIC-1` rolls up the epic across its children;
@@ -64,6 +64,15 @@ Jira project. Install locally first: `/plugin marketplace add <path-to-this-repo
       `--standup` / epic rollup via `/bitacora:digest EPIC-1`). → The **printed** render shows
       **bare** keys (no inline links). Re-run with `--copy-as-slack`. → The copied Slack text
       renders each per-ticket index entry's key as `<url|KEY>`; inline / tail keys stay bare.
+- [ ] **M10 — parked-debt ledger:** Run `/bitacora:digest --mine` (or 2+ keys) and
+      `/bitacora:digest EPIC-1` over scopes where at least one ticket's latest `[CTX]`
+      carries a `[debt]`-tagged `Decisions:` bullet. → The aggregate shows the ledger
+      (exec `Debt:` business framing, eng `Parked debt:` with the follow-up key, self
+      terse tail), grouped by ticket; **only real `[debt]` tags** appear (no invention)
+      and follow-up links are correct. The `Concentrated:` risk flag fires only when 2+
+      tickets genuinely share a surface — never on an inferred theme. `--for-pm` /
+      `--for-ops` omit the section; a scope with no `[debt]` tags renders no debt
+      section at all.
 
 ## Collision detection on `/handoff` (v1)
 
