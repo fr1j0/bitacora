@@ -31,3 +31,6 @@ build/
 
 # Bitácora per-project state (handoff marker for the statusLine indicator)
 .bitacora/
+
+# Python bytecode cache (demo/ scripts)
+__pycache__/
