@@ -13,6 +13,10 @@
 #
 # Scenario constants (change here if the fixtures' scenario changes):
 #   reporting: AUTH-12, DATA-77, UI-30   no-[CTX]: PERF-9   external dep: PLATFORM-4
+#   debt: DATA-77 carries a [debt] decision with follow-up DATA-81 (multi scenario);
+#         CHECKOUT-101 carries one with follow-up CHECKOUT-104 (epic scenario)
+#   recurrence: "peak traffic" recurs across CHECKOUT-101 + CHECKOUT-102 (epic scenario)
+#   negative: multi-aggregate-nodebt.txt is a 2-ticket no-debt scope (section omitted)
 #   coverage:  "4 tickets (3 reporting, 1 no [CTX])"
 set -uo pipefail
 DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -24,8 +28,9 @@ STD="$EX/multi-standup.txt"
 EPE="$EX/epic-exec.txt"
 EPG="$EX/epic-eng.txt"
 SLK="$EX/multi-aggregate-slack.txt"
+NDB="$EX/multi-aggregate-nodebt.txt"
 COVERAGE="4 tickets (3 reporting, 1 no [CTX])"
-ALLOWED="AUTH-12 DATA-77 UI-30 PERF-9 PLATFORM-4"
+ALLOWED="AUTH-12 DATA-77 UI-30 PERF-9 PLATFORM-4 DATA-81"
 
 fail=0
 pass() { echo "PASS: $1"; }
@@ -41,7 +46,7 @@ check_hasnot() { # file, substring, label
 }
 
 # 0. fixtures exist
-for f in "$AGG" "$BLK" "$STD"; do
+for f in "$AGG" "$BLK" "$STD" "$NDB"; do
   [ -f "$f" ] || bad "fixture missing: $f"
 done
 
@@ -51,7 +56,7 @@ for f in "$AGG" "$BLK" "$STD"; do
 done
 
 # 2. terminology guard — multi-ticket default is the cross-ticket digest, not a "portfolio"
-for f in "$AGG" "$BLK" "$STD"; do
+for f in "$AGG" "$BLK" "$STD" "$NDB"; do
   check_hasnot "$f" "portfolio" "no 'portfolio' in $(basename "$f")"
 done
 check_has    "$AGG" "By ticket:" "aggregate uses 'By ticket:'"
@@ -59,7 +64,7 @@ check_hasnot "$AGG" "By child:"  "aggregate avoids 'By child:'"
 
 # 3. ticket-key universe — every ABC-123 key must be in the allowed set
 keyfail=0
-for f in "$AGG" "$BLK" "$STD"; do
+for f in "$AGG" "$BLK" "$STD" "$NDB"; do
   while read -r key; do
     [ -n "$key" ] || continue
     case " $ALLOWED " in
@@ -120,5 +125,22 @@ check_slack "$SLK" "AUTH-12" "slack digest Slack-links AUTH-12"
 check_slack "$SLK" "DATA-77" "slack digest Slack-links DATA-77"
 check_slack "$SLK" "UI-30"   "slack digest Slack-links UI-30"
 check_hasnot "$SLK" "/browse/PERF-9|" "slack digest leaves Not-yet-reporting PERF-9 bare"
+
+# 10. parked-debt ledger (D1/D5) — aggregate-only pivot on existing [debt] tags
+check_has    "$AGG" "Parked debt:"      "aggregate (self) renders the Parked debt tail"
+check_has    "$AGG" "follow-up DATA-81" "debt line carries the named follow-up"
+check_has    "$SLK" "Parked debt:"      "slack render keeps the Parked debt section"
+check_hasnot "$SLK" "/browse/DATA-81|"  "slack leaves debt-ledger keys bare (inline, not index)"
+check_has    "$EPE" "Debt:"             "epic exec renders the Debt line"
+check_has    "$EPG" "Parked debt:"      "epic eng renders the Parked debt line"
+check_has    "$EPG" "CHECKOUT-104"      "epic eng debt line names the follow-up"
+check_hasnot "$NDB" "Debt:"             "no-debt scenario omits the debt section entirely"
+check_hasnot "$NDB" "Parked debt:"      "no-debt scenario omits the Parked debt section too"
+check_hasnot "$BLK" "Parked debt:"      "--blocked does not grow a debt section"
+check_hasnot "$STD" "Parked debt:"      "--standup does not grow a debt section"
+
+# 11. risk-concentration recurrence flag (D3) — surface named once, tickets listed
+check_has "$EPE" "Concentrated: peak traffic recurs across CHECKOUT-101 + CHECKOUT-102" "exec flags the concentrated surface"
+check_has "$EPG" "Concentrated: peak traffic recurs across CHECKOUT-101 + CHECKOUT-102" "eng flags the concentrated surface"
 
 exit $fail

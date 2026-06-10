@@ -6,8 +6,12 @@ Confidence:   high ×1 · medium ×1 · low ×1   (across 3 reporting children)
 Top risks:
 - CHECKOUT-103: checkout layout overflows on narrow viewports, unresolved before release
 - CHECKOUT-102: model drift could exceed threshold under peak traffic (mitigated by the soak)
+- CHECKOUT-101: serving capacity headroom under peak traffic unverified until the canary completes
+- Concentrated: peak traffic recurs across CHECKOUT-101 + CHECKOUT-102
 Dependencies:
 - CHECKOUT-103 → CHECKOUT-102: the checkout UI waits on the new ranking model
+Debt:
+- CHECKOUT-101: legacy REST serving path kept alive behind a flag — decommission parked (follow-up CHECKOUT-104)
 Cost:         ~+0.4¢ per prediction, plus extra serving nodes (approximate, from 2 children)
 By child:
 - CHECKOUT-101 "Serving cluster migration" — on track (high)

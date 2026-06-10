@@ -5,4 +5,6 @@ By ticket:
 • <https://example.atlassian.net/browse/AUTH-12|AUTH-12> "OAuth token refresh" — In Progress (confidence: medium)
 • <https://example.atlassian.net/browse/DATA-77|DATA-77> "Feature store migration" — In Progress (confidence: high)
 • <https://example.atlassian.net/browse/UI-30|UI-30> "Settings page redesign" — In Review
+Parked debt:
+• DATA-77 · dual-write to the legacy store kept through the migration — cutover cleanup deferred · follow-up DATA-81
 Not yet reporting: PERF-9
