@@ -149,3 +149,10 @@ account or teammate; do it opportunistically when one is available.)
       (a non-epic key) → "That's a single ticket — use /bitacora:status AT-1234"; no render.
       `/bitacora:status AT-EPIC` (an epic) → renders the epic's own [CTX] as one node (or the
       no-[CTX] line + a /bitacora:digest pointer).
+
+## Release hygiene
+
+- [ ] **README demo still truthful:** if this release changed user-visible
+      `/bitacora:handoff` or `/bitacora:resume` output, edit the scenario in
+      `demo/generate.py` and re-run `demo/build.sh` so `demo/bitacora-demo.gif`
+      matches what ships.
