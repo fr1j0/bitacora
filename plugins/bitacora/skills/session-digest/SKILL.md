@@ -128,10 +128,20 @@ same **no-invention** rule applies; never synthesize a number or claim a ticket 
 - **Confidence distribution** — tally the `(confidence: …)` cues across reporting tickets
   (`high ×A · medium ×B · low ×C`). Omit tickets that carry no cue from the tally.
 - **Risk concentration** — the tickets carrying `Risk:` or `Blockers:`, listed risk-bearing first,
-  one line each. Empty if none.
+  one line each. When the same surface or dependency recurs across 2+ tickets, flag it as
+  **concentrated** — name the recurring surface once and list the tickets sharing it
+  (`Concentrated: <surface> recurs across KEY-A + KEY-B`, extending with `+ KEY-C` for each
+  additional ticket; append the line after the per-ticket risk lines). Recurrence is evidence-based:
+  only flag a surface the bullets actually share; never infer a theme. Empty if none.
 - **Dependency graph** — parse each ticket's `Dependencies:`; when a dependency names another ticket
   in the same set, render it as an edge `KEY-A → KEY-B (what blocks what)`. Cross-set deps are
   listed as plain bullets. Empty if none.
+- **Parked debt** — every `[debt]`-tagged `Decisions:` bullet across the reporting tickets,
+  grouped by ticket in `By ticket:` / `By child:` order — one ledger line each:
+  `KEY · the deferred decision · follow-up KEY` — omit the follow-up segment when the
+  bullet names none. Empty if none. No new data is read — this is a pivot on the `[debt]` tags the strict read already
+  captures. Same **no-invention** rule: only `[debt]` tags that actually exist; never
+  synthesize a debt item.
 - **Cost rollup** — sum the numeric infra + inference `$` values across tickets that report them;
   label it **approximate** and note how many tickets contributed. Omit if no ticket reports cost.
 - **Coverage** — `N tickets (M reporting, K no [CTX], J malformed, U unreadable)`, dropping any zero terms — plus any truncation note from
