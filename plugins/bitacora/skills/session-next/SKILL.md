@@ -164,7 +164,7 @@ Print, then stop. Read-only — no gate, no write.
 
 Reuses `project_key_pattern`, the strict `[CTX]` read modes, and `jira_cloud_id` from the
 `bitacora:jira-comment-format` / handoff config (`${CLAUDE_PROJECT_DIR}/.bitacora.yml`
-then `~/.claude/bitacora.yml`; absence is normal). Two optional additions:
+then `~/.claude/bitacora.yml`; absence is normal). Optional additions:
 
 ```yaml
 next:
