@@ -27,8 +27,8 @@ happens to match one ticket (degenerate one-item digest) both proceed normally.
   `--sprint`, `--jql "<JQL>"`, or **two or more** `project_key_pattern` keys in the
   arguments. Multi-ticket mode activates **iff** a scope flag is present or 2+ keys are
   passed — a single epic key keeps the epic-rollup behavior. `--board <id|name>` is
-  **reserved for a later phase**: if passed, say it is not yet supported and stop (do not
-  silently fall back).
+  **not supported** (a board is a saved JQL — use `--jql`): if passed, say exactly that
+  and stop (do not silently fall back).
 - **Query lens (multi-ticket only).** `--blocked` or `--standup` selects *what to surface*
   across the scope; with neither, the default is the cross-ticket digest (§6). Query lenses
   compose with the `--for-*` audience lens, which still selects altitude. A query lens with
@@ -50,8 +50,9 @@ happens to match one ticket (degenerate one-item digest) both proceed normally.
   See §6's *Slack mrkdwn rendering* sub-section for the rendering rules.
 
 The multi-ticket default audience is `self`. `--blocked`, `--standup`, and the aggregate all
-honor an explicit `--for-*`; `--debt`/`--risk` will read naturally at `--for-eng`/`exec` when
-they land in Phase B.
+honor an explicit `--for-*`. There is no `--debt` / `--risk` / `--deps` query lens — parked
+debt is an aggregate **section** (§5), and the risk / dependency views are the aggregate's
+existing Risk-concentration and Dependency-graph signals.
 
 ## 2. Resolve the aggregate target
 
@@ -397,7 +398,7 @@ Print the render, then offer/copy to clipboard exactly as `bitacora:session-stat
 - **All reporting tickets have no `[CTX]`:** render the coverage line and the per-ticket
   Status/title list for orientation; suggest `/bitacora:handoff` on them. Nothing to aggregate
   or filter.
-- **`--board` passed:** not yet supported (Phase B); say so and stop.
+- **`--board` passed:** not supported (a board is a saved JQL — use `--jql`); say so and stop.
 - **Bad `--jql` / unknown field:** surface the JQL error verbatim; stop. No retry loop.
 - **Invalid / conflicting mode flag:** error listing the valid modes; do not guess.
 
