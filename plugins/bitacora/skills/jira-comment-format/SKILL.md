@@ -275,3 +275,18 @@ digest:
 
 Resolution per key: `digest.<key>` → legacy `status.<key>` → built-in default.
 `status.ctx_lookback` and `status.default_mode` remain single-ticket-only.
+
+`/bitacora:next` reads its own `next.*` keys (full semantics in `session-next`):
+
+```yaml
+next:
+  jql: ""              # verbatim override of the default picker query (owns its own scoping)
+  stale_days: 30       # "stale" threshold for the Needs-attention tail
+  remote_project_map:  # git-remote slug → Jira project key; scopes the default query.
+    "github.com/org/repo": "AT"
+```
+
+One exception to the file-level "repo `.bitacora.yml` *else* home" rule above:
+`next.remote_project_map` is consulted **per slug across both files** (a repo-level
+entry overrides the home one for the same slug), so the home file can stay the
+central table while individual repos override their own mapping.
