@@ -37,8 +37,6 @@ jobs:
         run: bash plugins/bitacora/scripts/test-staleness-check.sh
       - name: Run digest fixture tests
         run: bash plugins/bitacora/scripts/test-digest-fixtures.sh
-      - name: Run standup-buckets tests
-        run: bash plugins/bitacora/scripts/test-standup-buckets.sh
       - name: "Run /bit: alias sync tests"
         run: bash plugins/bitacora/scripts/test-sync-bit-aliases.sh
       - name: Run statusline tests

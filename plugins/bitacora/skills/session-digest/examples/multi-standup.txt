@@ -1,17 +1,15 @@
-Standup — since 1d · 4 tickets (3 reporting, 1 no [CTX])
+## Standup — 2024-01-09
+_since 1d · 4 tickets (3 reporting, 1 no [CTX])_
 
-Yesterday:
-- AUTH-12 "OAuth callback handling" — In Review
-    Did: handled the error-redirect edge case
-    Next: address review comments
-- DATA-77 "Feature store migration" — In Progress
-    Did: cut over the read path to the new store; backfill verified
-    Next: enable dual-write, monitor lag
-    ⚠ drift PSI could exceed threshold under May traffic
+### Yesterday
+- AUTH-12 "OAuth callback handling" `In Review` — handled the error-redirect edge case
+- DATA-77 "Feature store migration" `In Progress` — cut over the read path to the new store; backfill verified; enabled dual-write; replication lag holding under 200ms
 
-Today:
-- DATA-77 "Feature store migration" — In Progress
-    Did: enabled dual-write; replication lag holding under 200ms
-    Next: monitor 24h, then retire the old store
+### Today
+- AUTH-12 — address review comments
+- DATA-77 — monitor 24h, then retire the old store
 
-No movement: UI-30
+### Blockers
+- DATA-77 — drift PSI could exceed threshold under May traffic
+
+_No movement: UI-30_

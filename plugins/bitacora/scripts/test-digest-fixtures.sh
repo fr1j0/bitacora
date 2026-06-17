@@ -87,22 +87,20 @@ check_hasnot "$BLK" "UI-30"          "blocked omits non-blocked UI-30"
 check_has    "$BLK" "stale 2d"       "blocked shows staleness (stale 2d)"
 check_has    "$BLK" "Clear: 2 of 3"  "blocked clear-count math (2 of 3)"
 
-# 6. --standup lens — since 1d window, two-bucket day render.
-#    AUTH-12 + DATA-77 moved yesterday; DATA-77 also moved today (appears in BOTH
-#    buckets); UI-30 has a [CTX] but none in-window; PERF-9 has no [CTX] at all.
-check_has    "$STD" "Standup — since 1d"   "standup header carries the window token"
-check_has    "$STD" "Yesterday:"           "standup renders the past (Yesterday) bucket"
-check_has    "$STD" "Today:"               "standup renders the Today bucket"
-check_has    "$STD" "AUTH-12"              "standup lists AUTH-12 (moved yesterday)"
-check_has    "$STD" "No movement: UI-30"   "standup No-movement lists the in-window non-mover"
-check_hasnot "$STD" "PERF-9"               "standup omits the no-[CTX] ticket from movement lines"
-check_hasnot "$STD" "Moved:"               "standup uses day buckets, not a flat Moved: block"
-# DATA-77 spans both buckets → it must appear at least twice.
-if (( $(grep -c "DATA-77" "$STD") >= 2 )); then
-  pass "standup shows DATA-77 in both buckets (>=2 occurrences)"
-else
-  bad "standup should show DATA-77 in both Yesterday and Today (>=2 occurrences)"
-fi
+# 6. --standup lens — done/planned/blocked render (format-match).
+#    AUTH-12 + DATA-77 have in-window [CTX] (DATA-77 spans two days, all Did
+#    fold into Yesterday); UI-30 has a [CTX] but none in-window; PERF-9 has none.
+check_has    "$STD" "## Standup —"       "standup uses the markdown title heading"
+check_has    "$STD" "since 1d"           "standup subtitle carries the window token"
+check_has    "$STD" "### Yesterday"      "standup renders the Yesterday (done) section"
+check_has    "$STD" "### Today"          "standup renders the Today (planned) section"
+check_has    "$STD" "### Blockers"       "standup renders the Blockers section"
+check_has    "$STD" '`In Review`'        "standup tags per-ticket Jira status (inline code)"
+check_has    "$STD" "AUTH-12"            "standup lists AUTH-12 (moved in-window)"
+check_has    "$STD" "No movement: UI-30" "standup No-movement lists the in-window non-mover"
+check_hasnot "$STD" "PERF-9"             "standup omits the no-[CTX] ticket"
+check_hasnot "$STD" "Yesterday:"         "standup drops the old plain-label day bucket"
+check_hasnot "$STD" "Moved:"             "standup uses sections, not a flat Moved: block"
 
 # 7. since-window smoke — --standup rides this helper
 if "$SW" 1d 1704801600 >/dev/null 2>&1 && "$SW" last-working-day 1704801600 >/dev/null 2>&1; then
