@@ -260,7 +260,7 @@ If **no** ticket in the set is blocked, print `Nothing blocked across <coverage>
 `--for-pm`/`--for-exec` strip PR/commit hashes and frame `Waiting on:` as an ask; the other
 lenses keep references. See `examples/multi-blocked.txt`.
 
-### --standup — what moved, by day
+### --standup — done / planned / blocked
 
 Resolve the window cutoff with the helper (deterministic, pure-arithmetic UTC):
 
@@ -276,59 +276,66 @@ cutoff=$("${CLAUDE_PLUGIN_ROOT}/scripts/since-window.sh" "<token>")
 does **not** stop at the latest `[CTX]`. For each reporting ticket, take **every** compliant
 `[CTX]` whose `created >= cutoff` (the comments are already in hand from §4 — just stop
 discarding the earlier in-window ones; this is **no** extra API calls). A ticket with no
-in-window `[CTX]` has **not moved**. This per-`[CTX]` read is scoped to `--standup`;
-`--blocked`, the digest, and all epic paths keep latest-`[CTX]`-authoritative.
+in-window `[CTX]` has **not moved** — it falls to the `_No movement:_` tail. This per-`[CTX]`
+read is scoped to `--standup`; `--blocked`, the digest, and all epic paths keep
+latest-`[CTX]`-authoritative.
 
-**Bucket each in-window `[CTX]` by its UTC day.** Get today's day index once, and each
-`[CTX]`'s day index + weekday name, from the helper:
+**Semantic split — done / planned / blocked.** The standup is three sections, not a
+chronological log. There is **no** day-of-week bucketing (no Yesterday/Friday/Earlier
+derivation, no both-buckets duplication, no `standup-buckets.sh`). Map each reporting ticket's
+in-window `[CTX]` onto the three sections:
 
-```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/standup-buckets.sh" "<epoch>"   # prints "<day_index> <Weekday>"
-```
+- **Yesterday = done.** The `Did` (Done / status-change) text from **all** the ticket's
+  in-window `[CTX]`, joined in `created`-ascending order with `; `. One line per reporting
+  ticket — every reporting ticket moved in-window, so it always has a Yesterday line.
+- **Today = plan.** The `Next` bullet(s) from the ticket's **latest** in-window `[CTX]`
+  (earlier `Next`s are superseded). Omit a ticket whose latest in-window `[CTX]` carries no
+  `Next`.
+- **Blockers = stuck.** The `⚠` Risk / Blockers one-liner from each ticket that has one, one
+  bullet per ticket.
 
-- **Today** — `[CTX]` whose day index equals today's.
-- **Past** — `[CTX]` whose day index is *less than* today's (still ≥ cutoff).
+The past section is always literally `### Yesterday`; the actual window span lives in the
+subtitle. `--since 2d` widens the window but the heading stays `### Yesterday` per standup
+convention.
 
-Render the **past bucket first, then Today** (chronological). **Omit an empty bucket.** Within
-a bucket, order entries by `[CTX]` `created` descending. A ticket with in-window `[CTX]` on
-**both** the past day and today appears in **both** buckets, each line carrying that day's own
-`Did` / `Next` (within a bucket, the ticket's latest `[CTX]` in that bucket drives the line).
+**Per-ticket Jira status** is shown **once**, as an inline-code tag immediately after the
+title on the **Yesterday** line (every reporting ticket appears there). The Today and Blockers
+lines stay status-free to avoid repetition.
 
-**Past-bucket header** — derived from the distinct day indices present in the past bucket
-(call that set D; let `T` = today's day index):
+Render in the chosen lens (default `self`); `<date>` is today's UTC date (`date -u +%F`):
 
-- `|D| == 1` and that day is `T − 1` → **`Yesterday`**
-- `|D| == 1` and that day is `< T − 1` (the past day is not the immediate prior calendar
-  day — e.g. a weekend or non-working gap) → that **weekday name** (e.g. `Friday`)
-- `|D| > 1` (only possible with a wide `--since Nd`) → **`Earlier`**
+```markdown
+## Standup — <date>
+_since <token> · <coverage>_
 
-`Today` is always literally `Today`. Render in the chosen lens (default `self`):
-
-```
-Standup — since <token> · <coverage>
-
-<Yesterday | Friday | Earlier>:
-- <KEY> "<title>" — <Jira status>
-    Did: <Done / Status change from that day's [CTX]>
-    Next: <first Next bullet>
-    ⚠ <Risk or Blockers one-liner>            (only if present)
+### Yesterday
+- <KEY> "<title>" `<Jira status>` — <all in-window Did, joined "; ">
 - …
 
-Today:
-- <KEY> "<title>" — <Jira status>
-    Did: …
-    Next: …
+### Today
+- <KEY> — <Next from the latest in-window [CTX]>
 - …
 
-No movement: <KEY, KEY, …>   (reporting tickets with no in-window [CTX]; omit if none)
+### Blockers
+- <KEY> — <Risk / Blockers one-liner>
+
+_No movement: <KEY, KEY, …>_
 ```
 
-If nothing moved, print `No [CTX] activity since <token> across <coverage>.` The window is
-UTC-day-aligned (a deliberate v1 simplification — a Monday `last-working-day` run picks up
-Friday + weekend, all under the `Friday` header); `--since 2d` widens it. The per-ticket
-**staleness marker** (below) is printed **once per ticket**, on its entry in the **latest**
-bucket it appears in (Today if present, else the past bucket). See
-`examples/multi-standup.txt`.
+- **`### Blockers` is always rendered.** When no ticket has a blocker, its body is a single
+  `- _None_` line — the consistent, scannable three-section shape is the point.
+- **`### Yesterday` / `### Today`** are omitted only if genuinely empty: Yesterday is
+  effectively always present (a reporting ticket always has a `Did`); Today is empty only when
+  no reporting ticket's latest in-window `[CTX]` carries a `Next`.
+- **`_No movement: <KEY, …>_`** — trailing italic line listing the reporting tickets with no
+  in-window `[CTX]`; omit the line when none.
+- If nothing moved at all, print `No [CTX] activity since <token> across <coverage>.` and stop.
+- The window is UTC-day-aligned (a deliberate simplification — a Monday `last-working-day` run
+  picks up Friday + the weekend); `--since 2d` widens it.
+- The per-ticket **staleness marker** (below) is printed **once**, on the ticket's
+  `### Yesterday` line.
+
+See `examples/multi-standup.txt`.
 
 ### Slack mrkdwn rendering (when `--copy-as-slack` is set)
 
@@ -336,6 +343,8 @@ Render the **same content** as the chosen mode, but with Slack `mrkdwn` conventi
 of Markdown:
 
 - `*bold*` instead of `**bold**` (single asterisks for emphasis)
+- Markdown headings become bold lines: `## Standup — <date>` → `*Standup — <date>*`, and
+  each `### Heading` (e.g. `### Yesterday`) → `*Heading*` — Slack has no heading syntax
 - `<https://example.com|label>` instead of `[label](https://example.com)` (Slack
   angle-bracket link form with `|` as the label separator)
 - Plain bulleted lines (`• item` with U+2022) instead of Markdown lists (`- item`) —
@@ -347,8 +356,8 @@ of Markdown:
 
 **Ticket-key links (Slack only).** Printed renders show **bare** keys. Only under
 `--copy-as-slack` does each per-ticket **index entry** — the `By ticket:` / `By child:` lists
-(rendered via *Aggregate render*), the `--blocked` entries, and the `--standup` bucket
-entries (under the day headers) — render its **leading key** as a Slack link
+(rendered via *Aggregate render*), the `--blocked` entries, and the `--standup`
+Yesterday / Today / Blockers entries — render its **leading key** as a Slack link
 `<https://<site>/browse/KEY|KEY>`, where `<site>` is the Atlassian site resolved in §3.
 Even in Slack, inline mentions (`Health:`, `Top risks:`, `Dependencies:` edges, the
 `Debt:` / `Parked debt:` ledger lines) and the `Not yet reporting:` / `No movement:` tails
@@ -371,7 +380,7 @@ For each **reporting** ticket, run the drift check using its latest-`[CTX]` `cre
 ```
 
 When it returns `stale Nd`, suffix that ticket's per-index entry — `By ticket:` / `By child:`,
-`--blocked` entries, the `--standup` bucket entry in the ticket's latest bucket — with
+`--blocked` entries, the `--standup` `### Yesterday` line — with
 ` · ⚠ behind <N>d`, after the Jira status (and, in Slack, after the key-link). Fresh /
 no-`[CTX]` tickets get no marker. The marker is orthogonal to the query lens: it never
 changes `--blocked` / `--standup` selection, only annotates the entries a lens already shows.
