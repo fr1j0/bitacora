@@ -2,6 +2,26 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.7.7] — 2026-06-17 · done/planned/blocked standup
+
+### Changed
+
+- **`/digest --standup` restyled to the conventional standup shape** — a markdown
+  `## Standup — <date>` heading with a clean **Yesterday (done) / Today (planned) /
+  Blockers (stuck)** split, replacing the prior day-of-week bucket render. Yesterday
+  aggregates every in-window `[CTX]`'s `Did`; Today takes the latest `[CTX]`'s `Next`;
+  Blockers collects the per-ticket `⚠` one-liners. Per-ticket Jira status now shows once,
+  as an inline-code tag on the Yesterday line, and `### Blockers` always renders
+  (`- _None_` when empty) for a consistent, scannable shape. Slack-mrkdwn rendering maps
+  the `##`/`###` headings to `*bold*`. **No new flags.**
+  ([#125](https://github.com/fr1j0/bitacora/issues/125), [#124](https://github.com/fr1j0/bitacora/pull/124))
+
+### Removed
+
+- **Day-of-week standup bucketing** and its `standup-buckets.sh` helper (plus its test and
+  CI step) — superseded by the done/planned/blocked render. The window span now lives in
+  the subtitle; `since-window.sh` is unchanged.
+
 ## [v0.7.6] — 2026-06-10 · Parked-debt rollup in /digest
 
 ### Added
