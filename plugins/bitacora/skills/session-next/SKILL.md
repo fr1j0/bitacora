@@ -155,8 +155,12 @@ Print, then stop. Read-only — no gate, no write.
 On the **cli family** the scope *is* the current repo — do not run
 `resolve-project-scope.sh` and do not consult `next.remote_project_map`.
 
-Run `bitacora-tracker.sh doctor` first; on exit 5 surface the auth/install
-guidance and stop.
+Run the adapter's `doctor` preflight first; on exit 5 surface the auth/install
+guidance and stop:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" doctor
+```
 
 Fetch candidates with:
 
@@ -186,10 +190,13 @@ re-run.
 
 ## Error / edge behavior
 
-- **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
+- *(jira family)* **Atlassian MCP absent / auth fails / site unresolvable:** **hard stop.** Report the
   reason and point to MCP setup. Do not pretend a local-only fallback — without Jira read,
   there is nothing to pick from.
-- **No project scope** (repo's remote slug not in `next.remote_project_map`, repo has
+- *(cli family)* **`gh`/`glab` not installed or not authenticated** (`doctor` exit 5):
+  **hard stop.** Surface the adapter's auth/install guidance verbatim; do not degrade to an
+  unscoped or Jira query.
+- *(jira family)* **No project scope** (repo's remote slug not in `next.remote_project_map`, repo has
   no remote, or the project dir is not a git repo) and no `next.jql` override:
   **hard stop.** Relay `resolve-project-scope.sh`'s stderr verbatim (for an unmapped
   slug it names the detected slug and the exact YAML to add). Never degrade to the
