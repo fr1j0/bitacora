@@ -59,6 +59,9 @@ run comment 7 >/dev/null 2>&1; [[ $? -eq 2 ]] && echo "PASS: comment missing --b
 out="$(run edit-body 7 --body-file "$BODY")"; code=$?
 { [[ $code -eq 0 ]] && grep -q -- "issue edit 7 --body-file" "$GH_ARGS"; } \
   && echo "PASS: edit-body" || { echo "FAIL: edit-body → '$out' ($code)"; fail=1; }
+run edit-body 7 >/dev/null 2>&1; [[ $? -eq 2 ]] && echo "PASS: edit-body missing --body-file → 2" || { echo "FAIL: edit-body arg-guard"; fail=1; }
+run comment >/dev/null 2>&1; [[ $? -eq 2 ]] && echo "PASS: comment missing id → 2" || { echo "FAIL: comment id-guard"; fail=1; }
+run edit-body >/dev/null 2>&1; [[ $? -eq 2 ]] && echo "PASS: edit-body missing id → 2" || { echo "FAIL: edit-body id-guard"; fail=1; }
 
 # doctor passes when gh+jq present and authed
 run doctor >/dev/null 2>&1; [[ $? -eq 0 ]] && echo "PASS: doctor ok" || { echo "FAIL: doctor ok"; fail=1; }

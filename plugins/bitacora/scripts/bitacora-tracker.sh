@@ -38,10 +38,12 @@ gh_backend() {
         | jq '[.comments[] | {author: .author.login, createdAt: .createdAt, body: .body}]' ;;
     comment)
       local id="${1:-}"; shift || true
+      [[ -n "$id" ]] || die "comment needs <id> --body-file <f>"
       [[ "${1:-}" == "--body-file" && -n "${2:-}" ]] || die "comment needs <id> --body-file <f>"
       gh issue comment "$id" --body-file "$2" ;;
     edit-body)
       local id="${1:-}"; shift || true
+      [[ -n "$id" ]] || die "edit-body needs <id> --body-file <f>"
       [[ "${1:-}" == "--body-file" && -n "${2:-}" ]] || die "edit-body needs <id> --body-file <f>"
       gh issue edit "$id" --body-file "$2" ;;
     *) die "unknown verb '$verb'" ;;
