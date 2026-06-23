@@ -150,6 +150,12 @@ account or teammate; do it opportunistically when one is available.)
       `/bitacora:status AT-EPIC` (an epic) → renders the epic's own [CTX] as one node (or the
       no-[CTX] line + a /bitacora:digest pointer).
 
+## `next` — cli family (GitHub Issues)
+
+- [ ] **next (github):** in a GitHub-Issues repo with ≥1 issue assigned to you, run
+  `/bit:next`. Expect a categorized shortlist of *this repo's* issues — never a Jira
+  project's tickets, never an unscoped query.
+
 ## Release hygiene
 
 - [ ] **README demo still truthful:** if this release changed user-visible

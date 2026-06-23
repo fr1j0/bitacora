@@ -4,11 +4,30 @@ description: Morning ticket picker — query the tickets assigned to you, catego
 ---
 
 Read the tickets assigned to you and produce a categorized morning shortlist with a single
-recommendation. The edge over a native Jira board is that it leans on the `[CTX]` corpus —
+recommendation. The edge over a native tracker board is that it leans on the `[CTX]` corpus —
 so "continue where you left off" reflects your own handoff trail (`Status` / `Next`), not
-just a sort order. Strictly **read-only** — no Jira writes, no clipboard, no gate. Follow
+just a sort order. Strictly **read-only** — no writes, no clipboard, no gate. Follow
 the **READ** rules in `bitacora:jira-comment-format` (strict `status_extraction`) when
 extracting `[CTX]` state.
+
+## 0. Resolve the tracker (first)
+
+Run `resolve-tracker.sh` before any read step:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/resolve-tracker.sh"   # → github | gitlab | jira
+```
+
+Branch **once** on family and follow the corresponding path below:
+
+- **jira** → mcp family: proceed to step 1 (Atlassian site resolution) as today.
+- **github / gitlab** → cli family: **skip steps 1–3**; go directly to
+  [CLI path (github/gitlab)](#cli-path-githubgitlab) below.
+
+If the script exits 4 (not a git repo or no remote and no explicit `tracker:` in
+`.bitacora.yml`), hard stop: tell the user to set `tracker:` and do not guess.
+
+For full backend capability notes, see `bitacora:tracker-adapter`.
 
 ## 1. Resolve the Atlassian site
 
@@ -130,6 +149,40 @@ Needs attention: <K> blocked (<key>, <Nd> silent) · <M> stale (<key>, <Nd>)
 ```
 
 Print, then stop. Read-only — no gate, no write.
+
+## CLI path (github/gitlab)
+
+On the **cli family** the scope *is* the current repo — do not run
+`resolve-project-scope.sh` and do not consult `next.remote_project_map`.
+
+Run `bitacora-tracker.sh doctor` first; on exit 5 surface the auth/install
+guidance and stop.
+
+Fetch candidates with:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" list-mine
+```
+
+This returns a normalized JSON array `[{number, title, labels, updatedAt, milestone}]`
+scoped to the current repo.
+
+Rank and categorize with the **same pickup-cost / readiness logic** as the Jira path
+(steps 4–8 above), mapping fields as follows:
+
+- **labels** stand in for Jira status (e.g. `in-progress` → Continue; `blocked` →
+  Needs attention; no milestone/estimate → Quick win unavailable unless a label
+  signals effort).
+- **`updatedAt`** stands in for Jira's `updated` field (staleness, `next.stale_days`).
+- There is no `[CTX]` deep-read for issues that have no comments matching the
+  corpus selector — fall back to activity/label signals exactly as the Jira path
+  falls back when no `[CTX]` is found.
+- Issue numbers are bare integers (`#N`) — display as `#<number>  <title>` in the
+  shortlist in place of `PROJ-<key>  <summary>`.
+
+Render the same 3-bucket shortlist (Continue / Ready to start / Quick wins + Needs
+attention tail). Footer offers `/bitacora:resume #<N>` (or the repo+number form) and
+re-run.
 
 ## Error / edge behavior
 
