@@ -71,6 +71,8 @@ slug="${slug#git+ssh://}"; slug="${slug#ssh://}"; slug="${slug#git://}"
 slug="${slug#https://}";   slug="${slug#http://}"
 slug="${slug#*@}"            # drop user@
 slug="${slug/://}"           # scp-style host:owner/repo → host/owner/repo
+slug="${slug%/}"             # trailing slash, then trailing .git (handles .git/)
+slug="${slug%.git}"
 slug="$(printf '%s' "$slug" | tr '[:upper:]' '[:lower:]')"
 host="${slug%%/*}"
 case "$host" in

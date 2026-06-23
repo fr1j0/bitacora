@@ -52,6 +52,8 @@ check "unknown host infers jira" jira 0 \
   --dir "$JIRA_REPO" --repo-config "$MISSING" --home-config "$MISSING"
 check "explicit tracker beats inference" jira 0 \
   --dir "$GH_REPO" --repo-config "$OVERRIDE_CFG" --home-config "$MISSING"
+check "home-config tracker beats inference" gitlab 0 \
+  --dir "$GH_REPO" --repo-config "$MISSING" --home-config "$GL_CFG"
 check "explicit gitlab for self-managed (no remote)" gitlab 0 \
   --dir "$NOREMOTE" --repo-config "$GL_CFG" --home-config "$MISSING"
 check "no remote and no explicit tracker → exit 4" "" 4 \
