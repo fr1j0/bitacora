@@ -43,5 +43,5 @@ tracker: github   # jira | github | gitlab — omit to infer from the git remote
 ```
 
 GitHub/GitLab backends require the `gh`/`glab` CLI installed and authenticated
-(`gh auth login`). All skills read and write `[CTX]` comments on the selected
+(`gh auth login` / `glab auth login`). All skills read and write `[CTX]` comments on the selected
 tracker's issues exactly as they do on Jira.
