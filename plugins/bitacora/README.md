@@ -16,6 +16,17 @@ enriches the handoff, and the workflow degrades gracefully when it's missing.
   Without it, handoff runs local-only: it still drafts and shows each comment, it just
   skips the Jira write.
 
+## Configuration
+
+Bitácora targets Jira by default. To use GitHub Issues or GitLab, set:
+
+```yaml
+# .bitacora.yml (repo) or ~/.claude/bitacora.yml (home)
+tracker: github   # jira | github | gitlab — omit to infer from the git remote host
+```
+
+GitHub/GitLab backends require the `gh`/`glab` CLI installed and authenticated.
+
 ## Commands
 
 | Command | What it does |
