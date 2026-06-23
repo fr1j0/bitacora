@@ -2,6 +2,37 @@
 
 All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
 
+## [v0.8.0] — 2026-06-23 · GitHub Issues tracker backend
+
+### Added
+
+- **Pluggable tracker backends — GitHub Issues support** (with a GitLab-ready seam). The
+  read/write skills (`/next`, `/resume`, `/status`, `/digest`, `/handoff`, `/improve`) now
+  target **Jira _or_ GitHub Issues**, selected per-repo: an explicit `tracker:` in
+  `.bitacora.yml` (or `~/.claude/bitacora.yml`) wins, otherwise the backend is inferred
+  from the git remote host. New `resolve-tracker.sh` resolves `jira | github | gitlab`;
+  new `bitacora-tracker.sh` is a uniform CLI adapter over the `gh` CLI (verbs
+  `list-mine`/`view`/`comments`/`comment`/`edit-body`/`whoami`/`doctor`, emitting
+  normalized JSON). A new `tracker-adapter` skill documents the verb reference and the
+  per-backend capability table. On GitHub, `/next` is naturally **repo-scoped**, and
+  `/digest` epic rollup **degrades gracefully** (rolls up by sub-issues, else milestone)
+  and names the basis it used. Requires the `gh` CLI installed and authenticated.
+  ([#117](https://github.com/fr1j0/bitacora/issues/117), [#128](https://github.com/fr1j0/bitacora/pull/128))
+
+### Changed
+
+- **The `[CTX]` format is now tracker-agnostic.** `validate-ctx.sh` remains the single
+  format gate across all backends and reads tracker-neutral — URL-wrapping is required on
+  **every** family (GitHub-flavored markdown would autolink bare URLs, but the shared gate
+  still requires wrapping for cross-tracker consistency; behavior unchanged).
+- **`/bit:*` alias help text** generalized from Jira-only to **Jira · GitHub · GitLab**;
+  the plugin/marketplace descriptions and keywords likewise broadened.
+
+### Note
+
+- The **GitLab** adapter column (`glab`) is stubbed (the seam is built); GitLab support
+  ships in a follow-up release.
+
 ## [v0.7.7] — 2026-06-17 · done/planned/blocked standup
 
 ### Changed
