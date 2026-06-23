@@ -169,6 +169,12 @@ account or teammate; do it opportunistically when one is available.)
   drafts a `[CTX]`, confirms, then posts it as an issue comment (verify with
   `gh issue view <n> --json comments`). A bare URL renders as a link.
 
+## `improve` — cli family (GitHub Issues)
+
+- [ ] **improve (github):** `/bit:improve <n>` snapshots the old body to an
+  `[ARCHIVE]` comment, then rewrites the issue body in place (verify both with
+  `gh issue view <n>`). Type is inferred from labels.
+
 ## Release hygiene
 
 - [ ] **README demo still truthful:** if this release changed user-visible
