@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# validate-ctx.sh — classify a Jira comment against the [CTX] format spec.
+# validate-ctx.sh — classify a tracker comment against the [CTX] format spec.
+# Tracker-agnostic: the same rules apply to Jira, GitHub, and GitLab comments.
 #
 # Usage:  validate-ctx.sh [FILE]    (reads stdin if FILE is omitted)
 # Output: one of  compliant | malformed | not-in-format   (stdout)
@@ -14,8 +15,9 @@
 #   - Starts with "[CTX]" but missing Status/Next → malformed.
 #   - Also malformed if the body (including any preamble) contains:
 #       * a tool-arg sentinel (e.g. "<parameter name=", "</commentBody>") — agent leak;
-#       * a bare URL (an https?:// not wrapped as [label](url) or <url>) — Jira won't
-#         auto-linkify, so it renders as plain text in the comment.
+#       * a bare URL (an https?:// not wrapped as [label](url) or <url>) — wrap it on
+#         every tracker (Jira won't auto-linkify; the others render fine but the wrapped
+#         form keeps the [CTX] portable and consistent across backends).
 #     A one-line reason is printed to stderr for these classes.
 # NOTE: no date in the header — the comment's own created timestamp is authoritative.
 # NOTE: "Status:"/"Next:" are matched at column 0 — leading spaces disqualify a line.
@@ -75,7 +77,7 @@ fi
 stripped="$(sed -E -e 's/\[[^][]*\]\([^()]*\)//g' -e 's/<https?:\/\/[^>[:space:]]+>//g' <<< "$input")"
 if grep -qE 'https?://' <<< "$stripped"; then
   echo "malformed"
-  echo "validate-ctx: bare URL detected — wrap as [label](url) or <url> so Jira renders it as a link." >&2
+  echo "validate-ctx: bare URL detected — wrap as [label](url) or <url> so it renders as a link on every tracker." >&2
   exit 1
 fi
 

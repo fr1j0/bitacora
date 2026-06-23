@@ -56,9 +56,10 @@ the most-recent `[CTX]` author/timestamp, then call `collision-check.sh` and
 `staleness-check.sh` exactly as documented in the jira arm. Lenient throughout: if
 the adapter read fails, skip checks silently and draft as normal.
 
-**Draft the `[CTX]`** using the **GFM render** (bare URLs autolink in
-GitHub-flavored markdown — URL-wrapping is optional; compact `[#123](url)` refs
-still preferred; backticks still render). See the cli-family render note in the
+**Draft the `[CTX]`** in GitHub-flavored markdown. Wrap URLs (`[label](url)`,
+compact `[#123](url)` for references) and backtick identifiers the same as on the
+jira arm — the shared `validate-ctx.sh` gate enforces wrapping on every family, so
+don't rely on GFM bare-URL autolinking. See the render note in the
 `bitacora:jira-comment-format` skill. The logical sections (`Status:`, `Next:`,
 etc.) are identical to the jira arm.
 
@@ -262,8 +263,8 @@ Never write to the tracker (Jira or cli family) before this gate.
    that ticket's comment** — surface the validator's stderr reason to the user, keep the
    draft, and offer: edit-and-retry / skip-this-ticket / cancel-all. Other tickets are
    unaffected. The validator catches the structural rule (missing `Status:`/`Next:`) and
-   the *Write rules* hygiene classes from `jira-comment-format` — bare URLs (Jira won't
-   linkify) and tool-arg-leak sentinels (`<parameter name=`, `</commentBody>`, …).
+   the *Write rules* hygiene classes from `jira-comment-format` — bare URLs (wrap them on
+   every family) and tool-arg-leak sentinels (`<parameter name=`, `</commentBody>`, …).
    Example:
 
    ```bash
