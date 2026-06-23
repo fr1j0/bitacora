@@ -1,6 +1,6 @@
 ---
 name: session-digest
-description: Aggregate [CTX] reads across all tracker backends (jira | github | gitlab) — roll up an epic/milestone across its issues, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default cross-ticket digest, in any of five audience lenses. Read-only; prints and offers a clipboard copy. Use when the user runs /bitacora:digest or /bit:digest.
+description: Aggregate [CTX] reads across all tracker backends (jira | github | gitlab) — roll up an epic/milestone across its issues, or read a multi-ticket scope (--mine/2+ keys; --sprint/--jql on Jira only) through a query lens (--blocked, --standup) or the default cross-ticket digest, in any of five audience lenses. Read-only; prints and offers a clipboard copy. Use when the user runs /bitacora:digest or /bit:digest.
 ---
 
 `bitacora:session-digest` is the aggregate sibling of `bitacora:session-status`: same
