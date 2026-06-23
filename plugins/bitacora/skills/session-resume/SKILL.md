@@ -1,6 +1,6 @@
 ---
 name: session-resume
-description: Rehydrate a fresh session from a Jira ticket's latest [CTX] comment(s) — read the structured state and print a compact, read-only briefing (where you left off, what's done, decided, next). Read-side counterpart to session-handoff. Use when the user runs /bitacora:resume or /bit:resume.
+description: Rehydrate a fresh session from a ticket's latest [CTX] comment(s) — read the structured state and print a compact, read-only briefing (where you left off, what's done, decided, next). Read-side counterpart to session-handoff. Supports jira (MCP) and github/gitlab (cli). Use when the user runs /bitacora:resume or /bit:resume.
 ---
 
 Read a single ticket's latest `[CTX]` state back into the session and print a compact
@@ -9,8 +9,50 @@ strictly **read-only** — it never writes to Jira or mutates Remember, so there
 confirmation gate. Follow the **READ** rules in `bitacora:jira-comment-format` for
 extracting state from `[CTX]` comments.
 
-Optional explicit ticket key: any Jira-style key the invoking command passed through
-(parse with `project_key_pattern`). If present, it forces the target.
+Optional explicit ticket key: any key the invoking command passed through (parse with
+`project_key_pattern` for Jira; bare integers for GitHub/GitLab). If present, it forces
+the target.
+
+## Resolve the tracker (first)
+
+Before any ticket lookup, run:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-tracker.sh"   # → github | gitlab | jira
+```
+
+- **exit 4** (not a git repo / no remote / no explicit `tracker:`): tell the user to set
+  `tracker:` in `.bitacora.yml` and stop.
+- **exit 0**: branch once on **family** and keep that branch for all subsequent steps.
+
+See `bitacora:tracker-adapter` for the capability table and verb reference.
+
+### jira family (MCP)
+
+Continue with steps 1–6 below as written (Atlassian MCP, `getJiraIssue`, etc.).
+
+### cli family (github / gitlab)
+
+Run `doctor` first:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" doctor
+```
+
+- **exit 5:** surface the auth/install guidance from stdout and **stop** (hard stop —
+  same severity as a missing Atlassian MCP).
+- **exit 0:** fetch the `[CTX]` corpus:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" comments <id>
+# → [{author, createdAt, body}]
+```
+
+Grep bodies for the `[CTX]` marker exactly as the jira arm does; take the comment date
+from `createdAt` (never from the body). The adaptive lookback, trajectory stitching,
+staleness banner, vagueness hint, and local-scratch reconciliation in steps 3–5 are
+**unchanged** — apply them to the cli-fetched corpus. Step 2 (Atlassian site resolution)
+is **skipped entirely** on the cli family. Jump directly to step 3 after fetching.
 
 ## 1. Resolve the target ticket (single, focused)
 
@@ -24,12 +66,12 @@ Resolve exactly one ticket, in priority order:
   guess between them.
 - **Nothing resolves:** ask for a key once (no nag); stop.
 
-## 2. Resolve the Atlassian site
+## 2. Resolve the Atlassian site (jira family only)
 
 `getAccessibleAtlassianResources` → `cloudId`. If multiple sites, use the `jira_cloud_id`
 override if configured, else ask which (identical to handoff). **If the MCP is absent,
 auth fails, or the site can't be resolved, this is a hard stop** (see Error behavior) —
-resume cannot do its job without Jira read access.
+resume cannot do its job without Jira read access. Skip this step on the cli family.
 
 ## 3. Read the ticket
 

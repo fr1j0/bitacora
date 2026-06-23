@@ -156,6 +156,13 @@ account or teammate; do it opportunistically when one is available.)
   `/bit:next`. Expect a categorized shortlist of *this repo's* issues — never a Jira
   project's tickets, never an unscoped query.
 
+## `resume` + `status` — cli family (GitHub Issues)
+
+- [ ] **resume (github):** on an issue carrying a `[CTX]` comment, `/bit:resume <n>`
+  rehydrates Status/Decisions/Next from that comment.
+- [ ] **status (github):** `/bit:status <n>` synthesizes the latest `[CTX]` in the
+  selected lens; no Jira call is made.
+
 ## Release hygiene
 
 - [ ] **README demo still truthful:** if this release changed user-visible
