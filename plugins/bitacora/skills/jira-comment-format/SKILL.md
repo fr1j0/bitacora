@@ -101,6 +101,14 @@ validator checks only the `[CTX]` prefix and the presence of `Status:`/`Next:` l
   every URL as either a markdown link `[label](https://...)` (preferred — readable label)
   or an autolink `<https://...>` (label = URL). If you build ADF directly, attach a
   `link` mark to the URL text node. See `examples/malformed-bare-url.txt`.
+- **Render differs by tracker family (see `tracker-adapter`).** The wrapping rule
+  above is for the **mcp/Jira** family — Jira's ADF renderer does *not* autolink, so
+  every URL must be wrapped and identifiers need backticks (ADF code marks). On the
+  **cli family (GitHub/GitLab)** comments are GitHub-flavored markdown: bare URLs
+  autolink, so wrapping is *optional* (compact `[#123](url)` references are still
+  preferred for readability) and backticks render as GFM code spans. The GFM render
+  only *relaxes* the Jira rules — it never adds new ones. The logical sections and the
+  literal `[CTX]` marker are identical across families.
 - **Identifiers get backticks.** Wrap file paths, branch names, commit SHAs, symbol
   names, config keys, and slash commands in inline code (`` `splitPortfolioName` ``,
   `` `features/client-portfolios/portfolio-utils.ts` ``, `` `/bitacora:improve` ``).
