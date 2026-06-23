@@ -25,9 +25,10 @@ bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-tracker.sh"
 This emits one of `github`, `gitlab`, or `jira`. Branch on the result:
 
 - **jira** → continue to step 1 as today (MCP path, steps 1–9 below).
-- **github / gitlab (cli family)** → follow the **cli branch** in this step, then
-  jump to step 4 (scope) and the shared confirm/write/outcome steps; see the
-  `tracker-adapter` skill for the verb contract.
+- **github / gitlab (cli family)** → execute the **cli branch** below to completion.
+  It is self-contained — it carries its own confirm/write/outcome steps and stops on
+  its own; do **not** continue into the Jira-path steps 1–9. See the `tracker-adapter`
+  skill for the verb contract.
 
 ### cli branch (github / gitlab)
 
@@ -38,6 +39,10 @@ and stop:
 TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" doctor
 ```
 
+**Resolve the ticket id** first. Use the same priority order as step 1 (explicit arg →
+current branch → reflog), but match a GitHub/GitLab issue number instead of a Jira
+key.
+
 **Read the issue.** The issue has a single markdown **body** (no ADF). Read it with:
 
 ```bash
@@ -46,10 +51,6 @@ TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.
 
 The verb returns JSON `{number, title, body, labels, state, milestone, comments}`.
 Capture `body`, `title`, `labels`, and `comments`.
-
-**Resolve the ticket id.** Use the same priority order as step 1 (explicit arg →
-current branch → reflog), but match a GitHub/GitLab issue number instead of a Jira
-key.
 
 **Derive issue type from labels.** Inspect `labels` for values such as `bug`,
 `enhancement`, `story`, `epic`, `subtask`, `spike`, or tracker-native types. If no
