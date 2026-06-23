@@ -1,15 +1,78 @@
 ---
 name: session-handoff
-description: Run the Bitácora session handoff — reconstruct the Jira tickets touched this session, draft a [CTX] status comment for each (confirm before writing), write them via the Atlassian MCP, and save one consolidated local scratch via Remember. Use when the user runs /bitacora:handoff or /bit:handoff.
+description: Run the Bitácora session handoff — reconstruct the tickets touched this session, draft a [CTX] status comment for each (confirm before writing), write them via the appropriate tracker backend, and save one consolidated local scratch via Remember. Use when the user runs /bitacora:handoff or /bit:handoff.
 ---
 
 Wrap up the current session cleanly. You are in the live session — use what you
 actually did this session. Follow the `bitacora:jira-comment-format` skill for the
 `[CTX]` format and the outcome-vs-scratch split.
 
-Optional explicit ticket set: any Jira-style keys the invoking command passed
-through (parse them with `project_key_pattern`). If present, they force the
-touched-ticket set and you skip reconstruction.
+Optional explicit ticket set: any ticket keys the invoking command passed through
+(parse them with `project_key_pattern`). If present, they force the touched-ticket
+set and you skip reconstruction.
+
+## 0. Resolve the tracker (first)
+
+Before any ticket reconstruction or comment work, determine which tracker backend
+to use and branch once on family. All subsequent steps follow the arm that matches.
+
+```bash
+TRACKER=$(bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-tracker.sh")
+# exit 0 → stdout is "github", "gitlab", or "jira"
+# exit 4 → no repo / no remote and no explicit tracker; treat as local-only (skip
+#           all tracker steps; complete the local scratch from step 3 as usual)
+```
+
+For full adapter verb reference see the `bitacora:tracker-adapter` skill.
+
+### jira family
+
+Use the Atlassian MCP path: all existing steps below (continuity-read via
+`getJiraIssue`, collision/staleness checks, write via `addCommentToJiraIssue`).
+This is today's path — nothing changes on this arm.
+
+### cli family (GitHub / GitLab)
+
+Run `doctor` first and hard-stop on failure:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" doctor
+# exit 0 → OK; exit 5 → missing auth/config; surface the guidance and stop
+```
+
+If `doctor` exits 5, surface the printed guidance to the user and **stop** — do
+not attempt any read or write. The local scratch (step 3) may still be saved if
+the user wants it.
+
+**Collision / staleness pre-checks** read the comment corpus via the adapter:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" comments <id>
+# stdout: JSON array [{author, createdAt, body}, …]
+```
+
+Apply the same `[CTX]` grep and `createdAt` date logic as the jira arm to extract
+the most-recent `[CTX]` author/timestamp, then call `collision-check.sh` and
+`staleness-check.sh` exactly as documented in the jira arm. Lenient throughout: if
+the adapter read fails, skip checks silently and draft as normal.
+
+**Draft the `[CTX]`** using the **GFM render** (bare URLs autolink in
+GitHub-flavored markdown — URL-wrapping is optional; compact `[#123](url)` refs
+still preferred; backticks still render). See the cli-family render note in the
+`bitacora:jira-comment-format` skill. The logical sections (`Status:`, `Next:`,
+etc.) are identical to the jira arm.
+
+**After the SAME user confirmation gate as the jira arm** (step 4 — never write
+before the user approves), write each approved+validated `[CTX]` by saving its
+body to a temp file and calling the adapter:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" \
+  comment <id> --body-file "$TMP/ctx-<id>.md"
+```
+
+Per-ticket failures are isolated — one issue's error does not abort the others.
+The local Remember scratch save (step 5.1) is unchanged.
 
 ## 1. Gather the tickets touched this session (reconstruct — no hook/state)
 
@@ -184,18 +247,16 @@ Example gate line:
 
 `Approve all` also pauses on each `⚠ recent self-handoff` ticket for append/skip before writing it.
 
-Never write to Jira before this gate.
+Never write to the tracker (Jira or cli family) before this gate.
 
 ## 5. Write — LOCAL FIRST
 
 1. **Save the consolidated scratch via Remember:** invoke the `remember:remember` skill,
    passing the scratch content prepared in step 3. If it fails, warn and **print the
-   scratch to screen** for manual save, then proceed to the Jira writes — the existing
+   scratch to screen** for manual save, then proceed to the tracker writes — the existing
    per-ticket confirmation gate in step 4 still applies; do **not** add a second
-   "still attempt Jira writes?" prompt here.
-2. **Resolve the Atlassian site:** `getAccessibleAtlassianResources` → `cloudId`. If
-   multiple sites, ask which (or use a `jira_cloud_id` override if configured).
-3. **Validate each drafted `[CTX]` body before writing.** Pipe the body through
+   "still attempt tracker writes?" prompt here.
+2. **Validate each drafted `[CTX]` body before writing.** Pipe the body through
    `${CLAUDE_PLUGIN_ROOT}/scripts/validate-ctx.sh` (or `plugins/bitacora/scripts/validate-ctx.sh`
    from the repo root). If the output is anything other than `compliant`, **do not write
    that ticket's comment** — surface the validator's stderr reason to the user, keep the
@@ -210,12 +271,26 @@ Never write to Jira before this gate.
    # exit 0 = compliant; 1 = malformed (reason on stderr); 2 = not-in-format
    ```
 
-4. **Write each approved+validated ticket's `[CTX]`** via `addCommentToJiraIssue`,
-   following the *Write mechanics* rule in `jira-comment-format` (blank line before/after
-   every section label and bullet list, or build ADF directly) so labels like
-   `Decisions:`/`Next:` don't get absorbed into the preceding bullet. **Per-ticket
-   failures are isolated** — one ticket's 404 / permission error does not abort the
-   others.
+3. **Write each approved+validated ticket's `[CTX]`** — branch on the tracker family
+   resolved in step 0:
+
+   **jira family:** Resolve the Atlassian site first — `getAccessibleAtlassianResources`
+   → `cloudId`. If multiple sites, ask which (or use a `jira_cloud_id` override if
+   configured). Then write via `addCommentToJiraIssue`, following the *Write mechanics*
+   rule in `jira-comment-format` (blank line before/after every section label and bullet
+   list, or build ADF directly) so labels like `Decisions:`/`Next:` don't get absorbed
+   into the preceding bullet.
+
+   **cli family (GitHub / GitLab):** Save the drafted body to a temp file and call the
+   adapter:
+
+   ```bash
+   TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" \
+     comment <id> --body-file "$TMP/ctx-<id>.md"
+   ```
+
+   **Per-ticket failures are isolated on both arms** — one ticket's 404 / permission
+   error does not abort the others.
 
 ## 6. Report
 
@@ -242,17 +317,19 @@ Exact command:
 
 ## Error / edge behavior
 
-- **Atlassian MCP absent / auth fails / site unresolvable:** treat exactly like the
-  no-ticket path — skip the Jira half gracefully, complete the local scratch, report the
-  reason. **No retry loop.**
+- **Atlassian MCP absent / auth fails / site unresolvable (jira family):** treat exactly
+  like the no-ticket path — skip the jira half gracefully, complete the local scratch,
+  report the reason. **No retry loop.**
+- **cli family `doctor` exits 5:** surface the guidance and stop — do not attempt reads
+  or writes. The local scratch may still be saved if the user wants it.
 - **Ticket 404 / 403 / no write permission:** surface for that ticket, keep its draft,
-  offer retry with a different key or skip; other tickets unaffected. (`getJiraIssue`
-  may succeed while `addCommentToJiraIssue` returns 403 — Jira's project-level comment
-  permission is a distinct grant from view permission.)
+  offer retry with a different key or skip; other tickets unaffected. (jira family:
+  `getJiraIssue` may succeed while `addCommentToJiraIssue` returns 403 — Jira's
+  project-level comment permission is a distinct grant from view permission.)
 - **Empty/trivial session:** say "nothing substantive to hand off" and write nothing
   unless the user insists.
-- **Remember unavailable:** warn, print the scratch for manual save, still offer the Jira
-  writes.
+- **Remember unavailable:** warn, print the scratch for manual save, still offer the
+  tracker writes.
 - Re-running in one session writes a new `[CTX]` per ticket (one per logical update is
   fine); the continuity-read avoids restating `Done`.
 

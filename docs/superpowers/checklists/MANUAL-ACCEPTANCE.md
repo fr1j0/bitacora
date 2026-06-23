@@ -163,6 +163,12 @@ account or teammate; do it opportunistically when one is available.)
 - [ ] **status (github):** `/bit:status <n>` synthesizes the latest `[CTX]` in the
   selected lens; no Jira call is made.
 
+## `handoff` — cli family (GitHub Issues)
+
+- [ ] **handoff (github):** after a session touching a GitHub issue, `/bit:handoff`
+  drafts a `[CTX]`, confirms, then posts it as an issue comment (verify with
+  `gh issue view <n> --json comments`). A bare URL renders as a link.
+
 ## Release hygiene
 
 - [ ] **README demo still truthful:** if this release changed user-visible
