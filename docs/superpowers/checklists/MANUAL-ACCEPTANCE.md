@@ -175,6 +175,12 @@ account or teammate; do it opportunistically when one is available.)
   `[ARCHIVE]` comment, then rewrites the issue body in place (verify both with
   `gh issue view <n>`). Type is inferred from labels.
 
+## `digest` — cli family (GitHub Issues)
+
+- [ ] **digest (github):** `/bit:digest` over ≥2 GitHub issues produces a cross-issue
+  digest; an epic-style rollup names its basis (sub-issues or milestone) and does not
+  claim Jira-epic semantics.
+
 ## Release hygiene
 
 - [ ] **README demo still truthful:** if this release changed user-visible
