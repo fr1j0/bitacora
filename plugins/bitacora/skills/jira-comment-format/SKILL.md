@@ -101,6 +101,15 @@ validator checks only the `[CTX]` prefix and the presence of `Status:`/`Next:` l
   every URL as either a markdown link `[label](https://...)` (preferred — readable label)
   or an autolink `<https://...>` (label = URL). If you build ADF directly, attach a
   `link` mark to the URL text node. See `examples/malformed-bare-url.txt`.
+- **URL-wrapping and backticks apply on every tracker family (see `tracker-adapter`).**
+  Wrap every URL (`[label](url)`/`<url>`, compact `[#123](url)` for references) and
+  backtick identifiers regardless of backend — the shared `validate-ctx.sh` gate enforces
+  the wrapping rule on all families, so a bare URL is rejected on GitHub/GitLab just as on
+  Jira. The only per-family difference is the underlying markup of *already-compliant*
+  content: Jira renders these as ADF link/code marks, GitHub/GitLab as GitHub-flavored
+  markdown (GFM would additionally autolink a bare URL, but wrap anyway for cross-tracker
+  consistency and to pass the validator). The logical sections and the literal `[CTX]`
+  marker are identical across families.
 - **Identifiers get backticks.** Wrap file paths, branch names, commit SHAs, symbol
   names, config keys, and slash commands in inline code (`` `splitPortfolioName` ``,
   `` `features/client-portfolios/portfolio-utils.ts` ``, `` `/bitacora:improve` ``).

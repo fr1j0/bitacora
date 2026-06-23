@@ -31,3 +31,17 @@ Bitácora — commands
 
   Alias: /bit:handoff, /bit:resume, /bit:status, /bit:digest, /bit:next, /bit:improve, /bit:help (opt-in — see plugin README)
 ```
+
+## Tracker backend
+
+Bitácora targets **Jira** by default. In a repo whose tracker is **GitHub Issues**,
+set the backend (or let it infer from the git remote):
+
+```yaml
+# .bitacora.yml (repo) or ~/.claude/bitacora.yml (home)
+tracker: github   # jira | github | gitlab — omit to infer from the git remote host
+```
+
+GitHub/GitLab backends require the `gh`/`glab` CLI installed and authenticated
+(`gh auth login` / `glab auth login`). All skills read and write `[CTX]` comments on the selected
+tracker's issues exactly as they do on Jira.

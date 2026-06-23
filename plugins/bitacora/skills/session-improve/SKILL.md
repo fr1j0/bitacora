@@ -1,20 +1,134 @@
 ---
 name: session-improve
-description: Sharpen a Jira ticket — read the ticket plus its [CTX] trail, free-form comments, local Remember scratch, and git/PR history for the key; produce a type-aware structured rewrite (Story / Bug / Epic / Subtask) that makes confident engineering choices and labels them as Assumptions; show a diff; on accept, post a snapshot [ARCHIVE] comment then edit the description (and optionally the title) in place. Use when the user runs /bitacora:improve or /bit:improve.
+description: Sharpen a ticket — read the ticket plus its [CTX] trail, free-form comments, local Remember scratch, and git/PR history for the key; produce a type-aware structured rewrite (Story / Bug / Epic / Subtask) that makes confident engineering choices and labels them as Assumptions; show a diff; on accept, post a snapshot [ARCHIVE] comment then edit the description (and optionally the title) in place. Use when the user runs /bitacora:improve or /bit:improve. Supports both Jira (MCP) and GitHub/GitLab Issues (cli family via bitacora-tracker.sh).
 ---
 
-Sharpen a vague or technically weak Jira ticket by rewriting its description (and
-optionally its title) in place, grounded in a corpus the in-ticket Jira AI cannot see:
+Sharpen a vague or technically weak ticket by rewriting its description (and
+optionally its title) in place, grounded in a corpus the in-ticket AI cannot see:
 the `[CTX]` handoff trail, free-form discussion, local Remember scratch, and the
-git/PR history that references the ticket key. The PM's original text is preserved by
-a snapshot Jira comment posted **before** any field edit, so every rewrite is
+git/PR history that references the ticket key. The original text is preserved by
+a snapshot comment posted **before** any field edit, so every rewrite is
 reversible by copy-paste.
 
 Follow the **READ** rules in `bitacora:jira-comment-format` for state extraction from
 `[CTX]` comments. For this command the read mode is **lenient** — free-form comments
 are part of the corpus (they're often where the requirements actually live).
 
-## 1. Resolve the target ticket (single, focused)
+## 0. Resolve the tracker (first)
+
+Before anything else, run:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/scripts/resolve-tracker.sh"
+```
+
+This emits one of `github`, `gitlab`, or `jira`. Branch on the result:
+
+- **jira** → continue to step 1 as today (MCP path, steps 1–9 below).
+- **github / gitlab (cli family)** → execute the **cli branch** below to completion.
+  It is self-contained — it carries its own confirm/write/outcome steps and stops on
+  its own; do **not** continue into the Jira-path steps 1–9. See the `tracker-adapter`
+  skill for the verb contract.
+
+### cli branch (github / gitlab)
+
+Run `doctor` first; exit 5 from the adapter is a hard stop — print the guidance
+and stop:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" doctor
+```
+
+**Resolve the ticket id** first. Use the same priority order as step 1 (explicit arg →
+current branch → reflog), but match a GitHub/GitLab issue number instead of a Jira
+key.
+
+**Read the issue.** The issue has a single markdown **body** (no ADF). Read it with:
+
+```bash
+TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" view <id>
+```
+
+The verb returns JSON `{number, title, body, labels, state, milestone, comments}`.
+Capture `body`, `title`, `labels`, and `comments`.
+
+**Derive issue type from labels.** Inspect `labels` for values such as `bug`,
+`enhancement`, `story`, `epic`, `subtask`, `spike`, or tracker-native types. If no
+recognisable type label is present, fall back to the Story shape and surface the
+assumption in the confirm step.
+
+**Assemble corpus.** Read `[CTX]` comments from the `comments` array (lenient per
+`bitacora:jira-comment-format`). Grep Remember scratch and git/PR history exactly as
+step 5 (Jira path) does — the corpus assembly is identical.
+
+**Draft the rewrite.** Use the same type-aware section templates as step 6 (Jira
+path). The output is plain **GitHub-Flavored Markdown** — no ADF wrapping. Apply the
+same formatting conventions: `###` headings, bulleted lists, inline-code every
+technical token, wrap URLs (no bare URLs), use compact refs. **Empty sections are
+omitted.**
+
+**Confirm (shared gate — identical to step 7).** Show the unified diff and proposed
+title; print:
+
+```
+Tracker write pending:
+  - 1 [ARCHIVE] snapshot comment
+  - N field edit(s) — <body | title | body + title>
+
+Accept? (y/N)
+```
+
+`N` (or bare enter) aborts — **no write before the user types `y`.**
+
+**Write (on `y` — strict order).**
+
+1. **Snapshot first.** Write `$TMP/archive-<id>.md` containing the `[ARCHIVE]`
+   header and the verbatim pre-edit body (fenced in triple backticks, widened to
+   four if the body itself contains a fence). Post it as a comment:
+
+   ```bash
+   TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" \
+     comment <id> --body-file "$TMP/archive-<id>.md"
+   ```
+
+2. **Then overwrite the body.** Write `$TMP/rewrite-<id>.md` containing the new GFM
+   body. Replace the issue body:
+
+   ```bash
+   TRACKER=<resolved-backend> bash "${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" \
+     edit-body <id> --body-file "$TMP/rewrite-<id>.md"
+   ```
+
+   The snapshot step MUST complete successfully before `edit-body` is called — if the
+   archive comment fails, abort without touching the body.
+
+3. **Title edit (if in scope) — separate confirmed step.** Run:
+
+   ```bash
+   gh issue edit <id> --title "<new title>"
+   ```
+
+   Confirm the new title explicitly before running this command.
+
+**Failure modes (cli arm)** mirror the Jira arm: archive failure → abort; body
+failure after archive → report both states; title failure after body succeeds → report
+partial state with the original title verbatim.
+
+**Outcome.** Print:
+
+```
+Improved #<id>:
+  - <issue URL>
+  - archive comment: posted
+  - body: updated   (if in scope)
+  - title: updated  (if in scope)
+```
+
+Then stop. For the full verb contract see the `tracker-adapter` skill.
+
+---
+
+## 1. Resolve the target ticket (single, focused) — Jira path
 
 Resolve exactly one ticket, in priority order (identical to resume/status):
 
@@ -25,14 +139,14 @@ Resolve exactly one ticket, in priority order (identical to resume/status):
   candidates surface, **list them and let the user pick**. Never guess between them.
 - **Nothing resolves:** ask for a key once (no nag); stop.
 
-## 2. Resolve the Atlassian site
+## 2. Resolve the Atlassian site — Jira path
 
 `getAccessibleAtlassianResources` → `cloudId`. If multiple sites, use the
 `jira_cloud_id` override if configured, else ask. **If the MCP is absent, auth fails,
 or the site can't be resolved, this is a hard stop** (see Error behavior) — improve
 cannot do its job without Jira read + write access.
 
-## 3. Read the ticket
+## 3. Read the ticket — Jira path
 
 `getJiraIssue` for the resolved key, **requesting comments**. Capture `description`,
 `summary` (title), `issuetype.name`, `status`, and **all comments** (lenient — `[CTX]`

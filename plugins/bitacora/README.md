@@ -1,6 +1,6 @@
 # Bitácora (plugin)
 
-Jira-aware workflow layer for Claude Code. **Phase 1 (shipped):** `/bitacora:handoff`,
+Tracker-aware (Jira · GitHub · GitLab) workflow layer for Claude Code. **Phase 1 (shipped):** `/bitacora:handoff`,
 `/bitacora:resume`, `/bitacora:status` (single ticket), `/bitacora:digest` (epic rollup +
 multi-ticket reads), `/bitacora:next`, `/bitacora:improve`, `/bitacora:help`, an opt-in
 statusLine context meter, and the `[CTX]` comment-format discipline. Every bit of context, logged.
@@ -15,6 +15,17 @@ enriches the handoff, and the workflow degrades gracefully when it's missing.
 - **Atlassian Rovo MCP** with read/write to your Jira — for writing the `[CTX]` comments.
   Without it, handoff runs local-only: it still drafts and shows each comment, it just
   skips the Jira write.
+
+## Configuration
+
+Bitácora targets Jira by default. To use GitHub Issues or GitLab, set:
+
+```yaml
+# .bitacora.yml (repo) or ~/.claude/bitacora.yml (home)
+tracker: github   # jira | github | gitlab — omit to infer from the git remote host
+```
+
+GitHub/GitLab backends require the `gh`/`glab` CLI installed and authenticated.
 
 ## Commands
 

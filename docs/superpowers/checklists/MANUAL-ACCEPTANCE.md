@@ -150,6 +150,37 @@ account or teammate; do it opportunistically when one is available.)
       `/bitacora:status AT-EPIC` (an epic) → renders the epic's own [CTX] as one node (or the
       no-[CTX] line + a /bitacora:digest pointer).
 
+## `next` — cli family (GitHub Issues)
+
+- [ ] **next (github):** in a GitHub-Issues repo with ≥1 issue assigned to you, run
+  `/bit:next`. Expect a categorized shortlist of *this repo's* issues — never a Jira
+  project's tickets, never an unscoped query.
+
+## `resume` + `status` — cli family (GitHub Issues)
+
+- [ ] **resume (github):** on an issue carrying a `[CTX]` comment, `/bit:resume <n>`
+  rehydrates Status/Decisions/Next from that comment.
+- [ ] **status (github):** `/bit:status <n>` synthesizes the latest `[CTX]` in the
+  selected lens; no Jira call is made.
+
+## `handoff` — cli family (GitHub Issues)
+
+- [ ] **handoff (github):** after a session touching a GitHub issue, `/bit:handoff`
+  drafts a `[CTX]`, confirms, then posts it as an issue comment (verify with
+  `gh issue view <n> --json comments`). A bare URL renders as a link.
+
+## `improve` — cli family (GitHub Issues)
+
+- [ ] **improve (github):** `/bit:improve <n>` snapshots the old body to an
+  `[ARCHIVE]` comment, then rewrites the issue body in place (verify both with
+  `gh issue view <n>`). Type is inferred from labels.
+
+## `digest` — cli family (GitHub Issues)
+
+- [ ] **digest (github):** `/bit:digest` over ≥2 GitHub issues produces a cross-issue
+  digest; an epic-style rollup names its basis (sub-issues or milestone) and does not
+  claim Jira-epic semantics.
+
 ## Release hygiene
 
 - [ ] **README demo still truthful:** if this release changed user-visible

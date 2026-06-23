@@ -1,14 +1,75 @@
 ---
 name: session-digest
-description: Aggregate Jira [CTX] reads — roll up an epic across its children, or read a multi-ticket scope (--mine/--sprint/--jql/2+ keys) through a query lens (--blocked, --standup) or the default cross-ticket digest, in any of five audience lenses. Read-only; prints and offers a clipboard copy. Use when the user runs /bitacora:digest or /bit:digest.
+description: Aggregate [CTX] reads across all tracker backends (jira | github | gitlab) — roll up an epic/milestone across its issues, or read a multi-ticket scope (--mine/2+ keys; --sprint/--jql on Jira only) through a query lens (--blocked, --standup) or the default cross-ticket digest, in any of five audience lenses. Read-only; prints and offers a clipboard copy. Use when the user runs /bitacora:digest or /bit:digest.
 ---
 
 `bitacora:session-digest` is the aggregate sibling of `bitacora:session-status`: same
 strict `[CTX]` READ rules per `bitacora:jira-comment-format` (`strict` `status_extraction`),
 but focused on multi-ticket scope — rolling up an epic across its children or reading a set
-of tickets through a query lens. It is strictly **read-only** — it never writes to Jira or
-mutates Remember, so there is no confirmation gate. Apply the audience lens per the
-*Audience lenses* table in `bitacora:jira-comment-format`.
+of tickets through a query lens. It is strictly **read-only** — it never writes to the
+tracker or mutates Remember, so there is no confirmation gate. Apply the audience lens per
+the *Audience lenses* table in `bitacora:jira-comment-format`.
+
+## Resolve the tracker (first)
+
+Before parsing arguments, resolve the active backend. See `bitacora:tracker-adapter` for the
+full capability table and verb reference; the summary is:
+
+```bash
+TRACKER=$("${CLAUDE_PLUGIN_ROOT}/scripts/resolve-tracker.sh")
+# exit 0 → stdout is "jira" | "github" | "gitlab"
+# exit 4 → no git repo / no remote and no tracker: in .bitacora.yml — hard stop; tell the
+#            user to set tracker: and stop.
+```
+
+Branch once on **family**:
+
+- **`jira` → mcp family.** Use the Atlassian MCP exactly as today (§2–§4 below, unchanged).
+- **`github` / `gitlab` → cli family.** Run
+  `"${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" doctor` first; on exit 5 surface
+  the auth/install guidance from the tool and stop. Then continue at *cli family read path*
+  below.
+
+### cli family read path
+
+On the **cli family**, gather the issue set with `list-mine` (or the explicit issue numbers
+the user passed) and read each via `comments <id>`; cross-ticket synthesis and the five
+lenses (§5–§6) are unchanged from the Jira path.
+
+```bash
+# List issues assigned to me (repo-scoped; no project-map lookup)
+"${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" list-mine
+
+# Read one issue + its [CTX] corpus
+"${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" view <id>
+"${CLAUDE_PLUGIN_ROOT}/scripts/bitacora-tracker.sh" comments <id>
+# comments → [{author, createdAt, body}]; read createdAt from the field, never from the body
+```
+
+Apply the same cap (`digest.multi_fanout_cap`, default 25), the same coverage-line discipline,
+and the same staleness-marker logic as the Jira scope-set path. Scope is the current repo —
+do not consult `remote_project_map`.
+
+**Epic rollup degrades by backend (label the basis in the output):**
+
+- **GitHub:** if the issue has **sub-issues**, roll up over them; else fall back to grouping
+  by **milestone**. State which basis was used, e.g.
+  *"Rollup basis: milestone `v0.8` (no sub-issues found)."*
+- **GitLab:** use the native epic.
+
+Never imply Jira-epic parity — always name the basis so the reader knows the rollup's shape.
+The `Rollup basis:` line appears immediately after the header line in the rendered output,
+before `Health:`.
+
+**Error / edge cases specific to the cli family:**
+
+- `doctor` exit 5 → hard stop; surface the guidance from the tool.
+- `list-mine` returns zero → say so plainly and stop.
+- Any `view` / `comments` call fails for an individual issue → count it **unreadable**,
+  continue; carry the tally into the coverage line.
+- No `--sprint` or `--jql` on the cli family (those are Jira concepts); if passed, say
+  "not supported on the GitHub/GitLab backend — use `--mine` or explicit issue numbers"
+  and stop.
 
 ## 1. Parse arguments
 
