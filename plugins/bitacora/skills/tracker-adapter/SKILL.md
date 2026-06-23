@@ -27,7 +27,8 @@ Branch once on **family**:
 
 ## CLI verb reference (`bitacora-tracker.sh`)
 
-Set `TRACKER` from the resolved backend; all verbs emit normalized JSON.
+Set `TRACKER` from the resolved backend; the data verbs emit normalized JSON
+(`doctor` exits 0 with no output on success, exit 5 with guidance on failure).
 
 | Need | Verb |
 |---|---|
