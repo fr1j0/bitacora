@@ -1,6 +1,6 @@
 # Bitácora (plugin)
 
-Jira-aware workflow layer for Claude Code. **Phase 1 (shipped):** `/bitacora:handoff`,
+Tracker-aware (Jira · GitHub · GitLab) workflow layer for Claude Code. **Phase 1 (shipped):** `/bitacora:handoff`,
 `/bitacora:resume`, `/bitacora:status` (single ticket), `/bitacora:digest` (epic rollup +
 multi-ticket reads), `/bitacora:next`, `/bitacora:improve`, `/bitacora:help`, an opt-in
 statusLine context meter, and the `[CTX]` comment-format discipline. Every bit of context, logged.

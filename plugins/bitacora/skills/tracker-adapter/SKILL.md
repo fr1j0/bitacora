@@ -50,9 +50,13 @@ Read the comment **date from `createdAt`**, never from the body (same rule as Ji
 | single editable body | description (ADF) | body (md) | description (md) |
 | native issue types | ✓ | types (beta) / labels | labels |
 | epic / rollup basis | epic→child link | sub-issues, else milestone | native epics |
-| renderer autolinks bare URLs | ✗ (ADF) | ✓ (GFM) | ✓ (GFM) |
+| renderer autolinks bare URLs | ✗ (ADF) | ✓ (GFM)¹ | ✓ (GFM)¹ |
 | identity token | accountId | `@me` / login | `@me` / username |
 | scope unit | project key (map) | current repo | current project |
+
+¹ Capability fact only — Bitácora wraps URLs regardless of backend. The shared
+`validate-ctx.sh` gate rejects bare URLs on **every** family, so never emit one even
+where the renderer would autolink it. See the render note in `jira-comment-format`.
 
 Implications skills must honor:
 - **Scope:** on the cli family the scope *is* the current repo — do not consult the
