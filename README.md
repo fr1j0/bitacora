@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/bitacora-hero.png" alt="Bitácora: a notebook with /bit:handoff and /clear on the cover, flanked by Jira and GitHub badges" width="100%">
+
 # Bitácora
 
 **Every bit of context, logged.**
