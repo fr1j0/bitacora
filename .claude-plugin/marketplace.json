@@ -9,7 +9,7 @@
     {
       "name": "bitacora",
       "description": "Clean session handoffs, session resume, and audience-tailored status summaries — including multi-ticket reads — anchored on the [CTX] comment-format discipline. Targets Jira (Atlassian Rovo MCP) or GitHub Issues (gh CLI), selected per-repo; Remember optional.",
-      "version": "0.8.0",
+      "version": "0.8.1",
       "source": "./plugins/bitacora",
       "author": {
         "name": "Bitácora contributors"
