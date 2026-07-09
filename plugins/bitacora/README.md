@@ -225,8 +225,8 @@ classifies any comment as `compliant` / `malformed` / `not-in-format`.
 
 ## Stability
 
-Alpha (`0.x`): commands/flags may change between minor releases — pin a tag if you need
-stability. The `[CTX]` format is the versioned contract (current **v1**); see *Stability &
+Beta (`0.x`): the core loop is complete, but commands/flags may change between minor
+releases — pin a tag if you need stability. The `[CTX]` format is the versioned contract (current **v1**); see *Stability &
 compatibility* in the root README and `docs/JIRA_AGENT_COMMENT_FORMAT.md`.
 
 ## Safety
