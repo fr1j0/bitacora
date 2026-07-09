@@ -1,6 +1,28 @@
 # Changelog
 
-All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in alpha (`0.x.y`), expect the API to keep settling.
+All notable changes to Bitácora are recorded here. The plugin follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html); while in beta (`0.x.y`), expect the API to keep settling.
+
+## [v0.8.1] — 2026-07-10 · Beta status + tracker-neutral README
+
+### Changed
+
+- **Project status: alpha → beta.** The core read/write loop is complete — versioned
+  `[CTX]` v1 contract, two tracker backends (Jira, GitHub Issues), CI + test suite — so
+  beta ("core complete, surface still settling on `0.x`") is now the accurate posture.
+  README badge, warning note, Stability section, plugin README, `CONTRIBUTING.md`, and
+  `docs/TRIAGE.md` updated; versioning stays `0.x` and the pin guidance is kept. 1.0 is
+  deliberately deferred until the GitLab adapter ships and the command surface stops
+  moving. ([#134](https://github.com/fr1j0/bitacora/issues/134),
+  [#135](https://github.com/fr1j0/bitacora/pull/135))
+- **Root README finished its v0.8.0 tracker-neutral migration** — tagline, intro,
+  commands table, architecture diagram (tracker-backend column: Rovo MCP · `gh` ·
+  `glab`-soon), prerequisites (backend-per-tracker with the `.bitacora.yml` `tracker:` /
+  remote-host selection rule), and the `[CTX]` section now read Jira **or** GitHub
+  Issues, resolving the required-vs-optional Rovo MCP contradiction. The `/digest` row
+  also caught up with the done/planned/blocked `--standup` (v0.7.7) and the parked-debt
+  ledger (v0.7.6).
+
+Docs-only — no code change.
 
 ## [v0.8.0] — 2026-06-23 · GitHub Issues tracker backend
 
