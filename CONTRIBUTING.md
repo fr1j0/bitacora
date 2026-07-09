@@ -1,6 +1,6 @@
 # Contributing to Bitácora
 
-Thanks for your interest! Bitácora is in **alpha** and we're keeping the contribution flow
+Thanks for your interest! Bitácora is in **beta** and we're keeping the contribution flow
 deliberately simple: **every change starts as an issue.**
 
 ## The flow

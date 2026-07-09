@@ -37,7 +37,7 @@ If an issue proposes any of the above, it's a polite close.
 
 ## SLA
 
-Aspirational only: best-effort response within ~1 week. We're an alpha project run by
+Aspirational only: best-effort response within ~1 week. We're a beta project run by
 volunteers.
 
 ## Label ownership

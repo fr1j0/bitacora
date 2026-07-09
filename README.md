@@ -6,9 +6,9 @@
 
 **Every bit of context, logged.**
 
-*Structured session handoffs, logged to Jira — so context survives context clears, sessions, and teammates.*
+*Structured session handoffs, logged to your issue tracker — Jira or GitHub Issues — so context survives context clears, sessions, and teammates.*
 
-[![Status](https://img.shields.io/badge/status-alpha-orange?style=for-the-badge)](#)
+[![Status](https://img.shields.io/badge/status-beta-yellow?style=for-the-badge)](#)
 [![Release](https://img.shields.io/github/v/release/fr1j0/bitacora?style=for-the-badge&label=release)](https://github.com/fr1j0/bitacora/releases/latest)
 [![Tests](https://img.shields.io/github/actions/workflow/status/fr1j0/bitacora/test.yml?style=for-the-badge&label=tests)](https://github.com/fr1j0/bitacora/actions/workflows/test.yml)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-D97757?style=for-the-badge&logo=claude&logoColor=white)](https://claude.com/claude-code)
@@ -22,23 +22,23 @@
 
 > **bit·ácora** — Spanish for "ship's logbook": the structured journal kept aboard a ship to record position, decisions, and observations across long voyages.
 
-Bitácora is a Claude Code plugin that turns Jira into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. Phase 1 ships the full read/write loop: `handoff`, `resume`, `status` (single-ticket) and `digest` (epic rollup + multi-ticket reads), a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
+Bitácora is a Claude Code plugin that turns your issue tracker — Jira or GitHub Issues, selected per-repo — into a shared external memory layer for engineering teams — capturing structured handoffs across sessions and rehydrating them on resume, so context survives context clears. It ships the full read/write loop: `handoff`, `resume`, `status` (single-ticket) and `digest` (epic rollup + multi-ticket reads), a morning `next` picker, an `improve` rewriter for vague tickets, `help`, an opt-in statusLine context meter, and the `[CTX]` comment-format discipline.
 
-> [!WARNING]
-> **Alpha — in active development.** The API may change. Use at your own risk; pin to a commit you've audited.
+> [!NOTE]
+> **Beta (`0.x`) — the core loop is complete; the command surface is still settling.** Commands or flags can change between minor releases. Pin to a tagged release you've audited if you need stability.
 
 ---
 
 ## At a glance
 
-- **What** — a Claude Code plugin that uses Jira as a *shared, structured memory layer* across sessions and teammates.
+- **What** — a Claude Code plugin that uses your issue tracker (Jira or GitHub Issues) as a *shared, structured memory layer* across sessions and teammates.
 - **How** — a strict `[CTX]` comment format plus opinionated commands for handoff, resume, status, morning ticket picking, and corpus-grounded ticket sharpening.
-- **Today** — Phase 1 complete, plus **v0.8.0**: **pluggable tracker backends** — every read/write skill now targets **Jira or GitHub Issues** (selected per-repo; GitLab seam stubbed for a follow-up) — on top of `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`, or stacking a duplicate self-handoff), `resume`, `status` (single-ticket reads, now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), and **`digest`** (epic rollup + **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked` and a **done/planned/blocked `--standup`** lens, plus a **parked-debt ledger** in the aggregate; ticket keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
-- **Safety** — public source, no auto-update, no telemetry, and every Jira write is confirmation-gated.
+- **Today** — the core loop complete, plus **v0.8.0**: **pluggable tracker backends** — every read/write skill now targets **Jira or GitHub Issues** (selected per-repo; GitLab seam stubbed for a follow-up) — on top of `handoff` (with **collision detection** — warns before burying a teammate's recent `[CTX]`, or stacking a duplicate self-handoff), `resume`, `status` (single-ticket reads, now with a **staleness signal** — flag a `[CTX]` that's fallen behind the ticket's activity), and **`digest`** (epic rollup + **multi-ticket** scopes — `--mine`/`--sprint`/`--jql` with `--blocked` and a **done/planned/blocked `--standup`** lens, plus a **parked-debt ledger** in the aggregate; ticket keys linked when copied for Slack), `next`, `improve`, `help`, the `[CTX]` format, and an opt-in statusLine context meter.
+- **Safety** — public source, no auto-update, no telemetry, and every tracker write is confirmation-gated.
 
 ## Stability & compatibility
 
-Bitácora is **alpha (`0.x`)** — the command surface is still settling, and commands or flags can change between minor releases (e.g. v0.7.0 moved multi-ticket reads out of `/status` into `/digest`). Pin to a tagged release you've audited if you need stability.
+Bitácora is **beta (`0.x`)** — the core read/write loop is complete, but the command surface is still settling, and commands or flags can change between minor releases (e.g. v0.7.0 moved multi-ticket reads out of `/status` into `/digest`). Pin to a tagged release you've audited if you need stability.
 
 What we're deliberate about, by layer:
 
@@ -52,14 +52,14 @@ No telemetry, no auto-update — nothing on your machine changes unless you re-i
 
 Bitácora is a small plugin that builds on the Claude Code ecosystem:
 
-- **Atlassian Rovo MCP** — the Jira and Confluence primitives Bitácora reads and writes through *(required)*
+- **A tracker backend** — the **Atlassian Rovo MCP** for Jira-backed repos, or the **`gh` CLI** for GitHub Issues (a GitLab seam is stubbed for a follow-up). Selected per-repo: an explicit `tracker:` in `.bitacora.yml` wins, otherwise inferred from the git remote host. *(required — whichever matches your tracker)*
 - **Remember** (or a claude-mem-compatible plugin) — local session memory across context clears *(optional companion)*
 
-What Bitácora adds on top is the *Jira-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, picking work, and sharpening vague tickets — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
+What Bitácora adds on top is the *tracker-aware workflow layer*: opinionated commands for handing off, resuming, reporting status, picking work, and sharpening vague tickets — plus a comment-format discipline that lets agents read each other's structured updates across sessions and team members.
 
 ## What lives where — status vs. scratch
 
-Bitácora's job is **status** — the durable, ticket-level narrative a teammate would care about: where the work stands, the decisions behind it, and what's next. That belongs in Jira, on the ticket, in the open. That's what `[CTX]` comments are. `/bitacora:improve` extends the same principle to the ticket itself — sharpening a vague description or title is durable, shared, in-the-open work too, just on Jira fields instead of comments.
+Bitácora's job is **status** — the durable, ticket-level narrative a teammate would care about: where the work stands, the decisions behind it, and what's next. That belongs in the tracker, on the ticket, in the open. That's what `[CTX]` comments are. `/bitacora:improve` extends the same principle to the ticket itself — sharpening a vague description or title is durable, shared, in-the-open work too, just on ticket fields instead of comments.
 
 What Bitácora deliberately *doesn't* manage is the **high-frequency scratch** between sessions — the running breadcrumbs, the small "just did X" notes, the granular working state that turns over every few minutes. That data is local, personal, and churny, and it has its own tools:
 
@@ -67,7 +67,7 @@ What Bitácora deliberately *doesn't* manage is the **high-frequency scratch** b
 - **claude-mem** — a Remember-compatible alternative
 - Any **memory MCP server**, or Claude Code's built-in `CLAUDE.md` memory
 
-Two altitudes: Jira holds the milestones the team needs; your local memory tool holds the minute-to-minute scratch only you need. Bitácora owns the first and stays out of the second — which is why Remember is *optional*, not required.
+Two altitudes: the tracker holds the milestones the team needs; your local memory tool holds the minute-to-minute scratch only you need. Bitácora owns the first and stays out of the second — which is why Remember is *optional*, not required.
 
 ## Commands
 
@@ -77,19 +77,19 @@ The flagship command — wrap up a session cleanly:
 /bitacora:handoff
 ```
 
-Writes a structured `[CTX]` comment to each touched Jira ticket, plus a local handoff for next-session continuity.
+Writes a structured `[CTX]` comment to each touched ticket, plus a local handoff for next-session continuity.
 
-All commands below are **Phase 1 — shipped.**
+All commands below are **shipped**, and every one of them works against **Jira or GitHub Issues** (see [What it does](#what-it-does) for backend selection).
 
 | Command | What it does |
 |---------|--------------|
-| `/bitacora:handoff` | Wrap up a session cleanly. Writes a structured `[CTX]` comment to each touched Jira ticket plus a local handoff for next-session continuity. |
+| `/bitacora:handoff` | Wrap up a session cleanly. Writes a structured `[CTX]` comment to each touched ticket plus a local handoff for next-session continuity. |
 | `/bitacora:help` | Print the Bitácora command reference. |
-| `/bitacora:resume` | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from Jira (not just local Remember). |
+| `/bitacora:resume` | Rehydrate a fresh session from a ticket's latest `[CTX]` — pull its `Status` / `Decisions` / `Next` back into context after a `/clear`, closing the handoff loop from the tracker (not just local Remember). |
 | `/bitacora:status` | Synthesize ONE ticket's latest `[CTX]` into an audience-tailored summary (`--for-self`/`-eng`/`-ops`/`-pm`/`-exec`). Epics render as a single node (their own `[CTX]`, not a rollup). Read-only: prints and offers a clipboard copy. |
-| `/bitacora:digest` | Aggregate `[CTX]` read — roll up an epic across its children, or read a multi-ticket scope (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest or a query lens — `--blocked` (what's stuck) or `--standup` (what moved). Read-only: prints and offers a clipboard copy. |
+| `/bitacora:digest` | Aggregate `[CTX]` read — roll up an epic across its children, or read a multi-ticket scope (`--mine`, `--sprint`, `--jql`, or 2+ keys) for a cross-ticket digest (with a parked-debt ledger) or a query lens — `--blocked` (what's stuck) or `--standup` (done / planned / blocked). Read-only: prints and offers a clipboard copy. |
 | `/bitacora:next` | Morning ticket picker. Reads the tickets assigned to you, categorizes by pickup cost (Continue / Ready / Quick wins + a Needs-attention tail), annotates each with a `[CTX]`-grounded reason-to-pick, recommends one, and chains into `/bitacora:resume <KEY>`. Read-only. |
-| `/bitacora:improve` | Sharpen a ticket — corpus-grounded structured rewrite (Story / Bug / Epic / Subtask aware) with a snapshot to an `[ARCHIVE]` Jira comment before any field edit. Read + write; description by default, title opt-in per invocation. |
+| `/bitacora:improve` | Sharpen a ticket — corpus-grounded structured rewrite (Story / Bug / Epic / Subtask aware) with a snapshot to an `[ARCHIVE]` comment before any field edit. Read + write; description by default, title opt-in per invocation. |
 
 > Shipped commands also have a shorter, opt-in `/bit:` alias (e.g. `/bit:handoff`, `/bit:help`) — see the [plugin README](plugins/bitacora/README.md).
 
@@ -97,7 +97,7 @@ All commands below are **Phase 1 — shipped.**
 
 ## Why this exists
 
-The short version: long Claude Code sessions degrade. The context window fills up, attention spreads, decisions drift. The honest move is to clear and resume — but resuming cleanly requires a structured handoff somewhere. And if you do that handoff in Jira (where work already lives), in a format other agents can read, you get something better than personal memory: a shared external memory layer for the whole team.
+The short version: long Claude Code sessions degrade. The context window fills up, attention spreads, decisions drift. The honest move is to clear and resume — but resuming cleanly requires a structured handoff somewhere. And if you do that handoff in the tracker (where work already lives), in a format other agents can read, you get something better than personal memory: a shared external memory layer for the whole team.
 
 The longer version: a tool you trust with your workflow should be one you can fully inspect and control. Bitácora is built on that principle — public source, no auto-update, no telemetry, just plain files in directories you can grep. You always know exactly what it does, and nothing changes unless you change it.
 
@@ -110,16 +110,18 @@ Bitácora is intentionally small. It composes with existing tools rather than re
                           │
                           │  layers on top of
                           ▼
-  ┌────────────────────────┬────────────────────────┐
-  │   Atlassian Rovo MCP   │      Claude Code       │
-  │   (Jira read/write)    │         (host)         │
-  └────────────────────────┴────────────────────────┘
+  ┌───────────────────────────────┬─────────────────────┐
+  │      tracker backend          │     Claude Code     │
+  │  · Atlassian Rovo MCP (Jira)  │       (host)        │
+  │  · gh CLI (GitHub Issues)     │                     │
+  │  · glab CLI (GitLab — soon)   │                     │
+  └───────────────────────────────┴─────────────────────┘
 
   Optional companion · local scratch layer:
       Remember / claude-mem / memory MCP — the between-sessions notes
 ```
 
-At minimum you need the **Atlassian Rovo MCP** (so Bitácora can read and write Jira) and **Claude Code** itself. **Remember** is optional but recommended — it's where the high-frequency scratch lives, separate from the ticket-level status Bitácora owns (see [What lives where](#what-lives-where--status-vs-scratch)).
+At minimum you need **one tracker backend** — the **Atlassian Rovo MCP** for Jira, or the **`gh` CLI** for GitHub Issues — and **Claude Code** itself. **Remember** is optional but recommended — it's where the high-frequency scratch lives, separate from the ticket-level status Bitácora owns (see [What lives where](#what-lives-where--status-vs-scratch)).
 
 ## Installation
 
@@ -162,7 +164,10 @@ The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional
 **Prerequisites**
 
 - `git`, `jq`, and `bash` 3.2+ on `PATH`. `jq` is required by the handoff guardrail hook; without it the guard fails open with a one-line stderr note rather than silently disabling.
-- Atlassian Rovo MCP configured with read/write access to your team's Jira instance *(optional — handoff runs local-only without it, drafting comments to screen instead of writing them)*.
+- A tracker backend matching where your tickets live — selected per-repo via `tracker:` in `.bitacora.yml`, or inferred from the git remote host (see the [plugin README](plugins/bitacora/README.md)):
+  - **Jira** — the Atlassian Rovo MCP configured with read/write access to your team's Jira instance.
+  - **GitHub Issues** — the `gh` CLI installed and authenticated.
+  - *(Without any backend, handoff runs local-only — drafting comments to screen instead of writing them.)*
 - The [Remember](https://github.com/anthropics/claude-code/tree/main/plugins/remember) plugin or another local memory tool *(optional — for the between-sessions scratch Bitácora delegates rather than manages)*.
 
 **Pinning to a specific revision.** The marketplace points at `main`. To pin to an audited revision, check out a tagged release — the latest is [`v0.8.0`](https://github.com/fr1j0/bitacora/releases/tag/v0.8.0) — or fork the repo and `marketplace add <your-fork>`, or `git clone` and install as a `directory` source (see Claude Code's plugin docs).
@@ -171,7 +176,7 @@ The two opt-in surfaces — the [statusLine](plugins/bitacora/README.md#optional
 
 ## The `[CTX]` comment format
 
-Bitácora writes Jira comments in a strict structured format so other agents (and humans) can parse them reliably:
+Bitácora writes ticket comments in a strict structured format — the same tracker-agnostic format on Jira and GitHub — so other agents (and humans) can parse them reliably:
 
 ```
 [CTX] Status update
@@ -205,20 +210,20 @@ This creates a virtuous loop: the more team members adopt the format, the more u
 - **No auto-update.** Plugin updates happen only when you explicitly run `/plugin install` again. No version you didn't choose will land on your machine.
 - **No telemetry.** Bitácora does not phone home. No analytics, no usage tracking, no third-party reporting.
 - **Pin to a commit if you want.** Fork and lock to a specific revision for full reproducibility.
-- **Confirm before writing.** Bitácora never writes to Jira without showing you the draft first. There is no "trust mode" that bypasses this.
+- **Confirm before writing.** Bitácora never writes to your tracker without showing you the draft first. There is no "trust mode" that bypasses this.
 
 ## What Bitácora is not
 
 - *Not a memory system.* That's Remember (or claude-mem).
-- *Not a Jira client.* That's the Atlassian MCP.
+- *Not a tracker client.* That's the Atlassian MCP (Jira) or the `gh` CLI (GitHub).
 - *Not a context compressor.* It doesn't shrink your live context window — it helps you hand off cleanly and resume, so you can afford to `/clear`.
-- *Not a replacement for your judgment.* Every Jira write is confirmation-gated; you decide what goes up.
+- *Not a replacement for your judgment.* Every tracker write is confirmation-gated; you decide what goes up.
 
 Bitácora is the *glue* — the opinionated workflow layer that ties these tools into a coherent, team-aware ticket lifecycle.
 
 ## Contributing
 
-Alpha, single-maintainer. Issues and design discussion are welcome — every change starts as a GitHub issue; see [CONTRIBUTING.md](CONTRIBUTING.md) for the issue-first flow and maintainer guardrails. To use Bitácora during alpha, fork and pin to a commit you've audited.
+Beta, single-maintainer. Issues and design discussion are welcome — every change starts as a GitHub issue; see [CONTRIBUTING.md](CONTRIBUTING.md) for the issue-first flow and maintainer guardrails. If you need full reproducibility, fork and pin to a commit you've audited.
 
 ## License
 
